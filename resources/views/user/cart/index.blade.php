@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            🛒 Keranjang Belanja ({{ count($carts) }} item)
+            Keranjang Belanja ({{ count($carts) }} item)
         </h2>
     </x-slot>
 
@@ -433,13 +433,13 @@
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 
             @if(session('success'))
-                <div class="alert-success">✅ {{ session('success') }}</div>
+                <div class="alert-success"> {{ session('success') }}</div>
             @endif
             @if(session('error'))
-                <div class="alert-error">❌ {{ session('error') }}</div>
+                <div class="alert-error"> {{ session('error') }}</div>
             @endif
             @if(session('info'))
-                <div class="alert-info">ℹ️ {{ session('info') }}</div>
+                <div class="alert-info"> {{ session('info') }}</div>
             @endif
 
             @if(count($carts) > 0)
@@ -449,20 +449,20 @@
                             <!-- Vehicle Info -->
                             <div class="vehicle-info">
                                 <div class="name">
-                                    <span class="icon">{{ $cart->vehicle->vehicle_type == 'car' ? '🚗' : '🏍️' }}</span>
+                                     <span class="icon">{{ $cart->vehicle->vehicle_type == 'car' ? 'Car' : 'Motorcycle' }}</span>
                                     {{ $cart->vehicle->name }}
                                 </div>
                                 <div class="detail">
-                                    📍 {{ $cart->vehicle->location }} &nbsp;•&nbsp; 💰 Rp {{ number_format($cart->vehicle->price_per_day, 0, ',', '.') }} / hari
+                                     {{ $cart->vehicle->location }} &nbsp;•&nbsp; Rp {{ number_format($cart->vehicle->price_per_day, 0, ',', '.') }} / hari
                                 </div>
                                 <div class="subtotal">
                                     Subtotal: Rp {{ number_format($cart->subtotal, 0, ',', '.') }}
                                 </div>
                                 <div class="stock-status {{ $cart->is_stock_available ? 'available' : 'unavailable' }}">
                                     @if($cart->is_stock_available)
-                                        ✅ Stok tersedia ({{ $cart->available_stock }} unit)
+                                         Stok tersedia ({{ $cart->available_stock }} unit)
                                     @else
-                                        ⚠️ STOK TIDAK TERSEDIA! (Stok: {{ $cart->available_stock }} tersisa)
+                                         STOK TIDAK TERSEDIA! (Stok: {{ $cart->available_stock }} tersisa)
                                     @endif
                                 </div>
                             </div>
@@ -473,7 +473,7 @@
                                 @method('PUT')
 
                                 <div class="control-group">
-                                    <label>📅 Periode</label>
+                                     <label>Periode</label>
                                     <select name="period" onchange="toggleDays(this)">
                                         <option value="daily" {{ $cart->period == 'daily' ? 'selected' : '' }}>Per Hari</option>
                                         <option value="weekly" {{ $cart->period == 'weekly' ? 'selected' : '' }}>Per Minggu</option>
@@ -481,23 +481,23 @@
                                 </div>
 
                                 <div class="control-group">
-                                    <label>📆 Hari</label>
+                                     <label>Hari</label>
                                     <input type="number" name="quantity_days" id="quantity_days_{{ $cart->id }}" value="{{ $cart->quantity_days ?? 1 }}" min="1" max="7">
                                 </div>
 
                                 <div class="control-group">
-                                    <label>🚗 Unit</label>
+                                     <label>Unit</label>
                                     <input type="number" name="quantity_vehicle" value="{{ $cart->quantity_vehicle ?? 1 }}" min="1" max="{{ $cart->available_stock ?? 10 }}">
                                 </div>
 
-                                <button type="submit" class="btn-update">🔄 Update</button>
+                                <button type="submit" class="btn-update">Update</button>
                             </form>
 
                             <!-- Hapus -->
                             <form action="{{ route('user.cart.remove', $cart->id) }}" method="POST" onsubmit="return confirm('Hapus dari keranjang?')">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn-remove">🗑️ Hapus</button>
+                                <button type="submit" class="btn-remove">Hapus</button>
                             </form>
                         </div>
                     </div>
@@ -505,7 +505,7 @@
 
                 <!-- SUMMARY -->
                 <div class="summary-card">
-                    <h3 class="summary-title">📊 Ringkasan</h3>
+                     <h3 class="summary-title">Ringkasan</h3>
 
                     <div class="summary-row">
                         <span>Total Item:</span>
@@ -533,25 +533,25 @@
 
                     @if($hasStockIssue)
                         <div class="stock-warning">
-                            ⚠️ Ada item dengan stok tidak tersedia! Silahkan hapus atau kurangi item tersebut.
+                             Ada item dengan stok tidak tersedia! Silahkan hapus atau kurangi item tersebut.
                         </div>
                         <button disabled class="btn-checkout disabled">
-                            💳 Lanjut ke Pembayaran (Stock Issue)
+                             Lanjut ke Pembayaran (Stock Issue)
                         </button>
                     @else
                         <a href="{{ route('user.cart.checkout') }}" class="btn-checkout active">
-                            💳 Lanjut ke Pembayaran
+                             Lanjut ke Pembayaran
                         </a>
                     @endif
                 </div>
 
             @else
                 <div class="empty-state">
-                    <span class="icon">🛒</span>
+                    <span class="icon"></span>
                     <h3>Keranjang Kosong</h3>
                     <p>Belum ada kendaraan di keranjang</p>
                     <a href="{{ route('user.armada') }}" class="btn-armada">
-                        🚗 Lihat Armada
+                         Lihat Armada
                     </a>
                 </div>
             @endif

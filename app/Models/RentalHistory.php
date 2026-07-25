@@ -28,8 +28,8 @@ class RentalHistory extends Model
     ];
 
     protected $casts = [
-        'start_date' => 'date',
-        'end_date' => 'date',
+        'start_date' => 'datetime',
+        'end_date' => 'datetime',
         'returned_at' => 'datetime',
         'total_price' => 'decimal:2',
         'fine_amount' => 'decimal:2',

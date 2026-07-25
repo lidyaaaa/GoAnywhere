@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            🚗 Armada Kendaraan
+            Armada Kendaraan
         </h2>
     </x-slot>
 
@@ -814,7 +814,7 @@
             <div class="flex justify-between items-center mb-8 flex-wrap gap-4">
                 <div>
                     <h2 style="font-size: 32px; font-weight: 700; color: #2c3e50; font-family: 'Georgia', serif;">
-                        🚙 <span style="color: #43637E;">Armada</span> Kendaraan
+                         <span style="color: #43637E;">Armada</span> Kendaraan
                     </h2>
                     <p style="color: #7a8a9a; font-weight: 300;">Pilih kendaraan sesuai kebutuhan Anda</p>
                 </div>
@@ -826,7 +826,7 @@
                     <div class="filter-row">
                         <!-- Search -->
                         <div class="search-wrap">
-                            <span class="search-icon">🔍</span>
+                            <span class="search-icon"></span>
                             <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari produk...">
                         </div>
 
@@ -856,15 +856,15 @@
                     <!-- Filter Lanjutan -->
                     <div class="filter-advanced">
                         <div class="adv-item">
-                            <label>🚗 Tipe</label>
+                            <label>Tipe</label>
                             <select name="type">
                                 <option value="">Semua</option>
-                                <option value="car" {{ request('type') == 'car' ? 'selected' : '' }}>🚗 Mobil</option>
-                                <option value="motorcycle" {{ request('type') == 'motorcycle' ? 'selected' : '' }}>🏍️ Motor</option>
+                                    <option value="car" {{ request('type') == 'car' ? 'selected' : '' }}>Mobil</option>
+                                    <option value="motorcycle" {{ request('type') == 'motorcycle' ? 'selected' : '' }}>Motor</option>
                             </select>
                         </div>
                         <div class="adv-item">
-                            <label>📍 Lokasi</label>
+                            <label>Lokasi</label>
                             <select name="location">
                                 <option value="">Semua</option>
                                 @foreach($locations as $loc)
@@ -887,7 +887,7 @@
                             @if($vehicle->image)
                                 <img src="{{ asset('storage/' . $vehicle->image) }}" alt="{{ $vehicle->name }}">
                             @else
-                                <span class="placeholder-icon">{{ $vehicle->vehicle_type == 'car' ? '🚗' : '🏍️' }}</span>
+                                <span class="placeholder-icon">                                 {{ $vehicle->vehicle_type == 'car' ? 'Car' : 'Motorcycle' }}</span>
                             @endif
                             <span class="type-badge">{{ $vehicle->vehicle_type == 'car' ? 'Mobil' : 'Motor' }}</span>
                         </div>
@@ -907,19 +907,19 @@
                                 <small>/ hari</small>
                             </div>
                             <div class="info-row">
-                                <span class="location">📍 {{ $vehicle->location }}</span>
-                                <span class="stock">📦 {{ $vehicle->available_stock }} tersedia</span>
+                                <span class="location">{{ $vehicle->location }}</span>
+                                <span class="stock">{{ $vehicle->available_stock }} tersedia</span>
                             </div>
                             <div class="actions">
                                 <a href="{{ route('user.armada.detail', $vehicle->id) }}" class="btn-detail">
-                                    📋 Detail
+                                    Detail
                                 </a>
                                 <form action="{{ route('user.cart.add') }}" method="POST" style="margin:0; width:100%;">
                                     @csrf
                                     <input type="hidden" name="vehicle_id" value="{{ $vehicle->id }}">
                                     <input type="hidden" name="quantity" value="1">
                                     <button type="submit" class="btn-booking" style="width:100%;">
-                                        📝 Booking
+                                        Booking
                                     </button>
                                 </form>
                             </div>
@@ -927,7 +927,7 @@
                     </div>
                 @empty
                     <div class="empty-state">
-                        <span class="icon">🔍</span>
+                        <span class="icon"></span>
                         <h3>Tidak ada kendaraan</h3>
                         <p>Coba ubah filter atau cari dengan kata kunci lain</p>
                     </div>

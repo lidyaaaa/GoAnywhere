@@ -90,7 +90,6 @@ Route::middleware(['auth', 'verified', 'role:superadmin'])->prefix('superadmin')
     Route::get('/dashboard', [SuperAdminDashboardController::class, 'index'])->name('dashboard');
     
     Route::get('/users', [SuperAdminUserController::class, 'index'])->name('users');
-    Route::delete('/users/{id}', [SuperAdminUserController::class, 'destroy'])->name('users.destroy');
     
     Route::get('/managers', [SuperAdminManagerController::class, 'index'])->name('managers');
     Route::post('/managers', [SuperAdminManagerController::class, 'store'])->name('managers.store');
@@ -98,7 +97,6 @@ Route::middleware(['auth', 'verified', 'role:superadmin'])->prefix('superadmin')
     Route::delete('/managers/{id}', [SuperAdminManagerController::class, 'destroy'])->name('managers.destroy');
     
     Route::get('/vehicles', [SuperAdminVehicleController::class, 'index'])->name('vehicles');
-    Route::post('/vehicles', [SuperAdminVehicleController::class, 'store'])->name('vehicles.store');
     Route::delete('/vehicles/{id}', [SuperAdminVehicleController::class, 'destroy'])->name('vehicles.destroy');
     
     Route::get('/rentals', [SuperAdminRentalController::class, 'index'])->name('rentals');

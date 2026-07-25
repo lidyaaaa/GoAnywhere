@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            ✅ Kembalikan Kendaraan
+            Kembalikan Kendaraan
         </h2>
     </x-slot>
 
@@ -398,24 +398,24 @@
                 <div class="body">
                     <!-- Vehicle Info -->
                     <h3 class="vehicle-name">{{ $cart->vehicle->name }}</h3>
-                    <p class="vehicle-location">📍 {{ $cart->vehicle->location }}</p>
+                    <p class="vehicle-location">                     {{ $cart->vehicle->location }}</p>
 
                     <!-- Info Detail Grid -->
                     <div class="info-grid">
                         <div class="info-item">
-                            <div class="label">📅 Tanggal Sewa</div>
+                             <div class="label">Tanggal Sewa</div>
                             <div class="value">{{ \Carbon\Carbon::parse($cart->rental_start_date)->format('d M Y') }}</div>
                         </div>
                         <div class="info-item">
-                            <div class="label">⏰ Wajib Kembali</div>
+                             <div class="label">Wajib Kembali</div>
                             <div class="value"><span class="highlight">{{ \Carbon\Carbon::parse($cart->rental_end_date)->format('d M Y H:i') }}</span></div>
                         </div>
                         <div class="info-item">
-                            <div class="label">⏰ Toleransi</div>
+                             <div class="label">Batas Akhir Pengembalian</div>
                             <div class="value">{{ \Carbon\Carbon::parse($cart->rental_end_date)->addMinutes(30)->format('d M Y H:i') }}</div>
                         </div>
                         <div class="info-item">
-                            <div class="label">🕐 Waktu Kembali</div>
+                             <div class="label">Waktu Kembali</div>
                             <div class="value"><span class="highlight">{{ now()->format('d M Y H:i') }}</span></div>
                         </div>
                     </div>
@@ -424,20 +424,20 @@
                     <div class="status-box {{ $isLate ? 'late' : 'on-time' }}">
                         @if(!$isLate)
                             <div>
-                                <span class="status-icon">✅</span>
+                                 <span class="status-icon"></span>
                                 <span class="status-title">TEPAT WAKTU!</span>
-                                <div class="status-desc">Tidak ada denda. Terima kasih sudah mengembalikan tepat waktu! 🙏</div>
+                                 <div class="status-desc">Tidak ada denda. Terima kasih sudah mengembalikan tepat waktu!</div>
                             </div>
                         @else
                             <div>
-                                <span class="status-icon">❌</span>
+                                 <span class="status-icon"></span>
                                 <span class="status-title">TERLAMBAT!</span>
                                 <div class="status-desc">
                                     Telat: <strong>{{ floor($lateMinutes / 60) }} jam {{ $lateMinutes % 60 }} menit</strong>
                                 </div>
-                                <span class="fine-amount late">
-                                    💰 Denda: Rp {{ number_format($fineAmount, 0, ',', '.') }}
-                                </span>
+                                 <span class="fine-amount late">
+                                     Denda: Rp {{ number_format($fineAmount, 0, ',', '.') }}
+                                 </span>
                             </div>
                         @endif
                     </div>
@@ -446,7 +446,7 @@
                     <form action="{{ route('user.rental.processReturn', $cart->id) }}" method="POST">
                         @csrf
                         <button type="submit" class="btn-confirm">
-                            ✅ Konfirmasi Pengembalian
+                             Konfirmasi Pengembalian
                         </button>
                     </form>
 

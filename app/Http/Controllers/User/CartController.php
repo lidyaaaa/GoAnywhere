@@ -82,7 +82,7 @@ class CartController extends Controller
             'period' => 'daily',
             'subtotal' => $vehicle->price_per_day,
             'rental_start_date' => now()->addDay(),
-            'rental_end_date' => now()->addDays(1),
+            'rental_end_date' => now()->addDays(2),
             'status' => 'pending',
             'booking_code' => $tempBookingCode,
             'pickup_location' => 'SMKN 21 Jakarta',
@@ -132,7 +132,7 @@ class CartController extends Controller
         $cart->quantity_vehicle = $quantityVehicle;
         $cart->quantity = $totalDays * $quantityVehicle;
         $cart->subtotal = $vehicle->price_per_day * $totalDays * $quantityVehicle;
-        $cart->rental_end_date = now()->addDays($totalDays);
+        $cart->rental_end_date = \Carbon\Carbon::parse($cart->rental_start_date)->addDays($totalDays);
         $cart->save();
 
         return redirect()->route('user.cart')->with('success', 'Keranjang berhasil diupdate!');
@@ -188,7 +188,6 @@ class CartController extends Controller
     {
         $request->validate([
             'payment_method' => 'required|in:qris,bank_transfer,gopay,dana,ovo',
-            'nominal' => 'required|numeric|min:1',
         ]);
 
         $carts = Cart::where('user_id', auth()->id())
@@ -200,11 +199,6 @@ class CartController extends Controller
         }
 
         $total = $carts->sum('subtotal');
-
-        // Validasi nominal
-        if ((int) $request->nominal != $total) {
-            return back()->with('error', 'Nominal pembayaran tidak sesuai! Total: Rp ' . number_format($total, 0, ',', '.'));
-        }
 
         // Cek stok
         foreach ($carts as $cart) {
@@ -257,7 +251,7 @@ class CartController extends Controller
             DB::commit();
 
             return redirect()->route('user.payment.success', ['booking_code' => $bookingCode])
-                ->with('success', 'Pembayaran berhasil! Ambil kendaraan dalam 30 menit!');
+                ->with('success', 'Pembayaran berhasil! Silakan menunggu konfirmasi pengiriman.');
 
         } catch (\Exception $e) {
             DB::rollBack();

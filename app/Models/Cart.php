@@ -34,8 +34,8 @@ class Cart extends Model
     ];
 
     protected $casts = [
-        'rental_start_date' => 'date',
-        'rental_end_date' => 'date',
+        'rental_start_date' => 'datetime',
+        'rental_end_date' => 'datetime',
         'returned_at' => 'datetime',
         'payment_deadline' => 'datetime',
         'subtotal' => 'decimal:2',

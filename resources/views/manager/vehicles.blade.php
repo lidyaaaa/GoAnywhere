@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            📋 Kelola Armada - {{ Auth::user()->location }}
+            Kelola Armada - {{ Auth::user()->location }}
         </h2>
     </x-slot>
 
@@ -487,16 +487,16 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
             @if(session('success'))
-                <div class="alert-success">✅ {{ session('success') }}</div>
+                <div class="alert-success"> {{ session('success') }}</div>
             @endif
             @if(session('error'))
-                <div class="alert-error">❌ {{ session('error') }}</div>
+                <div class="alert-error"> {{ session('error') }}</div>
             @endif
 
             <div class="header-actions">
                 <h3 class="title">Daftar Kendaraan</h3>
                 <a href="{{ route('manager.vehicles.create') }}" class="btn-add">
-                    ➕ Tambah Kendaraan
+                     Tambah Kendaraan
                 </a>
             </div>
 
@@ -509,10 +509,10 @@
                                 @if($vehicle->image)
                                     <img src="{{ asset('storage/' . $vehicle->image) }}" alt="{{ $vehicle->name }}">
                                 @else
-                                    <span class="placeholder">{{ $vehicle->vehicle_type == 'car' ? '🚗' : '🏍️' }}</span>
+                                    <span class="placeholder">                                 {{ $vehicle->vehicle_type == 'car' ? 'Car' : 'Motorcycle' }}</span>
                                 @endif
                                 <span class="stock-badge {{ $vehicle->available_stock > 0 ? 'available' : 'empty' }}">
-                                    {{ $vehicle->available_stock > 0 ? '✅ Tersedia' : '❌ Habis' }}
+                                     {{ $vehicle->available_stock > 0 ? 'Tersedia' : 'Habis' }}
                                 </span>
                             </div>
 
@@ -525,21 +525,21 @@
                                 </div>
 
                                 <div class="stock-info">
-                                    <span>📦 Stok: <strong>{{ $vehicle->available_stock }}</strong>/{{ $vehicle->total_stock }}</span>
+                                    <span>                                     Stok: <strong>{{ $vehicle->available_stock }}</strong>/{{ $vehicle->total_stock }}</span>
                                     <span class="status-text {{ $vehicle->available_stock > 0 ? 'available' : 'empty' }}">
-                                        {{ $vehicle->available_stock > 0 ? '🟢 Tersedia' : '🔴 Habis' }}
+                                         {{ $vehicle->available_stock > 0 ? 'Tersedia' : 'Habis' }}
                                     </span>
                                 </div>
 
                                 <div class="actions">
                                     <a href="{{ route('manager.vehicles.edit', $vehicle->id) }}" class="btn-edit">
-                                        ✏️ Edit
+                                         Edit
                                     </a>
                                     <form action="{{ route('manager.vehicles.destroy', $vehicle->id) }}" method="POST" style="margin:0; width:100%;">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn-delete" onclick="return confirm('Hapus kendaraan {{ $vehicle->name }}?')">
-                                            🗑️ Hapus
+                                             Hapus
                                         </button>
                                     </form>
                                 </div>
@@ -547,7 +547,7 @@
                                 <form action="{{ route('manager.vehicles.addStock', $vehicle->id) }}" method="POST" class="add-stock-form">
                                     @csrf
                                     <input type="number" name="stock" min="1" placeholder="Tambah" required>
-                                    <button type="submit" class="btn-stock">➕ Stok</button>
+                                    <button type="submit" class="btn-stock">                            Stok</button>
                                 </form>
                             </div>
                         </div>
@@ -608,11 +608,11 @@
 
             @else
                 <div class="empty-state">
-                    <span class="icon">📭</span>
+                        <span class="icon"></span>
                     <h3>Belum Ada Kendaraan</h3>
                     <p>Belum ada kendaraan di lokasi {{ Auth::user()->location }}</p>
                     <a href="{{ route('manager.vehicles.create') }}" class="btn-add-first">
-                        ➕ Tambah Kendaraan Pertama
+                        Tambah Kendaraan Pertama
                     </a>
                 </div>
             @endif

@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            📋 Transaksi - {{ Auth::user()->location }}
+            Transaksi - {{ Auth::user()->location }}
         </h2>
     </x-slot>
 
@@ -255,7 +255,7 @@
 
             <!-- ===== SEWA AKTIF ===== -->
             <div class="section-card">
-                <h3 class="section-title"><span class="icon">🚗</span> Sewa Aktif</h3>
+                    <h3 class="section-title"><span class="icon"></span> Sewa Aktif</h3>
 
                 @if(count($rentals) > 0)
                     <div class="table-wrap">
@@ -297,7 +297,7 @@
                     </div>
                 @else
                     <div class="empty-state">
-                        <span class="icon">🚗</span>
+                        <span class="icon"></span>
                         <p>Tidak ada sewa aktif</p>
                     </div>
                 @endif
@@ -305,7 +305,7 @@
 
             <!-- ===== RIWAYAT TRANSAKSI ===== -->
             <div class="section-card">
-                <h3 class="section-title"><span class="icon">📜</span> Riwayat Transaksi</h3>
+                    <h3 class="section-title"><span class="icon"></span> Riwayat Transaksi</h3>
 
                 @if(count($history) > 0)
                     <div class="table-wrap">
@@ -330,9 +330,9 @@
                                         <td style="font-weight: 600; color: #43637E;">Rp {{ number_format($item->subtotal ?? 0, 0, ',', '.') }}</td>
                                         <td>
                                             @if($item->status == 'completed' || $item->status == 'paid')
-                                                <span class="status-badge completed">✅ Selesai</span>
+                                                <span class="status-badge completed">Selesai</span>
                                             @else
-                                                <span class="status-badge active">🔄 {{ ucfirst($item->status ?? 'N/A') }}</span>
+                                                <span class="status-badge active">{{ ucfirst($item->status ?? 'N/A') }}</span>
                                             @endif
                                         </td>
                                     </tr>
@@ -352,7 +352,7 @@
 
                 @else
                     <div class="empty-state">
-                        <span class="icon">📭</span>
+                        <span class="icon"></span>
                         <p>Belum ada transaksi</p>
                     </div>
                 @endif

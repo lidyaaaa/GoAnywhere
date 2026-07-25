@@ -6,54 +6,54 @@
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('user.home') }}" class="brand-link">
-                        <span class="brand-text">🚗 <span class="highlight">GoAnywhere</span></span>
+                        <span class="brand-text"><span class="highlight">GoAnywhere</span></span>
                     </a>
                 </div>
 
                 <!-- Navigation Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                <div class="hidden space-x-2 sm:-my-px sm:ms-10 sm:flex items-center">
                     @auth
                         @if(Auth::user()->role == 'user')
                             <x-nav-link :href="route('user.home')" :active="request()->routeIs('user.home')" class="nav-link">
-                                🏠 Home
+                                Home
                             </x-nav-link>
                             <x-nav-link :href="route('user.layanan')" :active="request()->routeIs('user.layanan')" class="nav-link">
-                                📋 Layanan
+                                Layanan
                             </x-nav-link>
                             <x-nav-link :href="route('user.armada')" :active="request()->routeIs('user.armada*')" class="nav-link">
-                                🚗 Armada
+                        Armada
                             </x-nav-link>
                             <x-nav-link :href="route('user.rental')" :active="request()->routeIs('user.rental')" class="nav-link">
-                                📋 Sewa Saya
+                                Sewa Saya
                             </x-nav-link>
                             <x-nav-link :href="route('user.profile')" :active="request()->routeIs('user.profile')" class="nav-link">
-                                📍 Profile
+                                Profile
                             </x-nav-link>
                         @elseif(Auth::user()->role == 'manager')
                             <x-nav-link :href="route('manager.dashboard')" :active="request()->routeIs('manager.dashboard')" class="nav-link">
-                                📊 Dashboard
+                                Dashboard
                             </x-nav-link>
                             <x-nav-link :href="route('manager.vehicles')" :active="request()->routeIs('manager.vehicles*')" class="nav-link">
-                                🚗 Kelola Armada
+                                Kelola Armada
                             </x-nav-link>
                             <x-nav-link :href="route('manager.rentals')" :active="request()->routeIs('manager.rentals')" class="nav-link">
-                                📋 Transaksi
+                        Transaksi
                             </x-nav-link>
                         @elseif(Auth::user()->role == 'superadmin')
                             <x-nav-link :href="route('superadmin.dashboard')" :active="request()->routeIs('superadmin.dashboard')" class="nav-link">
-                                👑 Dashboard
+                                Dashboard
                             </x-nav-link>
                             <x-nav-link :href="route('superadmin.users')" :active="request()->routeIs('superadmin.users')" class="nav-link">
-                                👤 User
+                                User
                             </x-nav-link>
                             <x-nav-link :href="route('superadmin.managers')" :active="request()->routeIs('superadmin.managers')" class="nav-link">
-                                👨‍💼 Manager
+                                Manager
                             </x-nav-link>
                             <x-nav-link :href="route('superadmin.vehicles')" :active="request()->routeIs('superadmin.vehicles')" class="nav-link">
-                                🚗 Armada
+                        Armada
                             </x-nav-link>
                             <x-nav-link :href="route('superadmin.rentals')" :active="request()->routeIs('superadmin.rentals')" class="nav-link">
-                                📋 Transaksi
+                        Transaksi
                             </x-nav-link>
                         @endif
                     @endauth
@@ -66,7 +66,6 @@
                 @auth
                     @if(Auth::user()->role == 'user')
                         <a href="{{ route('user.cart') }}" class="cart-btn" title="Keranjang">
-                            🛒
                             @php
                                 $cartCount = \App\Models\Cart::where('user_id', auth()->id())
                                     ->where('status', 'pending')
@@ -93,10 +92,10 @@
                     <x-slot name="content">
                         @if(Auth::user()->role == 'user')
                             <x-dropdown-link :href="route('user.cart')" class="dropdown-link">
-                                🛒 Cart
+                                Cart
                             </x-dropdown-link>
                             <x-dropdown-link :href="route('user.profile.user')" class="dropdown-link">
-                                👤 Profile User
+                                Profile User
                             </x-dropdown-link>
                             <div class="dropdown-divider"></div>
                         @endif
@@ -105,7 +104,7 @@
                             @csrf
                             <x-dropdown-link :href="route('logout')" class="dropdown-link logout"
                                     onclick="event.preventDefault(); this.closest('form').submit();">
-                                🚪 Log Out
+                        Log Out
                             </x-dropdown-link>
                         </form>
                     </x-slot>
@@ -130,45 +129,45 @@
             @auth
                 @if(Auth::user()->role == 'user')
                     <x-responsive-nav-link :href="route('user.home')" :active="request()->routeIs('user.home')" class="responsive-link">
-                        🏠 Home
+                        Home
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('user.layanan')" :active="request()->routeIs('user.layanan')" class="responsive-link">
-                        📋 Layanan
+                        Layanan
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('user.armada')" :active="request()->routeIs('user.armada*')" class="responsive-link">
-                        🚗 Armada
+                        Armada
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('user.rental')" :active="request()->routeIs('user.rental')" class="responsive-link">
-                        📋 Sewa Saya
+                        Sewa Saya
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('user.profile')" :active="request()->routeIs('user.profile')" class="responsive-link">
-                        📍 Profile
+                        Profile
                     </x-responsive-nav-link>
                 @elseif(Auth::user()->role == 'manager')
                     <x-responsive-nav-link :href="route('manager.dashboard')" :active="request()->routeIs('manager.dashboard')" class="responsive-link">
-                        📊 Dashboard
+                        Dashboard
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('manager.vehicles')" :active="request()->routeIs('manager.vehicles*')" class="responsive-link">
-                        🚗 Kelola Armada
+                        Kelola Armada
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('manager.rentals')" :active="request()->routeIs('manager.rentals')" class="responsive-link">
-                        📋 Transaksi
+                        Transaksi
                     </x-responsive-nav-link>
                 @elseif(Auth::user()->role == 'superadmin')
                     <x-responsive-nav-link :href="route('superadmin.dashboard')" :active="request()->routeIs('superadmin.dashboard')" class="responsive-link">
-                        👑 Dashboard
+                        Dashboard
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('superadmin.users')" :active="request()->routeIs('superadmin.users')" class="responsive-link">
-                        👤 User
+                        User
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('superadmin.managers')" :active="request()->routeIs('superadmin.managers')" class="responsive-link">
-                        👨‍💼 Manager
+                        Manager
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('superadmin.vehicles')" :active="request()->routeIs('superadmin.vehicles')" class="responsive-link">
-                        🚗 Armada
+                        Armada
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('superadmin.rentals')" :active="request()->routeIs('superadmin.rentals')" class="responsive-link">
-                        📋 Transaksi
+                        Transaksi
                     </x-responsive-nav-link>
                 @endif
             @endauth
@@ -184,10 +183,10 @@
             <div class="mt-3 space-y-1">
                 @if(Auth::user()->role == 'user')
                     <x-responsive-nav-link :href="route('user.cart')" class="responsive-link">
-                        🛒 Cart
+                        Cart
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('user.profile.user')" class="responsive-link">
-                        👤 Profile User
+                        Profile User
                     </x-responsive-nav-link>
                 @endif
 
@@ -195,7 +194,7 @@
                     @csrf
                     <x-responsive-nav-link :href="route('logout')" class="responsive-link logout"
                             onclick="event.preventDefault(); this.closest('form').submit();">
-                        🚪 Log Out
+                        Log Out
                     </x-responsive-nav-link>
                 </form>
             </div>
@@ -248,10 +247,11 @@
 
     /* ===== NAV LINK ===== */
     .nav-link {
-        color: #5a6a7a;
+        color: #374151;
         font-weight: 600;
         font-size: 14px;
-        padding: 8px 4px;
+        padding: 6px 14px;
+        border-radius: 9999px;
         border-bottom: 3px solid transparent;
         transition: all 0.3s ease;
         text-decoration: none;
@@ -261,12 +261,15 @@
 
     .nav-link:hover {
         color: #43637E;
-        border-bottom-color: #43637E;
+        background: #f3f4f6;
+        border-bottom-color: transparent;
     }
 
     .nav-link[aria-current="page"] {
-        color: #43637E;
-        border-bottom-color: #43637E;
+        color: #ffffff;
+        background: #111827;
+        border-bottom-color: transparent;
+        font-weight: 700;
     }
 
     /* ===== CART BUTTON ===== */
@@ -483,17 +486,20 @@
     }
 
     .dark .nav-link {
-        color: #b0bec5;
+        color: #e5e7eb;
     }
 
     .dark .nav-link:hover {
         color: #f0e6d0;
-        border-bottom-color: #f0e6d0;
+        background: rgba(255, 255, 255, 0.1);
+        border-bottom-color: transparent;
     }
 
     .dark .nav-link[aria-current="page"] {
-        color: #f0e6d0;
-        border-bottom-color: #f0e6d0;
+        color: #ffffff;
+        background: #ffffff;
+        border-bottom-color: transparent;
+        font-weight: 700;
     }
 
     .dark .cart-btn {

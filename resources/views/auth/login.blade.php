@@ -308,16 +308,16 @@
     <div class="login-container">
         <!-- Header -->
         <div class="login-header">
-            <span class="icon">🚗</span>
+            <span class="icon"></span>
             <h2 class="title">Welcome to <span class="highlight">GoAnywhere</span></h2>
             <p class="subtitle">Masuk untuk mulai menyewa kendaraan</p>
         </div>
 
         <!-- Session Status -->
         @if(session('status'))
-            <div class="session-status">
-                ✅ {{ session('status') }}
-            </div>
+                <div class="session-status">
+                     {{ session('status') }}
+                </div>
         @endif
 
         <!-- Form -->
@@ -325,7 +325,7 @@
             @csrf
 
             <div class="form-group">
-                <label for="email">📧 Email</label>
+                <label for="email">Email</label>
                 <input id="email" type="email" name="email" value="{{ old('email') }}" 
                        placeholder="Masukkan email Anda" required autofocus autocomplete="username">
                 @if($errors->has('email'))
@@ -334,7 +334,7 @@
             </div>
 
             <div class="form-group">
-                <label for="password">🔒 Password</label>
+                <label for="password">Password</label>
                 <input id="password" type="password" name="password" 
                        placeholder="Masukkan password Anda" required autocomplete="current-password">
                 @if($errors->has('password'))
@@ -349,7 +349,7 @@
 
             <div class="login-actions">
                 <button type="submit" class="btn-login">
-                    🚀 Login
+                    Login
                 </button>
 
                 <a class="register-link" href="{{ route('register') }}">

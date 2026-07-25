@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            ➕ Tambah Kendaraan Baru - {{ Auth::user()->location }}
+            Tambah Kendaraan Baru - {{ Auth::user()->location }}
         </h2>
     </x-slot>
 
@@ -218,40 +218,40 @@
 
                             <!-- Nama Kendaraan -->
                             <div class="form-group">
-                                <label>🚗 Nama Kendaraan</label>
+                                <label>Nama Kendaraan</label>
                                 <input type="text" name="name" required placeholder="Contoh: Toyota Avanza G 1.5">
                             </div>
 
                             <!-- Tipe -->
                             <div class="form-group">
-                                <label>📋 Tipe</label>
+                                <label>Tipe</label>
                                 <select name="vehicle_type" required>
-                                    <option value="car">🚗 Mobil</option>
-                                    <option value="motorcycle">🏍️ Motor</option>
+                                    <option value="car">Mobil</option>
+                                    <option value="motorcycle">Motor</option>
                                 </select>
                             </div>
 
                             <!-- Merk -->
                             <div class="form-group">
-                                <label>🏷️ Merk</label>
+                                <label>Merk</label>
                                 <input type="text" name="brand" required placeholder="Contoh: Toyota, Honda, Yamaha">
                             </div>
 
                             <!-- Tipe Kendaraan -->
                             <div class="form-group">
-                                <label>📌 Tipe Kendaraan</label>
+                                <label>Tipe Kendaraan</label>
                                 <input type="text" name="type" required placeholder="MPV/SUV/Sedan/Matic/Sport">
                             </div>
 
                             <!-- Tahun -->
                             <div class="form-group">
-                                <label>📅 Tahun</label>
+                                <label>Tahun</label>
                                 <input type="number" name="year" required min="2000" max="{{ date('Y') }}" placeholder="2024">
                             </div>
 
                             <!-- Transmisi Mobil -->
                             <div class="form-group">
-                                <label>⚙️ Transmisi (Mobil)</label>
+                                <label>Transmisi (Mobil)</label>
                                 <select name="transmission">
                                     <option value="">Pilih</option>
                                     <option value="manual">Manual</option>
@@ -261,7 +261,7 @@
 
                             <!-- Transmisi Motor -->
                             <div class="form-group">
-                                <label>⚙️ Transmisi (Motor)</label>
+                                <label>Transmisi (Motor)</label>
                                 <select name="transmission_motor">
                                     <option value="">Pilih</option>
                                     <option value="matic">Matic</option>
@@ -271,43 +271,43 @@
 
                             <!-- Kapasitas -->
                             <div class="form-group">
-                                <label>👥 Kapasitas (Orang/CC)</label>
+                                <label>Kapasitas (Orang/CC)</label>
                                 <input type="number" name="capacity" required min="1" placeholder="7 atau 150">
                             </div>
 
                             <!-- Warna -->
                             <div class="form-group">
-                                <label>🎨 Warna</label>
+                                <label>Warna</label>
                                 <input type="text" name="color" required placeholder="Hitam, Putih, Merah">
                             </div>
 
                             <!-- BBM -->
                             <div class="form-group">
-                                <label>⛽ BBM</label>
+                                <label>BBM</label>
                                 <input type="text" name="fuel" required placeholder="Bensin/Diesel/Pertalite">
                             </div>
 
                             <!-- Harga -->
                             <div class="form-group">
-                                <label>💰 Harga / Hari</label>
+                                <label>Harga / Hari</label>
                                 <input type="number" name="price_per_day" required min="0" placeholder="500000">
                             </div>
 
                             <!-- Stok -->
                             <div class="form-group">
-                                <label>📦 Stok</label>
+                                <label>Stok</label>
                                 <input type="number" name="total_stock" required min="1" placeholder="5">
                             </div>
 
                             <!-- Deskripsi -->
                             <div class="form-group md:col-span-2">
-                                <label>📝 Deskripsi</label>
+                                <label>Deskripsi</label>
                                 <textarea name="description" rows="3" placeholder="Deskripsi kendaraan..."></textarea>
                             </div>
 
                             <!-- Upload Gambar -->
                             <div class="form-group md:col-span-2">
-                                <label>📸 Foto Kendaraan</label>
+                                <label>Foto Kendaraan</label>
                                 <input type="file" name="image" accept="image/*">
                                 <div class="helper-text">Format: JPG, PNG, JPEG, GIF | Maks: 2MB</div>
                             </div>
@@ -317,10 +317,10 @@
                         <!-- Actions -->
                         <div class="form-actions">
                             <button type="submit" class="btn-save">
-                                💾 Simpan
+                                Simpan
                             </button>
                             <a href="{{ route('manager.vehicles') }}" class="btn-cancel">
-                                ❌ Batal
+                                Batal
                             </a>
                         </div>
 

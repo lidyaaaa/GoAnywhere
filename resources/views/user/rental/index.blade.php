@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            📋 Sewa Saya
+            Sewa Saya
         </h2>
     </x-slot>
 
@@ -833,12 +833,12 @@
             <!-- ===== ALERT ===== -->
             @if(session('success'))
                 <div class="alert-success">
-                    ✅ {{ session('success') }}
+                     {{ session('success') }}
                 </div>
             @endif
             @if(session('warning'))
                 <div class="alert-warning">
-                    ⚠️ {{ session('warning') }}
+                     {{ session('warning') }}
                 </div>
             @endif
 
@@ -862,24 +862,24 @@
             @if(count($pendingPickup) > 0)
                 <div class="pending-box">
                     <div class="pending-header">
-                        <span class="icon">⏳</span>
-                        <h3>Kendaraan Belum Diambil</h3>
+                         <span class="icon"></span>
+                        <h3>Kendaraan Dalam Pengantaran</h3>
                     </div>
                     @foreach($pendingPickup as $item)
                         <div class="pending-item">
                             <div class="pending-content">
                                 <div class="vehicle-info">
                                     <span class="name">{{ $item->vehicle->name }}</span>
-                                    <span class="location">📍 {{ $item->vehicle->location }}</span>
-                                    <span class="price">💰 {{ number_format($item->subtotal, 0, ',', '.') }}</span>
+                                    <span class="location">                                     <span class="location">{{ $item->vehicle->location }}</span></span>
+                                    <span class="price">                                     <span class="price">Rp {{ number_format($item->subtotal, 0, ',', '.') }}</span></span>
                                 </div>
                                 <a href="{{ route('user.payment.success', $item->booking_code) }}" class="btn-pickup">
-                                    Ambil Sekarang
+                                    Konfirmasi Penerimaan
                                 </a>
                             </div>
                             <div class="pending-meta">
                                 Kode Booking: <strong>{{ $item->booking_code }}</strong> &nbsp;|&nbsp;
-                                Batas Ambil: <strong>{{ \Carbon\Carbon::parse($item->payment_deadline)->format('d M Y H:i') }}</strong>
+                                Estimasi Pengantaran: <strong>{{ \Carbon\Carbon::parse($item->payment_deadline)->format('d M Y H:i') }}</strong>
                             </div>
                         </div>
                     @endforeach
@@ -887,21 +887,35 @@
             @endif
 
             <!-- ===== SEWA AKTIF ===== -->
-            <h3 class="section-title"><span class="icon">🚗</span> Sewa Aktif</h3>
+                    <h3 class="section-title"><span class="icon"></span> Sewa Aktif</h3>
 
             @if(count($activeRentals) > 0)
                 @foreach($activeRentals as $rental)
                     @php
-                        $remaining = now()->diffInDays(\Carbon\Carbon::parse($rental->rental_end_date), false);
-                        if ($remaining > 0) {
-                            $statusClass = 'green';
-                            $statusText = '⏱️ Sisa ' . $remaining . ' hari lagi';
-                        } elseif ($remaining == 0) {
-                            $statusClass = 'yellow';
-                            $statusText = '⏱️ Hari terakhir!';
+                        $endDate = \Carbon\Carbon::parse($rental->rental_end_date);
+                        $now = now();
+                        if ($now->lt($endDate)) {
+                            $diffInMinutes = $now->diffInMinutes($endDate);
+                            $days = floor($diffInMinutes / 1440);
+                            $hours = floor(($diffInMinutes % 1440) / 60);
+                            $minutes = $diffInMinutes % 60;
+                            $statusClass = $diffInMinutes > 1440 ? 'green' : 'yellow';
+                            $parts = [];
+                            if ($days > 0) $parts[] = $days . ' hari';
+                            if ($hours > 0) $parts[] = $hours . ' jam';
+                            if ($minutes > 0 || empty($parts)) $parts[] = $minutes . ' menit';
+                            $statusText = 'Sisa ' . implode(' ', $parts);
                         } else {
+                            $diffInMinutes = $endDate->diffInMinutes($now);
+                            $days = floor($diffInMinutes / 1440);
+                            $hours = floor(($diffInMinutes % 1440) / 60);
+                            $minutes = $diffInMinutes % 60;
                             $statusClass = 'red';
-                            $statusText = '⏱️ Telat ' . abs($remaining) . ' hari!';
+                            $parts = [];
+                            if ($days > 0) $parts[] = $days . ' hari';
+                            if ($hours > 0) $parts[] = $hours . ' jam';
+                            if ($minutes > 0 || empty($parts)) $parts[] = $minutes . ' menit';
+                            $statusText = 'Telat ' . implode(' ', $parts);
                         }
                     @endphp
 
@@ -909,28 +923,26 @@
                         <div class="rental-content">
                             <div class="rental-left">
                                 <div class="vehicle-name">
-                                    <span class="icon">{{ $rental->vehicle->vehicle_type == 'car' ? '🚗' : '🏍️' }}</span>
+                                     <span class="icon">{{ $rental->vehicle->vehicle_type == 'car' ? 'Car' : 'Motorcycle' }}</span>
                                     <h4>{{ $rental->vehicle->name }}</h4>
                                 </div>
                                 <div class="detail-row">
-                                    <span>📍 {{ $rental->vehicle->location }}</span>
-                                    <span>•</span>
-                                    <span>📅 {{ \Carbon\Carbon::parse($rental->rental_start_date)->format('d M Y') }} - {{ \Carbon\Carbon::parse($rental->rental_end_date)->format('d M Y') }}</span>
+                                     <span>{{ \Carbon\Carbon::parse($rental->rental_start_date)->format('d M Y') }} - {{ \Carbon\Carbon::parse($rental->rental_end_date)->format('d M Y') }}</span>
                                 </div>
                                 <div class="detail-row">
-                                    <span>⏰ Wajib kembali: {{ \Carbon\Carbon::parse($rental->rental_end_date)->format('d M Y H:i') }}</span>
+                                     <span>Wajib kembali: {{ \Carbon\Carbon::parse($rental->rental_end_date)->format('d M Y H:i') }}</span>
                                 </div>
                                 <div class="detail-row">
-                                    <span>⏰ Toleransi: {{ \Carbon\Carbon::parse($rental->rental_end_date)->addMinutes(30)->format('d M Y H:i') }}</span>
+                                     <span>Batas Akhir Pengembalian: {{ \Carbon\Carbon::parse($rental->rental_end_date)->addMinutes(30)->format('d M Y H:i') }}</span>
                                 </div>
                                 <div class="detail-row">
-                                    <span>💰 Denda telat: Rp 50.000/jam</span>
+                                     <span>Denda telat: Rp 50.000/jam</span>
                                 </div>
                                 <span class="status-badge {{ $statusClass }}">{{ $statusText }}</span>
                             </div>
                             <div class="rental-right">
                                 <a href="{{ route('user.rental.return', $rental->id) }}" class="btn-return">
-                                    ✅ Kembalikan
+                                    Kembalikan
                                 </a>
                             </div>
                         </div>
@@ -938,13 +950,13 @@
                 @endforeach
             @else
                 <div class="empty-state">
-                    <span class="icon">🚗</span>
+                            <span class="icon"></span>
                     <p>Tidak ada sewa aktif</p>
                 </div>
             @endif
 
             <!-- ===== RIWAYAT ===== -->
-            <h3 class="section-title" style="margin-top: 40px;"><span class="icon">📜</span> Riwayat Transaksi</h3>
+                    <h3 class="section-title" style="margin-top: 40px;"><span class="icon"></span> Riwayat Transaksi</h3>
 
             @if(count($history) > 0)
                 <div class="table-wrap">
@@ -975,9 +987,9 @@
                                     </td>
                                     <td>
                                         @if($item->status == 'completed')
-                                            <span class="status-badge-sm completed">✅ Selesai</span>
+                                            <span class="status-badge-sm completed">Selesai</span>
                                         @else
-                                            <span class="status-badge-sm cancelled">❌ Batal</span>
+                                            <span class="status-badge-sm cancelled">Batal</span>
                                         @endif
                                     </td>
                                 </tr>
@@ -990,7 +1002,7 @@
                 </div>
             @else
                 <div class="empty-state">
-                    <span class="icon">📭</span>
+                        <span class="icon"></span>
                     <p>Belum ada riwayat transaksi</p>
                 </div>
             @endif

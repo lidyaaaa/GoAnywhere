@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            👤 Kelola User
+            Kelola User
         </h2>
     </x-slot>
 
@@ -308,10 +308,10 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
             @if(session('success'))
-                <div class="alert-success">✅ {{ session('success') }}</div>
+                <div class="alert-success"> {{ session('success') }}</div>
             @endif
             @if(session('error'))
-                <div class="alert-error">❌ {{ session('error') }}</div>
+                <div class="alert-error"> {{ session('error') }}</div>
             @endif
 
             <!-- ===== TABLE ===== -->
@@ -325,7 +325,6 @@
                                 <th>No HP</th>
                                 <th>Total Sewa</th>
                                 <th>Status</th>
-                                <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -344,13 +343,13 @@
                                                 </span>
                                             </span>
                                             
-                                            {{-- 🔥 TAMPILIN SEMUA KENDARAAN --}}
+                                             {{-- TAMPILIN SEMUA KENDARAAN --}}
                                             <div class="rental-list">
                                                 @foreach($user->active_rentals as $rental)
                                                     <div class="rental-item">
-                                                        <span class="vehicle-icon">{{ $rental->vehicle->vehicle_type == 'car' ? '🚗' : '🏍️' }}</span>
+                                                         <span>{{ $rental->vehicle->vehicle_type == 'car' ? 'Car' : 'Motorcycle' }}</span>
                                                         <span class="vehicle-name">{{ $rental->vehicle->name ?? 'N/A' }}</span>
-                                                        <span class="location">📍 {{ $rental->vehicle->location ?? 'N/A' }}</span>
+                                                         <span class="location">{{ $rental->vehicle->location ?? 'N/A' }}</span>
                                                         @if($loop->count > 1)
                                                             <span class="badge-count">#{{ $loop->iteration }}</span>
                                                         @endif
@@ -363,24 +362,12 @@
                                             </span>
                                         @endif
                                     </td>
-                                    <td>
-                                        <form action="{{ route('superadmin.users.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Yakin hapus user {{ $user->name }}?')" style="margin:0;">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn-delete" {{ ($user->has_active_rental ?? false) ? 'disabled' : '' }}>
-                                                🗑️ Hapus
-                                            </button>
-                                        </form>
-                                        @if($user->has_active_rental ?? false)
-                                            <div style="font-size: 10px; color: #b04a4a; margin-top: 2px;">(sedang menyewa)</div>
-                                        @endif
-                                    </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6">
+                                    <td colspan="5">
                                         <div class="empty-state">
-                                            <span class="icon">👤</span>
+                                            <span class="icon"></span>
                                             <h4>Belum Ada User</h4>
                                             <p>Belum ada user yang terdaftar</p>
                                         </div>

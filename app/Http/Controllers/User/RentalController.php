@@ -191,11 +191,17 @@ class RentalController extends Controller
 
         // Update status ke active
         foreach ($carts as $cart) {
+            $startTime = now();
+            $totalDays = $cart->quantity_days ?? 1;
+            if ($cart->period == 'weekly') {
+                $totalDays = 7;
+            }
             $cart->status = 'active';
-            $cart->rental_start_date = now();
+            $cart->rental_start_date = $startTime;
+            $cart->rental_end_date = $startTime->copy()->addDays($totalDays);
             $cart->save();
         }
 
-        return redirect()->route('user.rental')->with('success', 'Kendaraan berhasil diambil! Selamat menggunakan!');
+        return redirect()->route('user.rental')->with('success', 'Kendaraan berhasil dikirim! Selamat menggunakan!');
     }
 }

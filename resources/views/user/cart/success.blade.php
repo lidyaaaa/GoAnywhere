@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            🎉 Pembayaran Berhasil!
+            Pembayaran Berhasil!
         </h2>
     </x-slot>
 
@@ -298,7 +298,7 @@
                 <div class="body">
 
                     <!-- Icon -->
-                    <span class="success-icon">🎉</span>
+                     <span class="success-icon"></span>
 
                     <!-- Title -->
                     <h3 class="success-title">PEMBAYARAN BERHASIL!</h3>
@@ -306,15 +306,15 @@
                         Kode Booking: <strong>{{ $booking_code }}</strong>
                     </p>
 
-                    <!-- ===== TIMER ===== -->
-                    <div class="timer-box">
+                    <!-- ===== DELIVERY INFO ===== -->
+                    <div class="timer-box" style="background: #e8f4ec; border-color: #4a7a5a;">
                         <div class="timer-header">
-                            <span class="icon">⏰</span>
-                            <span class="label">Ambil kendaraan dalam:</span>
+                            <span class="icon"></span>
+                            <span class="label" style="color: #4a7a5a;">Kendaraan akan diantar ke lokasi Anda</span>
                         </div>
-                        <div id="timer" class="timer-display">05:00</div>
+                        <div class="timer-display" style="font-size: 20px; color: #4a7a5a; letter-spacing: 0;">Staff kami sedang menyiapkan kendaraan Anda</div>
                         <div class="timer-location">
-                            📍 Lokasi: <strong>{{ $pickupLocation }}</strong>
+                             Pengembalian kendaraan: <strong>Dikembalikan ke kantor</strong>
                         </div>
                     </div>
 
@@ -335,18 +335,18 @@
                         <form action="{{ route('user.rental.start', $booking_code) }}" method="POST">
                             @csrf
                             <button type="submit" id="startRentalBtn" class="btn-full btn-primary">
-                                🚗 Ambil Kendaraan
+                                 Konfirmasi Penerimaan Kendaraan
                             </button>
                         </form>
                         <a href="{{ route('user.rental') }}" class="btn-full btn-secondary">
-                            📋 Sewa Saya
+                             Sewa Saya
                         </a>
                     </div>
 
                     <!-- ===== WA ===== -->
                     <a href="https://wa.me/628157184307?text=Halo%20GoAnywhere%2C%20saya%20sudah%20melakukan%20pembayaran%20dengan%20kode%20booking%3A%20{{ $booking_code }}" 
                        target="_blank" class="btn-wa">
-                        📱 Kirim bukti ke WhatsApp
+                         Kirim bukti ke WhatsApp
                     </a>
 
                 </div>
@@ -358,46 +358,6 @@
     <!-- TIMER SCRIPT                                 -->
     <!-- ============================================ -->
     <script>
-        let timeLeft = 300; // 5 menit = 300 detik
-        const timerElement = document.getElementById('timer');
-        const startRentalBtn = document.getElementById('startRentalBtn');
-
-        function updateTimer() {
-            const minutes = Math.floor(timeLeft / 60);
-            const seconds = timeLeft % 60;
-            timerElement.textContent = 
-                String(minutes).padStart(2, '0') + ':' + 
-                String(seconds).padStart(2, '0');
-
-            // Tambah class warning kalo sisa < 60 detik
-            if (timeLeft <= 60 && timeLeft > 30) {
-                timerElement.className = 'timer-display warning';
-            } else if (timeLeft <= 30) {
-                timerElement.className = 'timer-display danger';
-            } else {
-                timerElement.className = 'timer-display';
-            }
-
-            if (timeLeft <= 0) {
-                timerElement.textContent = '⏰ WAKTU HABIS!';
-                timerElement.className = 'timer-display danger';
-                if (startRentalBtn) {
-                    startRentalBtn.disabled = true;
-                    startRentalBtn.textContent = '⏰ Waktu Habis!';
-                }
-                // Redirect ke cart dengan pesan expired
-                setTimeout(() => {
-                    window.location.href = "{{ route('user.cart') }}?expired=true";
-                }, 3000);
-                return;
-            }
-
-            timeLeft--;
-            setTimeout(updateTimer, 1000);
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            updateTimer();
-        });
+        // No pickup timer needed - vehicles are delivered by staff
     </script>
 </x-app-layout>

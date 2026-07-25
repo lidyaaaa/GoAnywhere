@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            👑 Super Admin Dashboard
+            Super Admin Dashboard
         </h2>
     </x-slot>
 
@@ -308,7 +308,7 @@
             <div class="stat-grid">
                 <!-- Total User -->
                 <div class="stat-card">
-                    <div class="icon">👤</div>
+                    <div class="icon"></div>
                     <div class="info">
                         <div class="number blue">{{ $totalUsers ?? 0 }}</div>
                         <div class="label">Total User</div>
@@ -317,7 +317,7 @@
 
                 <!-- Total Manager -->
                 <div class="stat-card">
-                    <div class="icon">👨‍💼</div>
+                    <div class="icon"></div>
                     <div class="info">
                         <div class="number green">{{ $totalManagers ?? 0 }}</div>
                         <div class="label">Total Manager</div>
@@ -326,7 +326,7 @@
 
                 <!-- Total Armada -->
                 <div class="stat-card">
-                    <div class="icon">🚗</div>
+                    <div class="icon"></div>
                     <div class="info">
                         <div class="number purple">{{ $totalVehicles ?? 0 }}</div>
                         <div class="label">Total Armada</div>
@@ -335,7 +335,7 @@
 
                 <!-- Total Stok -->
                 <div class="stat-card">
-                    <div class="icon">📦</div>
+                    <div class="icon"></div>
                     <div class="info">
                         <div class="number orange">{{ $totalStock ?? 0 }}</div>
                         <div class="label">Total Stok</div>
@@ -344,7 +344,7 @@
 
                 <!-- Total Transaksi -->
                 <div class="stat-card">
-                    <div class="icon">📋</div>
+                    <div class="icon"></div>
                     <div class="info">
                         <div class="number indigo">{{ $totalTransactions ?? 0 }}</div>
                         <div class="label">Total Transaksi</div>
@@ -353,7 +353,7 @@
 
                 <!-- Sewa Aktif -->
                 <div class="stat-card">
-                    <div class="icon">🚗</div>
+                    <div class="icon"></div>
                     <div class="info">
                         <div class="number yellow">{{ $activeRentals ?? 0 }}</div>
                         <div class="label">Sewa Aktif</div>
@@ -362,7 +362,7 @@
 
                 <!-- Total Revenue (full width) -->
                 <div class="stat-card" style="grid-column: span 2;">
-                    <div class="icon">💰</div>
+                    <div class="icon"></div>
                     <div class="info">
                         <div class="number gold">Rp {{ number_format($totalRevenue ?? 0, 0, ',', '.') }}</div>
                         <div class="label">Total Revenue</div>
@@ -372,13 +372,13 @@
 
             <!-- ===== STATISTIK PER LOKASI ===== -->
             <div class="section-card">
-                <h3 class="section-title"><span class="icon">📍</span> Statistik per Lokasi</h3>
+                <h3 class="section-title"><span class="icon"></span> Statistik per Lokasi</h3>
 
                 <div class="location-grid">
                     @foreach($locationStats as $loc => $stats)
                         <div class="location-card">
                             <div class="name">{{ $loc }}</div>
-                            <div class="stat-row">🚗 <strong>{{ $stats['vehicles'] }}</strong> Armada</div>
+                            <div class="stat-row"> <strong>{{ $stats['vehicles'] }}</strong> Armada</div>
                             <div class="stat-row">⏳ <strong>{{ $stats['active_rentals'] }}</strong> Aktif</div>
                             <div class="revenue">Rp {{ number_format($stats['revenue'], 0, ',', '.') }}</div>
                         </div>
@@ -389,7 +389,7 @@
             <!-- ===== TRANSAKSI TERBARU ===== -->
             <div class="section-card">
                 <div class="flex justify-between items-center mb-4">
-                    <h3 class="section-title"><span class="icon">📜</span> Transaksi Terbaru</h3>
+                    <h3 class="section-title"><span class="icon"></span> Transaksi Terbaru</h3>
                     <a href="{{ route('superadmin.rentals') }}" class="view-all">Lihat Semua →</a>
                 </div>
 
@@ -420,7 +420,7 @@
                     </div>
                 @else
                     <div class="empty-state">
-                        <span class="icon">📭</span>
+                        <span class="icon"></span>
                         <p>Belum ada transaksi</p>
                     </div>
                 @endif

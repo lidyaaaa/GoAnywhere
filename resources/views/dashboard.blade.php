@@ -427,7 +427,7 @@
             <!-- ===== WELCOME CARD ===== -->
             <div class="welcome-card">
                 <div class="greeting">
-                    <span class="icon">👋</span>
+                    <span class="icon"></span>
                     <h1>
                         Halo, <span class="highlight">{{ Auth::user()->name }}</span>!
                     </h1>
@@ -436,52 +436,52 @@
                     Ini adalah dashboard <strong>User</strong> untuk aplikasi GoAnywhere.
                     Kelola sewa kendaraan Anda dengan mudah di sini.
                 </p>
-                <span class="role-badge">🔑 Role: {{ Auth::user()->role }}</span>
+                    <span class="role-badge">Role: {{ Auth::user()->role }}</span>
             </div>
 
             <!-- ===== STATISTIK ===== -->
             <div class="stats-grid">
                 <div class="stat-card">
-                    <span class="icon">🚗</span>
+                    <span class="icon"></span>
                     <div class="number">{{ $totalRentals ?? 0 }}</div>
                     <div class="label">Total Sewa</div>
                 </div>
                 <div class="stat-card">
-                    <span class="icon">✅</span>
+                    <span class="icon"></span>
                     <div class="number">{{ $activeRentals ?? 0 }}</div>
                     <div class="label">Sewa Aktif</div>
                 </div>
                 <div class="stat-card">
-                    <span class="icon">💰</span>
+                    <span class="icon"></span>
                     <div class="number">Rp {{ number_format($totalSpent ?? 0, 0, ',', '.') }}</div>
                     <div class="label">Total Belanja</div>
                 </div>
                 <div class="stat-card">
-                    <span class="icon">⏳</span>
+                    <span class="icon"></span>
                     <div class="number">{{ $pendingPickup ?? 0 }}</div>
-                    <div class="label">Menunggu Diambil</div>
+                    <div class="label">Menunggu Diantar</div>
                 </div>
             </div>
 
             <!-- ===== QUICK ACTIONS ===== -->
             <div class="quick-actions">
                 <a href="{{ route('user.armada') }}" class="quick-action">
-                    <span class="icon">🚙</span>
+                    <span class="icon"></span>
                     <div class="label">Lihat Armada</div>
                     <div class="desc">Cari kendaraan</div>
                 </a>
                 <a href="{{ route('user.rental') }}" class="quick-action">
-                    <span class="icon">📋</span>
+                    <span class="icon"></span>
                     <div class="label">Sewa Saya</div>
                     <div class="desc">Kelola sewa</div>
                 </a>
                 <a href="{{ route('user.layanan') }}" class="quick-action">
-                    <span class="icon">💎</span>
+                    <span class="icon"></span>
                     <div class="label">Layanan</div>
                     <div class="desc">Paket sewa</div>
                 </a>
                 <a href="{{ route('profile.edit') }}" class="quick-action">
-                    <span class="icon">⚙️</span>
+                    <span class="icon"></span>
                     <div class="label">Pengaturan</div>
                     <div class="desc">Edit profil</div>
                 </a>

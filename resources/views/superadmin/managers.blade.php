@@ -1,22 +1,22 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            👨‍💼 Kelola Manager
+            Kelola Manager
         </h2>
     </x-slot>
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             @if(session('success'))
-                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-4">✅ {{ session('success') }}</div>
+                 <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-4"> {{ session('success') }}</div>
             @endif
             @if(session('error'))
-                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4">❌ {{ session('error') }}</div>
+                 <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4"> {{ session('error') }}</div>
             @endif
 
             <!-- Tambah Manager -->
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-6">
-                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">➕ Tambah Manager Baru</h3>
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">                 Tambah Manager Baru</h3>
                 <form action="{{ route('superadmin.managers.store') }}" method="POST" class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     @csrf
                     <input type="text" name="name" placeholder="Nama Manager" required class="rounded-lg border-gray-300 dark:border-gray-700 dark:bg-gray-900">
@@ -29,7 +29,7 @@
                             <option value="{{ $loc }}">{{ $loc }}</option>
                         @endforeach
                     </select>
-                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">💾 Tambah</button>
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">                     Tambah</button>
                 </form>
             </div>
 
@@ -58,7 +58,7 @@
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-700 transition text-sm">
-                                                🗑️ Hapus
+                                                Hapus
                                             </button>
                                         </form>
                                     </td>

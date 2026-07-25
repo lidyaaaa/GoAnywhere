@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            👤 Profil Saya
+            Profil Saya
         </h2>
     </x-slot>
 
@@ -376,7 +376,7 @@
             <!-- ALERT -->
             @if(session('success'))
                 <div class="alert-success">
-                    ✅ {{ session('success') }}
+                     {{ session('success') }}
                 </div>
             @endif
 
@@ -394,11 +394,11 @@
                             <!-- ===== KOLOM KIRI: Profil ===== -->
                             <div>
                                 <div class="col-title">
-                                    <span class="icon">👤</span> Informasi Profil
+                                     <span class="icon"></span> Informasi Profil
                                 </div>
 
                                 <div class="form-group">
-                                    <label>👤 Nama Lengkap</label>
+                                    <label>Nama Lengkap</label>
                                     <input type="text" name="name" value="{{ old('name', $user->name) }}" placeholder="Masukkan nama lengkap">
                                     @error('name')
                                         <div class="error-text">{{ $message }}</div>
@@ -406,7 +406,7 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label>📧 Email</label>
+                                    <label>Email</label>
                                     <input type="email" name="email" value="{{ old('email', $user->email) }}" placeholder="Masukkan email">
                                     @error('email')
                                         <div class="error-text">{{ $message }}</div>
@@ -414,7 +414,7 @@
                                 </div>
 
                                 <div class="form-group" style="margin-bottom: 0;">
-                                    <label>📱 No. HP</label>
+                                    <label>No. HP</label>
                                     <input type="text" name="phone" value="{{ old('phone', $user->phone) }}" placeholder="0812-3456-7890">
                                     @error('phone')
                                         <div class="error-text">{{ $message }}</div>
@@ -425,11 +425,11 @@
                             <!-- ===== KOLOM KANAN: Ganti Password ===== -->
                             <div>
                                 <div class="col-title">
-                                    <span class="icon">🔑</span> Ganti Password
+                                     <span class="icon"></span> Ganti Password
                                 </div>
 
                                 <div class="form-group">
-                                    <label>🔒 Password Lama</label>
+                                    <label>Password Lama</label>
                                     <input type="password" name="current_password" placeholder="Masukkan password lama">
                                     @error('current_password')
                                         <div class="error-text">{{ $message }}</div>
@@ -437,7 +437,7 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label>🔒 Password Baru</label>
+                                    <label>Password Baru</label>
                                     <input type="password" name="new_password" placeholder="Masukkan password baru">
                                     @error('new_password')
                                         <div class="error-text">{{ $message }}</div>
@@ -445,7 +445,7 @@
                                 </div>
 
                                 <div class="form-group" style="margin-bottom: 0;">
-                                    <label>🔒 Konfirmasi Password Baru</label>
+                                    <label>Konfirmasi Password Baru</label>
                                     <input type="password" name="new_password_confirmation" placeholder="Konfirmasi password baru">
                                 </div>
                             </div>
@@ -456,13 +456,13 @@
                         <hr style="border: none; border-top: 1.5px solid #f0ede8; margin: 28px 0 24px;">
 
                         <h3 style="font-size: 18px; font-weight: 700; color: #2c3e50; font-family: 'Georgia', serif; margin-bottom: 16px;">
-                            <span style="margin-right: 8px;">📍</span> Alamat GoAnywhere
+                            <span style="margin-right: 8px;"></span> Alamat GoAnywhere
                         </h3>
 
                         <div class="location-grid">
                             @foreach($locations as $loc)
                                 <div class="location-card">
-                                    <div class="name">📍 {{ $loc }}</div>
+                                     <div class="name">{{ $loc }}</div>
                                     <div class="address">
                                         <?php
                                             $addresses = [
@@ -477,7 +477,7 @@
                                     </div>
                                     <a href="https://www.google.com/maps/search/{{ urlencode($addresses[$loc] ?? '') }}" 
                                        target="_blank" class="map-link">
-                                        🗺️ Lihat di Maps →
+                                                                                 Lihat di Maps →
                                     </a>
                                 </div>
                             @endforeach
@@ -485,7 +485,7 @@
 
                         <!-- ===== SUBMIT ===== -->
                         <button type="submit" class="btn-submit">
-                            💾 Simpan Perubahan
+                            Simpan Perubahan
                         </button>
 
                     </form>

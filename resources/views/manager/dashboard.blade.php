@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            📊 Dashboard Manager - {{ Auth::user()->location }}
+            Dashboard Manager - {{ Auth::user()->location }}
         </h2>
     </x-slot>
 
@@ -282,7 +282,7 @@
             <div class="stat-grid">
                 <!-- Total Income -->
                 <div class="stat-card">
-                    <div class="icon">💰</div>
+                    <div class="icon"></div>
                     <div class="info">
                         <div class="number income">Rp {{ number_format($totalIncome ?? 0, 0, ',', '.') }}</div>
                         <div class="label">Total Income</div>
@@ -300,7 +300,7 @@
 
                 <!-- Sewa Aktif -->
                 <div class="stat-card">
-                    <div class="icon">📋</div>
+                    <div class="icon"></div>
                     <div class="info">
                         <div class="number green">{{ $totalActiveRentals ?? 0 }}</div>
                         <div class="label">Sewa Aktif</div>
@@ -309,7 +309,7 @@
 
                 <!-- Riwayat Transaksi -->
                 <div class="stat-card">
-                    <div class="icon">📜</div>
+                    <div class="icon"></div>
                     <div class="info">
                         <div class="number purple">{{ $totalHistory ?? 0 }}</div>
                         <div class="label">Riwayat Transaksi</div>
@@ -318,7 +318,7 @@
 
                 <!-- Mobil -->
                 <div class="stat-card">
-                    <div class="icon">🚗</div>
+                    <div class="icon"></div>
                     <div class="info">
                         <div class="number orange">{{ $totalCars ?? 0 }}</div>
                         <div class="label">Mobil</div>
@@ -327,7 +327,7 @@
 
                 <!-- Motor -->
                 <div class="stat-card">
-                    <div class="icon">🏍️</div>
+                    <div class="icon"></div>
                     <div class="info">
                         <div class="number teal">{{ $totalMotorcycles ?? 0 }}</div>
                         <div class="label">Motor</div>
@@ -336,7 +336,7 @@
 
                 <!-- Total Stok -->
                 <div class="stat-card">
-                    <div class="icon">📦</div>
+                    <div class="icon"></div>
                     <div class="info">
                         <div class="number blue">{{ $totalStock ?? 0 }}</div>
                         <div class="label">Total Stok</div>
@@ -345,7 +345,7 @@
 
                 <!-- Stok Tersedia -->
                 <div class="stat-card">
-                    <div class="icon">✅</div>
+                    <div class="icon"></div>
                     <div class="info">
                         <div class="number green">{{ $availableStock ?? 0 }}</div>
                         <div class="label">Stok Tersedia</div>
@@ -356,7 +356,7 @@
             <!-- ===== SEWA AKTIF ===== -->
             <div class="section-card">
                 <div class="flex justify-between items-center mb-4">
-                    <h3 class="section-title"><span class="icon">🚗</span> Sewa Aktif - {{ Auth::user()->location }}</h3>
+                    <h3 class="section-title"><span class="icon"></span> Sewa Aktif - {{ Auth::user()->location }}</h3>
                 </div>
 
                 @if(isset($activeRentals) && count($activeRentals) > 0)
@@ -397,7 +397,7 @@
                     </div>
                 @else
                     <div class="empty-state">
-                        <span class="icon">🚗</span>
+                        <span class="icon"></span>
                         <p>Tidak ada sewa aktif</p>
                     </div>
                 @endif
@@ -406,7 +406,7 @@
             <!-- ===== RIWAYAT TRANSAKSI ===== -->
             <div class="section-card">
                 <div class="flex justify-between items-center mb-4">
-                    <h3 class="section-title"><span class="icon">📜</span> Riwayat Transaksi Terakhir</h3>
+                    <h3 class="section-title"><span class="icon"></span> Riwayat Transaksi Terakhir</h3>
                     <a href="{{ route('manager.rentals') }}" class="view-all">Lihat Semua →</a>
                 </div>
 
@@ -431,9 +431,9 @@
                                         <td class="font-semibold">Rp {{ number_format($item->subtotal ?? 0, 0, ',', '.') }}</td>
                                         <td>
                                             @if($item->status == 'completed' || $item->status == 'paid')
-                                                <span class="status-badge completed">✅ Selesai</span>
+                                                <span class="status-badge completed">Selesai</span>
                                             @else
-                                                <span class="status-badge active">🔄 {{ ucfirst($item->status ?? 'N/A') }}</span>
+                                                <span class="status-badge active">{{ ucfirst($item->status ?? 'N/A') }}</span>
                                             @endif
                                         </td>
                                     </tr>
@@ -443,7 +443,7 @@
                     </div>
                 @else
                     <div class="empty-state">
-                        <span class="icon">📭</span>
+                        <span class="icon"></span>
                         <p>Belum ada transaksi</p>
                     </div>
                 @endif

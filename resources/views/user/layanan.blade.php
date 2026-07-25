@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            📋 Layanan GoAnywhere
+            Layanan GoAnywhere
         </h2>
     </x-slot>
 
@@ -196,7 +196,7 @@
         }
 
         .layanan-card .feature-list li::before {
-            content: '✦';
+            content: '';
             color: #43637E;
             font-size: 16px;
             font-weight: 700;
@@ -311,7 +311,7 @@
         }
 
         .info-box .rule-list li::before {
-            content: '✅';
+            content: '';
             font-size: 16px;
         }
 
@@ -499,7 +499,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- HEADER -->
             <div class="text-center mb-16">
-                <h1 class="layanan-title">💎 <span>Layanan Kami</span></h1>
+                <h1 class="layanan-title"><span>Layanan Kami</span></h1>
                 <p class="layanan-subtitle">Pilihan layanan rental kendaraan sesuai kebutuhan Anda</p>
             </div>
 
@@ -507,11 +507,11 @@
             <div class="layanan-grid">
                 <!-- Sewa Harian -->
                 <div class="layanan-card">
-                    <span class="icon">📅</span>
+                    <span class="icon"></span>
                     <h3>Sewa Harian</h3>
                     <div class="price">Rp 120.000 <small>/ hari</small></div>
                     <p class="desc">Fleksibel untuk kebutuhan harian Anda</p>
-                    <div class="badge">⚠️ Maksimal 7 Hari</div>
+                    <div class="badge">                     Maksimal 7 Hari</div>
                     <ul class="feature-list">
                         <li>Bebas pilih kendaraan</li>
                         <li>Bebas pilih lokasi</li>
@@ -524,11 +524,11 @@
 
                 <!-- Sewa Mingguan -->
                 <div class="layanan-card">
-                    <span class="icon">📆</span>
+                    <span class="icon"></span>
                     <h3>Sewa Mingguan</h3>
                     <div class="price">Rp 700.000 <small>/ minggu</small></div>
                     <p class="desc">Lebih hemat untuk sewa 7 hari</p>
-                    <div class="badge">⚠️ Maksimal 1 Minggu</div>
+                    <div class="badge">                     Maksimal 1 Minggu</div>
                     <ul class="feature-list">
                         <li>Diskon 10%</li>
                         <li>Bebas pilih kendaraan</li>
@@ -545,7 +545,7 @@
                 <!-- Lokasi -->
                 <div class="info-box">
                     <div class="flex items-start gap-5">
-                        <span class="icon">📍</span>
+                         <span class="icon"></span>
                         <div style="flex: 1;">
                             <h4>Lokasi Pengambilan</h4>
                             <p class="mt-1">
@@ -565,7 +565,7 @@
                 <!-- Aturan Sewa -->
                 <div class="info-box">
                     <div class="flex items-start gap-5">
-                        <span class="icon">⏰</span>
+                         <span class="icon"></span>
                         <div style="flex: 1;">
                             <h4>Aturan Sewa</h4>
                             <ul class="rule-list">

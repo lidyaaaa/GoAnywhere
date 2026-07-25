@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            📋 Detail Kendaraan
+            Detail Kendaraan
         </h2>
     </x-slot>
 
@@ -267,7 +267,7 @@
         }
 
         .terms-list li::before {
-            content: '✅';
+            content: '';
             font-size: 14px;
             flex-shrink: 0;
         }
@@ -613,9 +613,9 @@
                         @if($vehicle->image)
                             <img src="{{ asset('storage/' . $vehicle->image) }}" alt="{{ $vehicle->name }}">
                         @else
-                            <span class="placeholder-icon">{{ $vehicle->vehicle_type == 'car' ? '🚗' : '🏍️' }}</span>
+                            <span class="placeholder-icon">                                 {{ $vehicle->vehicle_type == 'car' ? 'Car' : 'Motorcycle' }}</span>
                         @endif
-                        <span class="type-badge-lg">{{ $vehicle->vehicle_type == 'car' ? '🚗 Mobil' : '🏍️ Motor' }}</span>
+                            <span class="type-badge-lg">{{ $vehicle->vehicle_type == 'car' ? 'Mobil' : 'Motor' }}</span>
                     </div>
 
                     <!-- KANAN: Nama + Tags + Spesifikasi + Harga -->
@@ -624,7 +624,7 @@
                         <div class="tags">
                             <span class="tag tag-brand">{{ $vehicle->brand }}</span>
                             <span class="tag tag-year">{{ $vehicle->year }}</span>
-                            <span class="tag tag-location">📍 {{ $vehicle->location }}</span>
+                            <span class="tag tag-location">                            <span class="location">{{ $vehicle->location }}</span></span>
                         </div>
 
                         <!-- Spesifikasi Mini -->
@@ -651,7 +651,7 @@
                             </div>
                             <div class="spec-item">
                                 <div class="label">Stok</div>
-                                <div class="value"><span class="stock-badge">📦 {{ $vehicle->available_stock }} tersedia</span></div>
+                                <div class="value"><span class="stock-badge">                            <span class="stock-badge">{{ $vehicle->available_stock }} available</span></span></div>
                             </div>
                         </div>
 
@@ -662,7 +662,7 @@
                                 <small>/ hari</small>
                             </div>
                             <div class="price-note">
-                                ⚠️ Maksimal sewa <strong>7 hari</strong>
+                                Maksimal sewa <strong>7 hari</strong>
                             </div>
                         </div>
                     </div>
@@ -672,13 +672,13 @@
                 <div class="detail-bottom">
                     <!-- Deskripsi -->
                     @if($vehicle->description)
-                        <h2 class="section-title"><span class="icon">📝</span> Deskripsi</h2>
+                         <h2 class="section-title"><span class="icon"></span> Deskripsi</h2>
                         <p class="desc-text">{{ $vehicle->description }}</p>
                         <hr class="divider">
                     @endif
 
                     <!-- Syarat & Ketentuan -->
-                    <h2 class="section-title"><span class="icon">📋</span> Syarat & Ketentuan</h2>
+                     <h2 class="section-title"><span class="icon"></span> Syarat & Ketentuan</h2>
                     <ul class="terms-list">
                         <li>Wajib memiliki SIM {{ $vehicle->vehicle_type == 'car' ? 'A/C' : 'C' }}</li>
                         <li>Usia minimal {{ $vehicle->vehicle_type == 'car' ? '18' : '17' }} tahun</li>
@@ -699,11 +699,11 @@
                         @csrf
                         <input type="hidden" name="vehicle_id" value="{{ $vehicle->id }}">
                         <div class="form-group">
-                            <label>📅 Jumlah Hari (Max 7)</label>
+                             <label>Jumlah Hari (Max 7)</label>
                             <input type="number" name="quantity" value="1" min="1" max="7">
                         </div>
                         <button type="submit" class="btn-booking-lg">
-                            📝 Booking Sekarang
+                             Booking Sekarang
                         </button>
                     </form>
 

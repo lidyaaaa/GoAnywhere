@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            📍 Profile Perusahaan - GoAnywhere
+            Profile Perusahaan - GoAnywhere
         </h2>
     </x-slot>
 
@@ -429,32 +429,32 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
             <!-- ===== KONTAK ===== -->
-            <h3 class="section-title"><span class="icon">📞</span> Hubungi Kami</h3>
+            <h3 class="section-title"><span></span> Hubungi Kami</h3>
 
             <div class="contact-grid">
                 <div class="contact-card">
-                    <span class="icon">📱</span>
+                    <span></span>
                     <div class="info">
                         <div class="label">Telepon</div>
                         <div class="value">{{ $contacts['phone'] }}</div>
                     </div>
                 </div>
                 <div class="contact-card">
-                    <span class="icon">💬</span>
+                    <span></span>
                     <div class="info">
                         <div class="label">WhatsApp</div>
                         <div class="value">{{ $contacts['wa'] }}</div>
                     </div>
                 </div>
                 <div class="contact-card">
-                    <span class="icon">📧</span>
+                    <span></span>
                     <div class="info">
                         <div class="label">Email</div>
                         <div class="value">{{ $contacts['email'] }}</div>
                     </div>
                 </div>
                 <div class="contact-card">
-                    <span class="icon">🕐</span>
+                    <span></span>
                     <div class="info">
                         <div class="label">Jam Operasional</div>
                         <div class="value">{{ $contacts['hours'] }}</div>
@@ -463,38 +463,38 @@
             </div>
 
             <!-- ===== LOKASI ===== -->
-            <h3 class="section-title" style="margin-top: 40px;"><span class="icon">📍</span> Lokasi Kami</h3>
+            <h3 class="section-title" style="margin-top: 40px;"><span></span> Lokasi Kami</h3>
 
             <div class="location-grid">
                 @foreach($locations as $city => $data)
                     <div class="location-card">
                         <div class="header">
-                            <span class="icon">📍</span>
+                            <span></span>
                             <span class="name">{{ $city }}</span>
                         </div>
                         <div class="address">{{ $data['address'] }}</div>
                         <div class="detail">
-                            📱 <strong>{{ $data['phone'] }}</strong>
+                             <strong>{{ $data['phone'] }}</strong>
                         </div>
                         <div class="detail">
-                            🕐 {{ $data['hours'] }}
+                             {{ $data['hours'] }}
                         </div>
                         <a href="{{ $data['maps'] }}" target="_blank" class="btn-maps">
-                            🗺️ Lihat di Google Maps →
+                             Lihat di Google Maps →
                         </a>
                     </div>
                 @endforeach
             </div>
 
             <!-- ===== MAPS 5 LOKASI ===== -->
-            <h3 class="section-title" style="margin-top: 40px;"><span class="icon">🗺️</span> Peta Lokasi</h3>
+            <h3 class="section-title" style="margin-top: 40px;"><span></span> Peta Lokasi</h3>
 
             <div class="maps-grid">
                 <!-- Jakarta - Gambir -->
                 <div class="maps-item">
                     <div class="maps-header">
-                        <span class="city-name">📍 Jakarta</span>
-                        <span class="city-icon">🚗</span>
+                        <span class="city-name">Jakarta</span>
+                        <span class="city-icon"></span>
                     </div>
                     <iframe 
                         src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d253840.3106681789!2d106.664702!3d-6.229728!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f3e945e34b9d%3A0x5371bf0fdad786a2!2sStasiun%20Gambir!5e0!3m2!1sid!2sid!4v1700000000000" 
@@ -507,8 +507,8 @@
                 <!-- Bogor - Stasiun Bogor -->
                 <div class="maps-item">
                     <div class="maps-header">
-                        <span class="city-name">📍 Bogor</span>
-                        <span class="city-icon">🚗</span>
+                        <span class="city-name">Bogor</span>
+                        <span class="city-icon"></span>
                     </div>
                     <iframe 
                         src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d253807.78092420747!2d106.6211987!3d-6.5951369!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69c53bdb1c9b1f%3A0xf0f6e5d8b0f5c4a6!2sStasiun%20Bogor!5e0!3m2!1sid!2sid!4v1700000000000" 
@@ -521,8 +521,8 @@
                 <!-- Depok - Stasiun Depok -->
                 <div class="maps-item">
                     <div class="maps-header">
-                        <span class="city-name">📍 Depok</span>
-                        <span class="city-icon">🚗</span>
+                        <span class="city-name">Depok</span>
+                        <span class="city-icon"></span>
                     </div>
                     <iframe 
                         src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d253855.7070807047!2d106.6994986!3d-6.4160436!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69bef09cdcf885%3A0xf85f1f6c5f2491f2!2sStasiun%20Depok!5e0!3m2!1sid!2sid!4v1700000000000" 
@@ -535,8 +535,8 @@
                 <!-- Tangerang - Stasiun Tangerang -->
                 <div class="maps-item">
                     <div class="maps-header">
-                        <span class="city-name">📍 Tangerang</span>
-                        <span class="city-icon">🚗</span>
+                        <span class="city-name">Tangerang</span>
+                        <span class="city-icon"></span>
                     </div>
                     <iframe 
                         src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d253735.67877117748!2d106.4923152!3d-6.1747981!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f8226fda7b83%3A0xf7c036ffc8a5f1b4!2sStasiun%20Tangerang!5e0!3m2!1sid!2sid!4v1700000000000" 
@@ -549,8 +549,8 @@
                 <!-- Bekasi - Stasiun Bekasi -->
                 <div class="maps-item">
                     <div class="maps-header">
-                        <span class="city-name">📍 Bekasi</span>
-                        <span class="city-icon">🚗</span>
+                        <span class="city-name">Bekasi</span>
+                        <span class="city-icon"></span>
                     </div>
                     <iframe 
                         src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d253863.80712239974!2d106.8235392!3d-6.241456!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e698b8a1b0db5b1%3A0x2adde5d06b2e6a0c!2sStasiun%20Bekasi!5e0!3m2!1sid!2sid!4v1700000000000" 

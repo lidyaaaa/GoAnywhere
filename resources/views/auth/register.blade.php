@@ -266,7 +266,7 @@
     <div class="register-container">
         <!-- Header -->
         <div class="register-header">
-            <span class="icon">🚗</span>
+            <span class="icon"></span>
             <h2 class="title">Daftar <span class="highlight">GoAnywhere</span></h2>
             <p class="subtitle">Buat akun untuk mulai menyewa kendaraan</p>
         </div>
@@ -277,7 +277,7 @@
 
             <!-- Name -->
             <div class="form-group">
-                <label for="name">👤 Nama Lengkap</label>
+                <label for="name">Nama Lengkap</label>
                 <input id="name" type="text" name="name" value="{{ old('name') }}" 
                        placeholder="Masukkan nama lengkap" required autofocus autocomplete="name">
                 @if($errors->has('name'))
@@ -287,7 +287,7 @@
 
             <!-- Email -->
             <div class="form-group">
-                <label for="email">📧 Email</label>
+                <label for="email">Email</label>
                 <input id="email" type="email" name="email" value="{{ old('email') }}" 
                        placeholder="Masukkan email" required autocomplete="username">
                 @if($errors->has('email'))
@@ -297,7 +297,7 @@
 
             <!-- Password -->
             <div class="form-group">
-                <label for="password">🔒 Password</label>
+                <label for="password">Password</label>
                 <input id="password" type="password" name="password" 
                        placeholder="Masukkan password" required autocomplete="new-password">
                 @if($errors->has('password'))
@@ -307,7 +307,7 @@
 
             <!-- Confirm Password -->
             <div class="form-group" style="margin-bottom: 0;">
-                <label for="password_confirmation">🔒 Konfirmasi Password</label>
+                <label for="password_confirmation">Konfirmasi Password</label>
                 <input id="password_confirmation" type="password" name="password_confirmation" 
                        placeholder="Konfirmasi password" required autocomplete="new-password">
                 @if($errors->has('password_confirmation'))
@@ -318,7 +318,7 @@
             <!-- Actions -->
             <div class="register-actions">
                 <button type="submit" class="btn-register">
-                    🚀 Daftar
+                    Daftar
                 </button>
 
                 <a class="login-link" href="{{ route('login') }}">

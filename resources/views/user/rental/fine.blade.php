@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            💰 Bayar Denda
+            Bayar Denda
         </h2>
     </x-slot>
 
@@ -387,7 +387,7 @@
                 <div class="body">
                     <!-- Vehicle Info -->
                     <h3 class="vehicle-name">{{ $cart->vehicle->name }}</h3>
-                    <p class="vehicle-location">📍 {{ $cart->vehicle->location }}</p>
+                    <p class="vehicle-location">                     {{ $cart->vehicle->location }}</p>
 
                     <!-- Fine Box -->
                     <div class="fine-box">
@@ -396,7 +396,7 @@
                             <small>Total Denda</small>
                         </div>
                         <div class="fine-detail">
-                            ⏱️ Telat: <strong>{{ floor(($fine->late_minutes ?? 0) / 60) }} jam {{ ($fine->late_minutes ?? 0) % 60 }} menit</strong>
+                             Telat: <strong>{{ floor(($fine->late_minutes ?? 0) / 60) }} jam {{ ($fine->late_minutes ?? 0) % 60 }} menit</strong>
                         </div>
                     </div>
 
@@ -408,29 +408,29 @@
 
                         <div class="payment-grid">
                             <button type="submit" name="payment_method" value="qris" class="payment-btn">
-                                <span class="icon">📱</span>
+                                <span class="icon"></span>
                                 QRIS
                             </button>
                             <button type="submit" name="payment_method" value="bank_transfer" class="payment-btn">
-                                <span class="icon">🏦</span>
+                                <span class="icon"></span>
                                 Transfer
                             </button>
                             <button type="submit" name="payment_method" value="gopay" class="payment-btn">
-                                <span class="icon">💚</span>
+                                <span class="icon"></span>
                                 GoPay
                             </button>
                             <button type="submit" name="payment_method" value="dana" class="payment-btn">
-                                <span class="icon">🟣</span>
+                                <span class="icon"></span>
                                 DANA
                             </button>
                             <button type="submit" name="payment_method" value="ovo" class="payment-btn">
-                                <span class="icon">🟡</span>
+                                <span class="icon"></span>
                                 OVO
                             </button>
                         </div>
 
                         <button type="submit" class="btn-submit">
-                            💳 Bayar Denda
+                             Bayar Denda
                         </button>
                     </form>
 

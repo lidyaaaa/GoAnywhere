@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            👤 Profile User
+            Profile User
         </h2>
     </x-slot>
 
@@ -287,7 +287,7 @@
             <!-- ALERT -->
             @if(session('success'))
                 <div class="alert-success">
-                    ✅ {{ session('success') }}
+                     {{ session('success') }}
                 </div>
             @endif
 
@@ -305,11 +305,11 @@
                             <!-- ===== KOLOM KIRI: Profil ===== -->
                             <div>
                                 <div class="col-title">
-                                    <span class="icon">👤</span> Informasi Profil
+                                    <span></span> Informasi Profil
                                 </div>
 
                                 <div class="form-group">
-                                    <label>👤 Nama Lengkap</label>
+                                    <label>Nama Lengkap</label>
                                     <input type="text" name="name" value="{{ old('name', $user->name) }}" placeholder="Masukkan nama lengkap">
                                     @error('name')
                                         <div class="error-text">{{ $message }}</div>
@@ -317,7 +317,7 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label>📧 Email</label>
+                                    <label>Email</label>
                                     <input type="email" name="email" value="{{ old('email', $user->email) }}" placeholder="Masukkan email">
                                     @error('email')
                                         <div class="error-text">{{ $message }}</div>
@@ -325,7 +325,7 @@
                                 </div>
 
                                 <div class="form-group" style="margin-bottom: 0;">
-                                    <label>📱 No. HP</label>
+                                    <label>No. HP</label>
                                     <input type="text" name="phone" value="{{ old('phone', $user->phone) }}" placeholder="0812-3456-7890">
                                     @error('phone')
                                         <div class="error-text">{{ $message }}</div>
@@ -336,11 +336,11 @@
                             <!-- ===== KOLOM KANAN: Ganti Password ===== -->
                             <div>
                                 <div class="col-title">
-                                    <span class="icon">🔑</span> Ganti Password
+                                    <span></span> Ganti Password
                                 </div>
 
                                 <div class="form-group">
-                                    <label>🔒 Password Lama</label>
+                                    <label>Password Lama</label>
                                     <input type="password" name="current_password" placeholder="Masukkan password lama">
                                     @error('current_password')
                                         <div class="error-text">{{ $message }}</div>
@@ -348,7 +348,7 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label>🔒 Password Baru</label>
+                                    <label>Password Baru</label>
                                     <input type="password" name="new_password" placeholder="Masukkan password baru">
                                     @error('new_password')
                                         <div class="error-text">{{ $message }}</div>
@@ -356,7 +356,7 @@
                                 </div>
 
                                 <div class="form-group" style="margin-bottom: 0;">
-                                    <label>🔒 Konfirmasi Password Baru</label>
+                                    <label>Konfirmasi Password Baru</label>
                                     <input type="password" name="new_password_confirmation" placeholder="Konfirmasi password baru">
                                 </div>
                             </div>
@@ -365,7 +365,7 @@
 
                         <!-- ===== SUBMIT ===== -->
                         <button type="submit" class="btn-submit">
-                            💾 Simpan Perubahan
+                            Simpan Perubahan
                         </button>
 
                     </form>

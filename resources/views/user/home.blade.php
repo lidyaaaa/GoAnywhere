@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            🏠 Home - GoAnywhere
+            Home - GoAnywhere
         </h2>
     </x-slot>
 
@@ -661,7 +661,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
                 <div>
                     <h1 class="hero-title">
-                        🚗 <span>GoAnywhere</span>
+                        <span>GoAnywhere</span>
                     </h1>
                     <p class="hero-subtitle">Mewah. Nyaman. Profesional.</p>
                     <p class="hero-desc">
@@ -669,15 +669,15 @@
                     </p>
                     <div style="display: flex; flex-wrap: wrap; gap: 16px; position: relative; z-index: 1; margin-top: 8px;">
                         <a href="{{ route('user.armada') }}" class="hero-btn-primary">
-                            🚙 Lihat Armada
+                            Lihat Armada
                         </a>
                         <a href="{{ route('user.layanan') }}" class="hero-btn-secondary">
-                            📋 Layanan
+                            Layanan
                         </a>
                     </div>
                 </div>
                 <div class="hidden md:block text-center">
-                    <div class="hero-icon">🚗</div>
+                    <div class="hero-icon"></div>
                     <p style="color: rgba(255,255,255,0.6); margin-top: 20px; position: relative; z-index: 1; font-weight: 300; letter-spacing: 2px; font-size: 14px; text-transform: uppercase;">
                         Rental Kendaraan Terpercaya
                     </p>
@@ -693,7 +693,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-16">
                 <div>
-                    <h2 class="about-title">📖 Tentang <span>GoAnywhere</span></h2>
+                    <h2 class="about-title">Tentang <span>GoAnywhere</span></h2>
                     <p class="about-text">
                         GoAnywhere adalah perusahaan penyedia jasa rental kendaraan Jakarta dan sekitarnya untuk harian dan mingguan.
                     </p>
@@ -704,29 +704,29 @@
                         Dengan berbagai macam pilihan kendaraan terbaik, kami jamin mampu memenuhi kebutuhan transportasi Anda, terutama dari segi kenyamanan dan keselamatan demi kepuasan Anda dalam perjalanan.
                     </p>
                     <div class="about-highlight">
-                        <p>✨ Sewa kendaraan di GoAnywhere sekarang juga! Kami siap melayani Anda sepenuh hati!</p>
+                        <p>Sewa kendaraan di GoAnywhere sekarang juga! Kami siap melayani Anda sepenuh hati!</p>
                     </div>
                 </div>
                 <div>
                     <!-- STATISTIK 2x2 -->
                     <div class="stat-grid">
                         <div class="stat-card">
-                            <span class="stat-icon">🏢</span>
+                            <span class="stat-icon"></span>
                             <div class="stat-number">2024</div>
                             <div class="stat-label">Berdiri Sejak</div>
                         </div>
                         <div class="stat-card">
-                            <span class="stat-icon">📍</span>
+                            <span class="stat-icon"></span>
                             <div class="stat-number">5</div>
                             <div class="stat-label">Lokasi</div>
                         </div>
                         <div class="stat-card">
-                            <span class="stat-icon">🚗</span>
+                            <span class="stat-icon"></span>
                             <div class="stat-number">{{ $totalVehicles }}+</div>
                             <div class="stat-label">Armada</div>
                         </div>
                         <div class="stat-card">
-                            <span class="stat-icon">⭐</span>
+                            <span class="stat-icon"></span>
                             <div class="stat-number">100%</div>
                             <div class="stat-label">Kepercayaan</div>
                         </div>
@@ -743,7 +743,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; flex-wrap: wrap; gap: 16px;">
                 <div>
-                    <h2 style="font-size: 34px; font-weight: 700; color: #2c3e50; font-family: 'Georgia', serif;">🚙 Armada Terbaru</h2>
+                     <h2 style="font-size: 34px; font-weight: 700; color: #2c3e50; font-family: 'Georgia', serif;">Armada Terbaru</h2>
                     <p style="color: #7a8a9a; margin-top: 4px; font-weight: 300;">Kendaraan pilihan dengan kualitas terbaik</p>
                 </div>
                 <a href="{{ route('user.armada') }}" style="color: #43637E; font-weight: 600; text-decoration: none; padding: 8px 20px; border: 2px solid #43637E; border-radius: 8px; transition: all 0.3s ease; font-size: 14px; letter-spacing: 0.5px; white-space: nowrap;">
@@ -759,7 +759,7 @@
                             @if($vehicle->image)
                                 <img src="{{ asset('storage/' . $vehicle->image) }}" alt="{{ $vehicle->name }}">
                             @else
-                                {{ $vehicle->vehicle_type == 'car' ? '🚗' : '🏍️' }}
+                                 {{ $vehicle->vehicle_type == 'car' ? 'Car' : 'Motorcycle' }}
                             @endif
                         </div>
                         <div class="armada-body">
@@ -776,17 +776,17 @@
                                 <small>/ hari</small>
                             </div>
                             <div class="armada-location">
-                                📍 {{ $vehicle->location }}
-                                <span class="armada-stock">📦 {{ $vehicle->available_stock }} tersedia</span>
+                                 {{ $vehicle->location }}
+                                 <span class="armada-stock">{{ $vehicle->available_stock }} available</span>
                             </div>
                             <a href="{{ route('user.armada.detail', $vehicle->id) }}" class="armada-btn">
-                                📋 Detail
+                                 Detail
                             </a>
                         </div>
                     </div>
                 @empty
                     <div style="grid-column: span 3; text-align: center; padding: 60px 0; color: #7a8a9a;">
-                        <div style="font-size: 56px; margin-bottom: 20px; opacity: 0.5;">🚗</div>
+                        <div style="font-size: 56px; margin-bottom: 20px; opacity: 0.5;"></div>
                         <p style="font-size: 18px; font-weight: 300;">Belum ada kendaraan tersedia</p>
                     </div>
                 @endforelse
@@ -801,28 +801,28 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-10">
                 <div>
-                    <h3 class="footer-title">🚗 GoAnywhere</h3>
+                    <h3 class="footer-title">GoAnywhere</h3>
                     <p class="footer-text">Solusi rental kendaraan terpercaya</p>
                 </div>
                 <div>
-                    <h4 class="footer-heading">📌 Lokasi</h4>
+                    <h4 class="footer-heading">Lokasi</h4>
                     <ul class="footer-list">
-                        <li>📍 Jakarta</li>
-                        <li>📍 Bogor</li>
-                        <li>📍 Depok</li>
-                        <li>📍 Tangerang</li>
-                        <li>📍 Bekasi</li>
+                        <li>Jakarta</li>
+                        <li>Bogor</li>
+                        <li>Depok</li>
+                        <li>Tangerang</li>
+                        <li>Bekasi</li>
                     </ul>
                 </div>
                 <div>
-                    <h4 class="footer-heading">📞 Kontak</h4>
+                    <h4 class="footer-heading">Kontak</h4>
                     <ul class="footer-list">
-                        <li>📱 0812-3456-7890</li>
-                        <li>📧 info@goanywhere.com</li>
+                        <li>0812-3456-7890</li>
+                        <li>info@goanywhere.com</li>
                     </ul>
                 </div>
                 <div>
-                    <h4 class="footer-heading">🕐 Jam Operasional</h4>
+                    <h4 class="footer-heading">Jam Operasional</h4>
                     <ul class="footer-list">
                         <li>Senin - Minggu</li>
                         <li>08:00 - 22:00</li>
