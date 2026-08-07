@@ -394,7 +394,7 @@
                             <!-- ===== KOLOM KIRI: Profil ===== -->
                             <div>
                                 <div class="col-title">
-                                     <span class="icon"></span> Informasi Profil
+                                     <span class="section-badge"></span> Informasi Profil
                                 </div>
 
                                 <div class="form-group">
@@ -425,7 +425,7 @@
                             <!-- ===== KOLOM KANAN: Ganti Password ===== -->
                             <div>
                                 <div class="col-title">
-                                     <span class="icon"></span> Ganti Password
+                                     <span class="section-badge"></span> Ganti Password
                                 </div>
 
                                 <div class="form-group">

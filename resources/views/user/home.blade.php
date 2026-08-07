@@ -129,11 +129,27 @@
         }
 
         .hero-icon {
-            font-size: 120px;
+            width: 160px;
+            height: 160px;
+            border-radius: 28px;
             position: relative;
             z-index: 1;
             animation: float 5s ease-in-out infinite;
             filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.3));
+            background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.4), rgba(67, 99, 126, 0.18) 45%, transparent 70%);
+            border: 1px solid rgba(255, 255, 255, 0.28);
+        }
+
+        .hero-icon::before {
+            content: '';
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.8);
+            top: 16px;
+            left: 20px;
+            opacity: 0.7;
         }
 
         @keyframes float {
@@ -233,9 +249,24 @@
         }
 
         .stat-icon {
-            font-size: 36px;
-            margin-bottom: 8px;
+            width: 48px;
+            height: 48px;
+            margin-bottom: 12px;
             display: block;
+            border-radius: 16px;
+            background: rgba(67, 99, 126, 0.14);
+            position: relative;
+        }
+
+        .stat-icon::before {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border-radius: 999px;
+            background: rgba(67, 99, 126, 0.22);
+            top: 12px;
+            left: 12px;
         }
 
         .stat-number {

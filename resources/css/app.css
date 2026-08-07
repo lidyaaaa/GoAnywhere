@@ -191,6 +191,136 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ======================================================== */
+/* ICON PLACEHOLDERS FOR EMPTY SPANS                        */
+/* ======================================================== */
+.icon,
+.hero-icon,
+.stat-icon,
+.city-icon,
+.search-icon,
+.status-icon,
+.feature-icon,
+.section-badge,
+.contact-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    border-radius: 999px;
+    background: rgba(67, 99, 126, 0.10);
+    border: 1px solid rgba(67, 99, 126, 0.15);
+    color: #43637E;
+    position: relative;
+    flex-shrink: 0;
+}
+.icon::before,
+.hero-icon::before,
+.stat-icon::before,
+.city-icon::before,
+.search-icon::before,
+.status-icon::before,
+.feature-icon::before,
+.section-badge::before,
+.contact-icon::before {
+    content: '';
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border-radius: 999px;
+    background: #43637E;
+    opacity: 0.18;
+}
+.hero-icon {
+    width: 120px;
+    height: 120px;
+    border-radius: 24px;
+    background: radial-gradient(circle at top left, rgba(255,255,255,0.35), rgba(67, 99, 126, 0.18));
+    border: 1px solid rgba(255,255,255,0.28);
+}
+.hero-icon::before {
+    width: 26px;
+    height: 26px;
+    opacity: 0.22;
+}
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 16px;
+    background: rgba(67, 99, 126, 0.14);
+}
+.city-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: rgba(67, 99, 126, 0.16);
+}
+.feature-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 18px;
+    background: rgba(67, 99, 126, 0.11);
+}
+.section-badge {
+    width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    background: #43637E;
+    border: none;
+}
+.section-badge::before {
+    display: none;
+}
+
+.section-title .icon,
+.col-title .icon {
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    min-height: 18px;
+    border-radius: 999px;
+    background: rgba(67, 99, 126, 0.16);
+}
+.section-title .icon::before,
+.col-title .icon::before {
+    width: 8px;
+    height: 8px;
+    opacity: 0.3;
+}
+
+.hero-circle {
+    width: 140px;
+    height: 140px;
+    border-radius: 28px;
+    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.45), rgba(67, 99, 126, 0.18) 45%, transparent 72%);
+    border: 1px solid rgba(255,255,255,0.32);
+    box-shadow: 0 20px 50px rgba(67, 99, 126, 0.18);
+    position: relative;
+    overflow: hidden;
+}
+.hero-circle::before {
+    content: '';
+    position: absolute;
+    top: 18px;
+    left: 18px;
+    width: 28px;
+    height: 28px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.75);
+}
+
+.maps-item .city-icon {
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    min-height: 20px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.18);
+}
+
+/* ======================================================== */
 /* BUTTONS: Monochromatic Minimalist Style                  */
 /* ======================================================== */
 .btn-primary, 

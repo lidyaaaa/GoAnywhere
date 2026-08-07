@@ -39,8 +39,14 @@
             margin-bottom: 20px;
         }
 
-        .section-title .icon {
-            margin-right: 8px;
+        .section-title .section-badge {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border-radius: 999px;
+            background: #43637E;
+            margin-right: 12px;
+            vertical-align: middle;
         }
 
         /* ===== CONTACT GRID ===== */
@@ -68,9 +74,26 @@
             border-color: #43637E;
         }
 
-        .contact-card .icon {
-            font-size: 28px;
+        .contact-card .contact-icon {
+            width: 48px;
+            height: 48px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #43637E, #6b89a0);
+            box-shadow: 0 10px 20px rgba(67, 99, 126, 0.18);
             flex-shrink: 0;
+            position: relative;
+        }
+
+        .contact-card .contact-icon::before {
+            content: '';
+            width: 14px;
+            height: 14px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.85);
+            position: absolute;
         }
 
         .contact-card .info .label {
@@ -118,8 +141,14 @@
             margin-bottom: 8px;
         }
 
+        .location-card .header .location-pin,
         .location-card .header .icon {
-            font-size: 28px;
+            width: 16px;
+            height: 16px;
+            min-width: 16px;
+            border-radius: 999px;
+            background: #43637E;
+            display: inline-block;
         }
 
         .location-card .header .name {
@@ -429,32 +458,32 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
             <!-- ===== KONTAK ===== -->
-            <h3 class="section-title"><span></span> Hubungi Kami</h3>
+            <h3 class="section-title"><span class="section-badge"></span> Hubungi Kami</h3>
 
             <div class="contact-grid">
                 <div class="contact-card">
-                    <span></span>
+                    <span class="contact-icon"></span>
                     <div class="info">
                         <div class="label">Telepon</div>
                         <div class="value">{{ $contacts['phone'] }}</div>
                     </div>
                 </div>
                 <div class="contact-card">
-                    <span></span>
+                    <span class="contact-icon"></span>
                     <div class="info">
                         <div class="label">WhatsApp</div>
                         <div class="value">{{ $contacts['wa'] }}</div>
                     </div>
                 </div>
                 <div class="contact-card">
-                    <span></span>
+                    <span class="contact-icon"></span>
                     <div class="info">
                         <div class="label">Email</div>
                         <div class="value">{{ $contacts['email'] }}</div>
                     </div>
                 </div>
                 <div class="contact-card">
-                    <span></span>
+                    <span class="contact-icon"></span>
                     <div class="info">
                         <div class="label">Jam Operasional</div>
                         <div class="value">{{ $contacts['hours'] }}</div>
@@ -463,13 +492,13 @@
             </div>
 
             <!-- ===== LOKASI ===== -->
-            <h3 class="section-title" style="margin-top: 40px;"><span></span> Lokasi Kami</h3>
+            <h3 class="section-title" style="margin-top: 40px;"><span class="section-badge"></span> Lokasi Kami</h3>
 
             <div class="location-grid">
                 @foreach($locations as $city => $data)
                     <div class="location-card">
                         <div class="header">
-                            <span></span>
+                            <span class="location-pin"></span>
                             <span class="name">{{ $city }}</span>
                         </div>
                         <div class="address">{{ $data['address'] }}</div>
@@ -487,7 +516,7 @@
             </div>
 
             <!-- ===== MAPS 5 LOKASI ===== -->
-            <h3 class="section-title" style="margin-top: 40px;"><span></span> Peta Lokasi</h3>
+            <h3 class="section-title" style="margin-top: 40px;"><span class="section-badge"></span> Peta Lokasi</h3>
 
             <div class="maps-grid">
                 <!-- Jakarta - Gambir -->
