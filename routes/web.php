@@ -46,6 +46,7 @@ Route::middleware(['auth', 'verified', 'role:user'])->prefix('user')->name('user
     
     // SEWA SAYA (di menu navigasi)
     Route::get('/rental', [RentalController::class, 'index'])->name('rental');
+    Route::post('/rental/cancel/{booking_code}', [RentalController::class, 'cancelBooking'])->name('rental.cancel');
     Route::get('/rental/return/{id}', [RentalController::class, 'return'])->name('rental.return');
     Route::post('/rental/process/{id}', [RentalController::class, 'processReturn'])->name('rental.processReturn');
     Route::get('/rental/fine/{id}', [RentalController::class, 'fine'])->name('rental.fine');

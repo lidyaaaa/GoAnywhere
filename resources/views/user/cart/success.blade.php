@@ -301,7 +301,7 @@
                      <span class="success-icon"></span>
 
                     <!-- Title -->
-                    <h3 class="success-title">PEMBAYARAN BERHASIL!</h3>
+                    <h3 class="success-title">PEMBAYARAN MENUNGGU KONFIRMASI</h3>
                     <p class="success-subtitle">
                         Kode Booking: <strong>{{ $booking_code }}</strong>
                     </p>

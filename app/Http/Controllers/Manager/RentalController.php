@@ -23,8 +23,10 @@ class RentalController extends Controller
                 ->with('error', 'Transaksi tidak ditemukan atau sudah diproses.');
         }
 
+        $approvedAt = now();
+
         foreach ($carts as $cart) {
-            $startTime = now();
+            $startTime = $approvedAt->copy();
             $totalDays = $cart->quantity_days ?? 1;
             if ($cart->period === 'weekly') {
                 $totalDays = 7;
@@ -35,6 +37,11 @@ class RentalController extends Controller
             $cart->rental_end_date = $startTime->copy()->addDays($totalDays);
             $cart->save();
         }
+
+        $carts->first()->payment()->update([
+            'payment_status' => 'success',
+            'paid_at' => $approvedAt,
+        ]);
 
         return redirect()->route('manager.rentals')
             ->with('success', 'Booking ' . $bookingCode . ' berhasil disetujui.');

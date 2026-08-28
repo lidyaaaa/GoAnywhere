@@ -229,9 +229,9 @@ class CartController extends Controller
                 'user_id' => auth()->id(),
                 'amount' => $total,
                 'payment_method' => $request->payment_method,
-                'payment_status' => 'success',
+                'payment_status' => 'pending',
                 'payment_code' => 'PAY-' . strtoupper(Str::random(10)),
-                'paid_at' => now(),
+                'paid_at' => null,
                 'expired_at' => now()->addMinutes(30),
             ]);
 
@@ -246,14 +246,12 @@ class CartController extends Controller
                 $vehicle->available_stock -= ($cart->quantity_vehicle ?? 1);
                 $vehicle->save();
 
-                $payment->cart_id = $cart->id;
-                $payment->save();
             }
 
             DB::commit();
 
             return redirect()->route('user.payment.success', ['booking_code' => $bookingCode])
-                ->with('success', 'Pembayaran berhasil! Silakan menunggu konfirmasi pengiriman.');
+                ->with('success', 'Pembayaran menunggu konfirmasi manager.');
 
         } catch (\Exception $e) {
             DB::rollBack();

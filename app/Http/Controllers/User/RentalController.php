@@ -10,6 +10,7 @@ use App\Models\RentalHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 class RentalController extends Controller
 {
@@ -69,12 +70,46 @@ class RentalController extends Controller
         $lateMinutes = 0;
 
         if ($isLate) {
-            $lateMinutes = $now->diffInMinutes($endDate);
+            $lateMinutes = $now->diffInMinutes($tolerance);
             $hoursLate = ceil($lateMinutes / 60);
             $fineAmount = $hoursLate * 50000; // Rp 50.000/jam
         }
 
         return view('user.rental.return', compact('cart', 'isLate', 'fineAmount', 'lateMinutes'));
+    }
+
+    public function cancelBooking($bookingCode)
+    {
+        $carts = Cart::where('user_id', auth()->id())
+            ->where('booking_code', $bookingCode)
+            ->where('status', 'paid')
+            ->with('vehicle')
+            ->get();
+
+        if ($carts->isEmpty()) {
+            return redirect()->route('user.rental')
+                ->with('error', 'Booking tidak dapat dibatalkan atau sudah dikonfirmasi manager.');
+        }
+
+        DB::transaction(function () use ($carts) {
+            foreach ($carts as $cart) {
+                $cart->status = 'cancelled';
+                $cart->save();
+
+                $vehicle = $cart->vehicle;
+                if ($vehicle) {
+                    $vehicle->available_stock += ($cart->quantity_vehicle ?? 1);
+                    $vehicle->save();
+                }
+            }
+
+            $carts->first()->payment()->update([
+                'payment_status' => 'failed',
+            ]);
+        });
+
+        return redirect()->route('user.rental')
+            ->with('success', 'Booking berhasil dibatalkan.');
     }
 
     public function processReturn(Request $request, $id)
@@ -93,7 +128,7 @@ class RentalController extends Controller
         $lateMinutes = 0;
 
         if ($isLate) {
-            $lateMinutes = $now->diffInMinutes($endDate);
+            $lateMinutes = $now->diffInMinutes($tolerance);
             $hoursLate = ceil($lateMinutes / 60);
             $fineAmount = $hoursLate * 50000;
 
@@ -170,6 +205,10 @@ class RentalController extends Controller
             ->firstOrFail();
 
         $fine = Fine::where('cart_id', $cart->id)->first();
+        if (!$fine || $fine->payment_status === 'paid') {
+            return redirect()->route('user.rental');
+        }
+
         $fine->payment_status = 'paid';
         $fine->payment_method = $request->payment_method;
         $fine->paid_at = now();

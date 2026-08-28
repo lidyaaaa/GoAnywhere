@@ -1124,6 +1124,10 @@
                                     <span class="location">📍 {{ $item->vehicle->location }}</span>
                                     <span class="price">💵 Rp {{ number_format($item->subtotal, 0, ',', '.') }}</span>
                                 </div>
+                                <form action="{{ route('user.rental.cancel', $item->booking_code) }}" method="POST" onsubmit="return confirm('Batalkan booking ini?')">
+                                    @csrf
+                                    <button type="submit" class="btn-pickup">Batal Booking</button>
+                                </form>
                             </div>
                             <div class="pending-meta">
                                 <span>🔑 Kode Booking: <strong>{{ $item->booking_code }}</strong></span>
@@ -1135,36 +1139,12 @@
             @endif
 
             <!-- ===== SEWA AKTIF ===== -->
-            <h3 class="section-title"><span class="icon">🚗</span> Sewa Aktif</h3>
+            <h3 class="section-title"><span class="icon">🚚</span> Kendaraan Sedang Diantar / Sewa Aktif</h3>
 
             @if(count($activeRentals) > 0)
                 @foreach($activeRentals as $rental)
                     @php
                         $endDate = \Carbon\Carbon::parse($rental->rental_end_date);
-                        $now = now();
-                        if ($now->lt($endDate)) {
-                            $diffInMinutes = $now->diffInMinutes($endDate);
-                            $days = floor($diffInMinutes / 1440);
-                            $hours = floor(($diffInMinutes % 1440) / 60);
-                            $minutes = $diffInMinutes % 60;
-                            $statusClass = $diffInMinutes > 1440 ? 'green' : 'yellow';
-                            $parts = [];
-                            if ($days > 0) $parts[] = $days . ' hari';
-                            if ($hours > 0) $parts[] = $hours . ' jam';
-                            if ($minutes > 0 || empty($parts)) $parts[] = $minutes . ' menit';
-                            $statusText = '⏳ Sisa ' . implode(' ', $parts);
-                        } else {
-                            $diffInMinutes = $endDate->diffInMinutes($now);
-                            $days = floor($diffInMinutes / 1440);
-                            $hours = floor(($diffInMinutes % 1440) / 60);
-                            $minutes = $diffInMinutes % 60;
-                            $statusClass = 'red';
-                            $parts = [];
-                            if ($days > 0) $parts[] = $days . ' hari';
-                            if ($hours > 0) $parts[] = $hours . ' jam';
-                            if ($minutes > 0 || empty($parts)) $parts[] = $minutes . ' menit';
-                            $statusText = '⚠️ Telat ' . implode(' ', $parts);
-                        }
                     @endphp
 
                     <div class="rental-card">
@@ -1189,7 +1169,7 @@
                                     <span class="label">💸 Denda telat:</span>
                                     <span>Rp 50.000/jam</span>
                                 </div>
-                                <span class="status-badge {{ $statusClass }}">{{ $statusText }}</span>
+                                <span class="status-badge rental-countdown" data-end-time="{{ $endDate->toIso8601String() }}" data-tolerance-time="{{ $endDate->copy()->addMinutes(30)->toIso8601String() }}">Memuat waktu...</span>
                             </div>
                             <div class="rental-right">
                                 <a href="{{ route('user.rental.return', $rental->id) }}" class="btn-return">
@@ -1261,3 +1241,50 @@
         </div>
     </div>
 </x-app-layout>
+
+<script>
+    function formatRemainingTime(totalSeconds) {
+        const days = Math.floor(totalSeconds / 86400);
+        const hours = Math.floor((totalSeconds % 86400) / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+        const parts = [];
+
+        if (days > 0) parts.push(`${days} hari`);
+        if (hours > 0 || days > 0) parts.push(`${hours} jam`);
+        if (minutes > 0 || hours > 0 || days > 0) parts.push(`${minutes} menit`);
+        parts.push(`${seconds} detik`);
+
+        return parts.join(' ');
+    }
+
+    function updateRentalCountdowns() {
+        const now = Date.now();
+
+        document.querySelectorAll('.rental-countdown').forEach((element) => {
+            const endTime = new Date(element.dataset.endTime).getTime();
+            const toleranceTime = new Date(element.dataset.toleranceTime).getTime();
+            const secondsUntilEnd = Math.max(0, Math.floor((endTime - now) / 1000));
+
+            if (now <= endTime) {
+                element.className = 'status-badge rental-countdown green';
+                element.textContent = `⏳ Sisa ${formatRemainingTime(secondsUntilEnd)}`;
+                return;
+            }
+
+            const secondsUntilTolerance = Math.max(0, Math.floor((toleranceTime - now) / 1000));
+            if (now <= toleranceTime) {
+                element.className = 'status-badge rental-countdown yellow';
+                element.textContent = `⚠️ Masa toleransi ${formatRemainingTime(secondsUntilTolerance)}`;
+                return;
+            }
+
+            const lateSeconds = Math.floor((now - toleranceTime) / 1000);
+            element.className = 'status-badge rental-countdown red';
+            element.textContent = `⚠️ Telat ${formatRemainingTime(lateSeconds)}`;
+        });
+    }
+
+    updateRentalCountdowns();
+    setInterval(updateRentalCountdowns, 1000);
+</script>
