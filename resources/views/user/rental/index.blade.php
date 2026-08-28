@@ -1114,7 +1114,7 @@
                 <div class="pending-box">
                     <div class="pending-header">
                         <span class="icon">🚚</span>
-                        <h3>Kendaraan Dalam Pengantaran</h3>
+                        <h3>Menunggu Persetujuan Manager</h3>
                     </div>
                     @foreach($pendingPickup as $item)
                         <div class="pending-item">
@@ -1124,9 +1124,6 @@
                                     <span class="location">📍 {{ $item->vehicle->location }}</span>
                                     <span class="price">💵 Rp {{ number_format($item->subtotal, 0, ',', '.') }}</span>
                                 </div>
-                                <a href="{{ route('user.payment.success', $item->booking_code) }}" class="btn-pickup">
-                                    📦 Konfirmasi Penerimaan
-                                </a>
                             </div>
                             <div class="pending-meta">
                                 <span>🔑 Kode Booking: <strong>{{ $item->booking_code }}</strong></span>

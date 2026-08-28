@@ -34,8 +34,8 @@ class DashboardController extends Controller
             })
             ->count();
         
-        // 🔥 TOTAL RIWAYAT TRANSAKSI
-        $totalHistory = Cart::whereIn('status', ['completed', 'paid'])
+        // TOTAL RIWAYAT TRANSAKSI
+        $totalHistory = Cart::where('status', 'completed')
             ->whereHas('vehicle', function($q) use ($location) {
                 $q->where('location', $location);
             })
@@ -51,7 +51,7 @@ class DashboardController extends Controller
             ->get();
         
         // Riwayat transaksi terakhir
-        $recentHistory = Cart::whereIn('status', ['completed', 'paid'])
+        $recentHistory = Cart::where('status', 'completed')
             ->whereHas('vehicle', function($q) use ($location) {
                 $q->where('location', $location);
             })

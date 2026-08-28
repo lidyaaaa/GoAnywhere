@@ -1,10 +1,4 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            Layanan GoAnywhere
-        </h2>
-    </x-slot>
-
     <!-- ============================================ -->
     <!-- STYLE ELEGAN - #43637E + SHADOW HITAM TEBEL -->
     <!-- ============================================ -->
@@ -19,16 +13,21 @@
             padding: 80px 0 100px;
             background: #f8f6f2;
             position: relative;
+            min-height: 100vh;
         }
 
         .layanan-section::before {
-            content: '';
+            display: none;
+        }
+
+        .layanan-section::after {
+            content: '✦';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #43637E, #f0e6d0, #43637E);
+            bottom: 40px;
+            right: 40px;
+            font-size: 60px;
+            color: rgba(67, 99, 126, 0.06);
+            pointer-events: none;
         }
 
         .layanan-title {
@@ -322,6 +321,10 @@
 
         .dark .layanan-section::before {
             background: linear-gradient(90deg, #43637E, #f0e6d0, #43637E);
+        }
+
+        .dark .layanan-section::after {
+            color: rgba(67, 99, 126, 0.08);
         }
 
         .dark .layanan-title {

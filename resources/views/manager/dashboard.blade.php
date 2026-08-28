@@ -373,7 +373,7 @@
                             <tbody>
                                 @foreach($activeRentals as $rental)
                                     @php
-                                        $remaining = now()->diffInDays(\Carbon\Carbon::parse($rental->rental_end_date), false);
+                                        $remaining = now()->startOfDay()->diffInDays(\Carbon\Carbon::parse($rental->rental_end_date)->startOfDay(), false);
                                         if ($remaining > 0) {
                                             $statusClass = 'active';
                                             $statusText = $remaining . ' hari';
@@ -430,7 +430,7 @@
                                         <td>{{ $item->user->name ?? 'N/A' }}</td>
                                         <td class="font-semibold">Rp {{ number_format($item->subtotal ?? 0, 0, ',', '.') }}</td>
                                         <td>
-                                            @if($item->status == 'completed' || $item->status == 'paid')
+                                            @if($item->status == 'completed')
                                                 <span class="status-badge completed">Selesai</span>
                                             @else
                                                 <span class="status-badge active">{{ ucfirst($item->status ?? 'N/A') }}</span>

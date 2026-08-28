@@ -163,6 +163,7 @@ class CartController extends Controller
         foreach ($carts as $cart) {
             $vehicle = Vehicle::find($cart->vehicle_id);
             $cartCount = Cart::where('vehicle_id', $cart->vehicle_id)
+                ->where('id', '!=', $cart->id)
                 ->whereIn('status', ['pending', 'paid'])
                 ->sum('quantity_vehicle');
             $availableStock = $vehicle->available_stock - $cartCount;
@@ -204,6 +205,7 @@ class CartController extends Controller
         foreach ($carts as $cart) {
             $vehicle = Vehicle::find($cart->vehicle_id);
             $cartCount = Cart::where('vehicle_id', $cart->vehicle_id)
+                ->where('id', '!=', $cart->id)
                 ->whereIn('status', ['pending', 'paid'])
                 ->sum('quantity_vehicle');
             $availableStock = $vehicle->available_stock - $cartCount;

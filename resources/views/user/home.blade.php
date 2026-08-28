@@ -993,7 +993,7 @@
 
                         <!-- RIGHT: Image -->
                         <div class="hero-image-wrapper">
-                            <img src="{{ asset('storage/goy.jpg') }}" alt="GoAnywhere - Rental Kendaraan Terpercaya">
+                            <img src="{{ asset('storage/goy.png') }}" alt="GoAnywhere - Rental Kendaraan Terpercaya">
                             <div class="hero-image-overlay"></div>
                             <div class="hero-image-badge">
                                 <span>🚙</span>

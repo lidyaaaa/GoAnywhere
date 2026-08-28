@@ -310,9 +310,9 @@
                     <div class="timer-box" style="background: #e8f4ec; border-color: #4a7a5a;">
                         <div class="timer-header">
                             <span class="icon"></span>
-                            <span class="label" style="color: #4a7a5a;">Kendaraan akan diantar ke lokasi Anda</span>
+                            <span class="label" style="color: #4a7a5a;">Menunggu persetujuan manager</span>
                         </div>
-                        <div class="timer-display" style="font-size: 20px; color: #4a7a5a; letter-spacing: 0;">Staff kami sedang menyiapkan kendaraan Anda</div>
+                        <div class="timer-display" style="font-size: 20px; color: #4a7a5a; letter-spacing: 0;">Menunggu persetujuan manager</div>
                         <div class="timer-location">
                              Pengembalian kendaraan: <strong>Dikembalikan ke kantor</strong>
                         </div>
@@ -332,12 +332,6 @@
 
                     <!-- ===== BUTTONS ===== -->
                     <div class="btn-grid">
-                        <form action="{{ route('user.rental.start', $booking_code) }}" method="POST">
-                            @csrf
-                            <button type="submit" id="startRentalBtn" class="btn-full btn-primary">
-                                 Konfirmasi Penerimaan Kendaraan
-                            </button>
-                        </form>
                         <a href="{{ route('user.rental') }}" class="btn-full btn-secondary">
                              Sewa Saya
                         </a>

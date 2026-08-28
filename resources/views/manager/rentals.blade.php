@@ -129,6 +129,21 @@
             color: #4a7a5a;
         }
 
+        .approve-btn {
+            border: 0;
+            border-radius: 8px;
+            padding: 8px 14px;
+            background: #43637E;
+            color: #ffffff;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .approve-btn:hover {
+            background: #36546b;
+        }
+
         .empty-state {
             text-align: center;
             padding: 32px 20px;
@@ -253,6 +268,48 @@
     <div class="transaksi-section">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
+            <!-- ===== MENUNGGU PERSETUJUAN ===== -->
+            <div class="section-card">
+                <h3 class="section-title"><span class="icon"></span> Menunggu Persetujuan</h3>
+
+                @if(count($pendingApprovals) > 0)
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Kode</th>
+                                    <th>Kendaraan</th>
+                                    <th>Penyewa</th>
+                                    <th>Total</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($pendingApprovals as $item)
+                                    <tr>
+                                        <td><span class="booking-code">{{ $item->booking_code ?? 'N/A' }}</span></td>
+                                        <td class="vehicle-name">{{ $item->vehicle->name ?? 'N/A' }}</td>
+                                        <td>{{ $item->user->name ?? 'N/A' }}</td>
+                                        <td>Rp {{ number_format($item->subtotal ?? 0, 0, ',', '.') }}</td>
+                                        <td>
+                                            <form action="{{ route('manager.rentals.approve', $item->booking_code) }}" method="POST">
+                                                @csrf
+                                                <button type="submit" class="approve-btn" onclick="return confirm('Setujui booking ini?')">Setujui Booking</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <div class="empty-state">
+                        <span class="icon"></span>
+                        <p>Tidak ada transaksi yang menunggu persetujuan</p>
+                    </div>
+                @endif
+            </div>
+
             <!-- ===== SEWA AKTIF ===== -->
             <div class="section-card">
                     <h3 class="section-title"><span class="icon"></span> Sewa Aktif</h3>
@@ -272,7 +329,7 @@
                             <tbody>
                                 @foreach($rentals as $rental)
                                     @php
-                                        $remaining = now()->diffInDays(\Carbon\Carbon::parse($rental->rental_end_date), false);
+                                        $remaining = now()->startOfDay()->diffInDays(\Carbon\Carbon::parse($rental->rental_end_date)->startOfDay(), false);
                                         if ($remaining > 0) {
                                             $statusClass = 'active';
                                             $statusText = $remaining . ' hari';
@@ -329,7 +386,7 @@
                                         <td>{{ $item->quantity }} hari</td>
                                         <td style="font-weight: 600; color: #43637E;">Rp {{ number_format($item->subtotal ?? 0, 0, ',', '.') }}</td>
                                         <td>
-                                            @if($item->status == 'completed' || $item->status == 'paid')
+                                            @if($item->status == 'completed')
                                                 <span class="status-badge completed">Selesai</span>
                                             @else
                                                 <span class="status-badge active">{{ ucfirst($item->status ?? 'N/A') }}</span>

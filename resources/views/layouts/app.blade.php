@@ -14,7 +14,7 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans antialiased bg-[#F8FAFC] dark:bg-[#0B0F19]">
+    <body class="font-sans antialiased bg-[#F0F4F8] dark:bg-[#001F3F]">
         <div class="min-h-screen">
             @include('layouts.navigation')
 

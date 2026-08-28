@@ -8,6 +8,38 @@ use Illuminate\Http\Request;
 
 class RentalController extends Controller
 {
+    public function approve($bookingCode)
+    {
+        $location = auth()->user()->location;
+        $carts = Cart::where('booking_code', $bookingCode)
+            ->where('status', 'paid')
+            ->whereHas('vehicle', function ($query) use ($location) {
+                $query->where('location', $location);
+            })
+            ->get();
+
+        if ($carts->isEmpty()) {
+            return redirect()->route('manager.rentals')
+                ->with('error', 'Transaksi tidak ditemukan atau sudah diproses.');
+        }
+
+        foreach ($carts as $cart) {
+            $startTime = now();
+            $totalDays = $cart->quantity_days ?? 1;
+            if ($cart->period === 'weekly') {
+                $totalDays = 7;
+            }
+
+            $cart->status = 'active';
+            $cart->rental_start_date = $startTime;
+            $cart->rental_end_date = $startTime->copy()->addDays($totalDays);
+            $cart->save();
+        }
+
+        return redirect()->route('manager.rentals')
+            ->with('success', 'Booking ' . $bookingCode . ' berhasil disetujui.');
+    }
+
     public function index()
     {
         $location = auth()->user()->location;
@@ -21,8 +53,17 @@ class RentalController extends Controller
             ->orderBy('rental_start_date', 'desc')
             ->get();
 
-        // 🔥 RIWAYAT - status 'completed' ATAU 'paid'
-        $history = Cart::whereIn('status', ['completed', 'paid'])
+        // Transaksi yang sudah dibayar dan menunggu persetujuan manager.
+        $pendingApprovals = Cart::where('status', 'paid')
+            ->whereHas('vehicle', function($q) use ($location) {
+                $q->where('location', $location);
+            })
+            ->with(['vehicle', 'user'])
+            ->orderBy('updated_at', 'asc')
+            ->get();
+
+        // Riwayat transaksi yang sudah selesai.
+        $history = Cart::where('status', 'completed')
             ->whereHas('vehicle', function($q) use ($location) {
                 $q->where('location', $location);
             })
@@ -30,6 +71,6 @@ class RentalController extends Controller
             ->orderBy('updated_at', 'desc')
             ->paginate(20);
 
-        return view('manager.rentals', compact('rentals', 'history'));
+        return view('manager.rentals', compact('rentals', 'pendingApprovals', 'history'));
     }
 }

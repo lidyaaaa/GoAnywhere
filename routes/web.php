@@ -50,7 +50,6 @@ Route::middleware(['auth', 'verified', 'role:user'])->prefix('user')->name('user
     Route::post('/rental/process/{id}', [RentalController::class, 'processReturn'])->name('rental.processReturn');
     Route::get('/rental/fine/{id}', [RentalController::class, 'fine'])->name('rental.fine');
     Route::post('/rental/pay-fine/{id}', [RentalController::class, 'payFine'])->name('rental.payFine');
-    Route::post('/rental/start/{booking_code}', [RentalController::class, 'startRental'])->name('rental.start');
     
     // CART (di dropdown kanan atas)
     Route::get('/cart', [CartController::class, 'index'])->name('cart');
@@ -81,6 +80,7 @@ Route::middleware(['auth', 'verified', 'role:manager'])->prefix('manager')->name
     Route::delete('/vehicles/{id}', [ManagerVehicleController::class, 'destroy'])->name('vehicles.destroy');
     
     Route::get('/rentals', [ManagerRentalController::class, 'index'])->name('rentals');
+    Route::post('/rentals/{booking_code}/approve', [ManagerRentalController::class, 'approve'])->name('rentals.approve');
 });
 
 // =============================================

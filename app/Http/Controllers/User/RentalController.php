@@ -178,30 +178,4 @@ class RentalController extends Controller
         return redirect()->route('user.rental')->with('success', 'Denda berhasil dibayar!');
     }
 
-    public function startRental($booking_code)
-    {
-        $carts = Cart::where('user_id', auth()->id())
-            ->where('booking_code', $booking_code)
-            ->where('status', 'paid')
-            ->get();
-
-        if ($carts->isEmpty()) {
-            return redirect()->route('user.cart')->with('error', 'Transaksi tidak ditemukan!');
-        }
-
-        // Update status ke active
-        foreach ($carts as $cart) {
-            $startTime = now();
-            $totalDays = $cart->quantity_days ?? 1;
-            if ($cart->period == 'weekly') {
-                $totalDays = 7;
-            }
-            $cart->status = 'active';
-            $cart->rental_start_date = $startTime;
-            $cart->rental_end_date = $startTime->copy()->addDays($totalDays);
-            $cart->save();
-        }
-
-        return redirect()->route('user.rental')->with('success', 'Kendaraan berhasil dikirim! Selamat menggunakan!');
-    }
 }
