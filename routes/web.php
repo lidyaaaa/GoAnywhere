@@ -20,7 +20,7 @@ use App\Http\Controllers\SuperAdmin\RentalController as SuperAdminRentalControll
 // HOME
 Route::get('/', function () {
     return view('welcome');
-});
+})->middleware('guest');
 
 // DASHBOARD USER
 Route::get('/dashboard', function () {

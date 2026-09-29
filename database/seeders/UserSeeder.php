@@ -45,19 +45,5 @@ class UserSeeder extends Seeder
             ]);
         }
 
-        // USERS (10 sample)
-        $userNames = ['Andi', 'Budi', 'Citra', 'Dewi', 'Eko', 'Fitri', 'Gilang', 'Hana', 'Iqbal', 'Joko'];
-        for ($i = 0; $i < 10; $i++) {
-            User::create([
-                'id' => Str::uuid(),
-                'name' => $userNames[$i] . ' ' . ['Saputra', 'Wijaya', 'Kusuma', 'Putri', 'Hidayat'][rand(0, 4)],
-                'email' => 'user' . ($i + 1) . '@goanywhere.com',
-                'password' => Hash::make('password'),
-                'role' => 'user',
-                'location' => null,
-                'phone' => '08' . rand(1000000000, 9999999999),
-                'email_verified_at' => now(),
-            ]);
-        }
     }
 }

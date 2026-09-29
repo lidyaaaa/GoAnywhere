@@ -23,6 +23,25 @@ body, html {
     letter-spacing: -0.01em;
 }
 
+body.superadmin-page {
+    background-color: #F0F4F8 !important;
+    background-image:
+        radial-gradient(circle at 10% 15%, rgba(106, 155, 209, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 45%, rgba(0, 75, 135, 0.06) 0%, transparent 45%),
+        radial-gradient(circle at 40% 75%, rgba(106, 155, 209, 0.05) 0%, transparent 40%),
+        linear-gradient(to bottom, #F0F4F8, #FFFFFF) !important;
+}
+
+.superadmin-page .superadmin-section,
+.superadmin-page .user-section {
+    background: transparent;
+}
+
+.superadmin-page .superadmin-section::before,
+.superadmin-page .user-section::before {
+    display: none;
+}
+
 /* Dark Mode support */
 .dark body, .dark html {
     background-color: #001F3F !important;
@@ -33,6 +52,20 @@ body, html {
         linear-gradient(to bottom, #001F3F, #001224) !important;
     background-attachment: fixed !important;
     color: #F0F4F8 !important;
+}
+
+.dark body.superadmin-page {
+    background-color: #001F3F !important;
+    background-image:
+        radial-gradient(circle at 10% 15%, rgba(106, 155, 209, 0.15) 0%, transparent 45%),
+        radial-gradient(circle at 90% 45%, rgba(0, 75, 135, 0.20) 0%, transparent 45%),
+        radial-gradient(circle at 40% 75%, rgba(106, 155, 209, 0.10) 0%, transparent 40%),
+        linear-gradient(to bottom, #001F3F, #001224) !important;
+}
+
+.dark .superadmin-page .superadmin-section,
+.dark .superadmin-page .user-section {
+    background: transparent;
 }
 
 /* Headings */
@@ -111,18 +144,35 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 500 !important;
     font-size: 14px !important;
     border: none !important;
+    border-radius: 12px !important;
+    padding: 10px 16px !important;
+    position: relative !important;
     transition: all 0.2s ease !important;
 }
 
-.nav-link:hover, .nav-link[aria-current="page"] {
+.nav-link:hover {
     color: #002D55 !important;
+    background: rgba(106, 155, 209, 0.12) !important;
+    transform: translateY(-1px);
+}
+
+.nav-link[aria-current="page"] {
+    color: #002D55 !important;
+    background: rgba(106, 155, 209, 0.18) !important;
+    box-shadow: inset 0 -2px 0 #004B87;
 }
 
 .dark .nav-link {
     color: #94A3B8 !important;
 }
-.dark .nav-link:hover, .dark .nav-link[aria-current="page"] {
+.dark .nav-link:hover {
     color: #F0F4F8 !important;
+    background: rgba(106, 155, 209, 0.18) !important;
+}
+.dark .nav-link[aria-current="page"] {
+    color: #F0F4F8 !important;
+    background: rgba(106, 155, 209, 0.24) !important;
+    box-shadow: inset 0 -2px 0 #6A9BD1;
 }
 
 /* ======================================================== */
