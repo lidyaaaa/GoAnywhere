@@ -9,7 +9,7 @@
 
         .armada-section {
             padding: 40px 0 60px;
-            background: #f8f6f2;
+            background: #eef1f4;
             position: relative;
             min-height: 100vh;
         }
@@ -540,10 +540,6 @@
         /* ===== DARK MODE ===== */
         .dark .armada-section {
             background: #1a2632;
-        }
-
-        .dark .armada-section::before {
-            background: linear-gradient(90deg, #43637E, #f0e6d0, #43637E);
         }
 
         .dark .armada-section::after {

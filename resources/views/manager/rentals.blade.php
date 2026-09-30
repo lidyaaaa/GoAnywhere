@@ -12,19 +12,9 @@
 
         .transaksi-section {
             padding: 40px 0 60px;
-            background: #f8f6f2;
+            background: #eef1f4;
             position: relative;
             min-height: 100vh;
-        }
-
-        .transaksi-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #43637E, #f0e6d0, #43637E);
         }
 
         .section-card {
@@ -64,7 +54,7 @@
         }
 
         .table-wrap thead {
-            background: #f8f6f2;
+            background: #eef1f4;
             border-radius: 10px;
         }
 
@@ -225,7 +215,6 @@
 
         /* ===== DARK MODE ===== */
         .dark .transaksi-section { background: #1a2632; }
-        .dark .transaksi-section::before { background: linear-gradient(90deg, #43637E, #f0e6d0, #43637E); }
         .dark .section-card { background: #1a2632; border-color: #2c3e50; box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
         .dark .section-card:hover { border-color: #43637E; }
         .dark .section-card .section-title { color: #f0ede8; }

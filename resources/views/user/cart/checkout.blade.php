@@ -15,19 +15,9 @@
 
         .checkout-section {
             padding: 40px 0 60px;
-            background: #f8f6f2;
+            background: #eef1f4;
             position: relative;
             min-height: 100vh;
-        }
-
-        .checkout-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #43637E, #f0e6d0, #43637E);
         }
 
         /* Decorative floating shapes */
@@ -520,7 +510,6 @@
 
         /* ===== DARK MODE ===== */
         .dark .checkout-section { background: #1a2632; }
-        .dark .checkout-section::before { background: linear-gradient(90deg, #43637E, #f0e6d0, #43637E); }
         .dark .checkout-section::after { color: rgba(67, 99, 126, 0.08); }
         .dark .alert-error { background: #3d1e1e; border-color: #d46a6a; color: #d46a6a; }
         .dark .alert-warning { background: #3d3a1e; border-color: #b08a3a; color: #d4b86a; }

@@ -15,19 +15,9 @@
 
         .dashboard-section {
             padding: 40px 0 60px;
-            background: #f8f6f2;
+            background: #eef1f4;
             position: relative;
             min-height: 100vh;
-        }
-
-        .dashboard-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #43637E, #f0e6d0, #43637E);
         }
 
         /* ===== WELCOME CARD ===== */
@@ -197,10 +187,6 @@
         /* ===== DARK MODE ===== */
         .dark .dashboard-section {
             background: #1a2632;
-        }
-
-        .dark .dashboard-section::before {
-            background: linear-gradient(90deg, #43637E, #f0e6d0, #43637E);
         }
 
         .dark .welcome-card {

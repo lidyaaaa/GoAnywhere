@@ -12,19 +12,9 @@
 
         .user-section {
             padding: 40px 0 60px;
-            background: #f8f6f2;
+            background: #eef1f4;
             position: relative;
             min-height: 100vh;
-        }
-
-        .user-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #43637E, #f0e6d0, #43637E);
         }
 
         .alert-success {
@@ -77,7 +67,7 @@
         }
 
         .table-wrap thead {
-            background: #f8f6f2;
+            background: #eef1f4;
         }
 
         .table-wrap thead th {
@@ -257,7 +247,6 @@
 
         /* ===== DARK MODE ===== */
         .dark .user-section { background: #1a2632; }
-        .dark .user-section::before { background: linear-gradient(90deg, #43637E, #f0e6d0, #43637E); }
         .dark .alert-success { background: #1e3d2e; border-color: #4a7a5a; color: #8abd9a; }
         .dark .alert-error { background: #3d1e1e; border-color: #d46a6a; color: #d46a6a; }
         .dark .table-card { background: #1a2632; border-color: #2c3e50; box-shadow: 0 12px 40px rgba(0,0,0,0.4); }

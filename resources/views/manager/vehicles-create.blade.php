@@ -12,19 +12,9 @@
 
         .form-section {
             padding: 40px 0 60px;
-            background: #f8f6f2;
+            background: #eef1f4;
             position: relative;
             min-height: 100vh;
-        }
-
-        .form-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #43637E, #f0e6d0, #43637E);
         }
 
         .form-card {
@@ -164,7 +154,6 @@
 
         /* ===== DARK MODE ===== */
         .dark .form-section { background: #1a2632; }
-        .dark .form-section::before { background: linear-gradient(90deg, #43637E, #f0e6d0, #43637E); }
         .dark .form-card { background: #1a2632; border-color: #2c3e50; box-shadow: 0 16px 50px rgba(0,0,0,0.5); }
         .dark .form-card:hover { border-color: #43637E; box-shadow: 0 24px 65px rgba(0,0,0,0.6); }
         .dark .form-group label { color: #f0e6d0; }

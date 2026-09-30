@@ -11,7 +11,7 @@
         /* ===== LAYANAN SECTION ===== */
         .layanan-section {
             padding: 80px 0 100px;
-            background: #f8f6f2;
+            background: #eef1f4;
             position: relative;
             min-height: 100vh;
         }
@@ -317,10 +317,6 @@
         /* ===== DARK MODE ===== */
         .dark .layanan-section {
             background: #1a2632;
-        }
-
-        .dark .layanan-section::before {
-            background: linear-gradient(90deg, #43637E, #f0e6d0, #43637E);
         }
 
         .dark .layanan-section::after {

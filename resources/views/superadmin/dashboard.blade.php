@@ -11,16 +11,6 @@
             min-height: 100vh;
         }
 
-        .superadmin-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #43637E, #f0e6d0, #43637E);
-        }
-
         /* ===== STATISTIK ===== */
         .stat-grid {
             display: grid;
@@ -257,7 +247,7 @@
         }
 
         .table-wrap thead {
-            background: #f8f6f2;
+            background: #eef1f4;
             border-radius: 10px;
         }
 
@@ -309,7 +299,6 @@
 
         /* ===== DARK MODE ===== */
         .dark .superadmin-section { background: #1a2632; }
-        .dark .superadmin-section::before { background: linear-gradient(90deg, #43637E, #f0e6d0, #43637E); }
         .dark .stat-card { background: rgba(15, 26, 36, 0.78) !important; border-color: rgba(148, 163, 184, 0.16) !important; box-shadow: 0 10px 24px rgba(0,0,0,0.24) !important; }
         .dark .stat-card:hover { background: #162b3d !important; border-color: #6a9bd1 !important; box-shadow: 0 18px 34px rgba(0,0,0,0.34) !important; }
         .dark .stat-card .info .number { color: #f0ede8; }
