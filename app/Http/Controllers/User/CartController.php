@@ -66,11 +66,10 @@ class CartController extends Controller
             return redirect()->route('user.cart')->with('info', 'Kendaraan sudah ada di keranjang! Silahkan update jumlah.');
         }
 
-        // 🔥 BOOKING CODE SEMENTARA
-        $tempBookingCode = 'TEMP-' . strtoupper(Str::random(8));
-        while (Cart::where('booking_code', $tempBookingCode)->exists()) {
+        // BOOKING CODE SEMENTARA (UNIQUE)
+        do {
             $tempBookingCode = 'TEMP-' . strtoupper(Str::random(8));
-        }
+        } while (Cart::where('booking_code', $tempBookingCode)->exists());
 
         Cart::create([
             'id' => Str::uuid(),
@@ -175,7 +174,6 @@ class CartController extends Controller
 
         $total = $carts->sum('subtotal');
         
-        // 🔥 BOOKING CODE UNIQUE UNTUK CHECKOUT
         do {
             $bookingCode = 'BK-' . strtoupper(Str::random(8));
         } while (Cart::where('booking_code', $bookingCode)->exists());
@@ -217,12 +215,17 @@ class CartController extends Controller
 
         DB::beginTransaction();
         try {
-            // 🔥 GENERATE BOOKING CODE UNIQUE
-            do {
-                $bookingCode = 'BK-' . strtoupper(Str::random(8));
-            } while (Cart::where('booking_code', $bookingCode)->exists());
+            // 🔥 STEP 1: SET SEMUA BOOKING_CODE CART INI KE NULL DULU
+            foreach ($carts as $cart) {
+                DB::table('carts')
+                    ->where('id', $cart->id)
+                    ->update([
+                        'booking_code' => null,
+                        'updated_at' => now(),
+                    ]);
+            }
 
-            // Buat payment record
+            // 🔥 STEP 2: BUAT PAYMENT RECORD
             $payment = Payment::create([
                 'id' => Str::uuid(),
                 'cart_id' => $carts->first()->id,
@@ -235,22 +238,50 @@ class CartController extends Controller
                 'expired_at' => now()->addMinutes(30),
             ]);
 
-            // Update semua cart
-            foreach ($carts as $cart) {
-                $cart->status = 'paid';
-                $cart->booking_code = $bookingCode;
-                $cart->payment_deadline = now()->addMinutes(30);
-                $cart->save();
+            // 🔥 STEP 3: UPDATE SETIAP CART DENGAN BOOKING CODE UNIQUE (SUFFIX)
+            $baseBookingCode = 'BK-' . strtoupper(Str::random(8));
+            $counter = 1;
+            $firstBookingCode = null;
 
+            foreach ($carts as $cart) {
+                // Kalo cuma 1 cart, pake base code
+                // Kalo lebih dari 1, tambahin suffix biar unik
+                if ($carts->count() == 1) {
+                    $bookingCode = $baseBookingCode;
+                } else {
+                    $bookingCode = $baseBookingCode . '-' . $counter;
+                }
+
+                // Pastikan unik
+                while (Cart::where('booking_code', $bookingCode)->exists()) {
+                    $bookingCode = $baseBookingCode . '-' . strtoupper(Str::random(4));
+                }
+
+                // Simpan booking code pertama buat redirect
+                if ($counter == 1) {
+                    $firstBookingCode = $bookingCode;
+                }
+
+                DB::table('carts')
+                    ->where('id', $cart->id)
+                    ->update([
+                        'status' => 'paid',
+                        'booking_code' => $bookingCode,
+                        'payment_deadline' => now()->addMinutes(30),
+                        'updated_at' => now(),
+                    ]);
+
+                // Kurangi stok
                 $vehicle = Vehicle::find($cart->vehicle_id);
                 $vehicle->available_stock -= ($cart->quantity_vehicle ?? 1);
                 $vehicle->save();
-
+                
+                $counter++;
             }
 
             DB::commit();
 
-            return redirect()->route('user.payment.success', ['booking_code' => $bookingCode])
+            return redirect()->route('user.payment.success', ['booking_code' => $firstBookingCode])
                 ->with('success', 'Pembayaran menunggu konfirmasi manager.');
 
         } catch (\Exception $e) {
