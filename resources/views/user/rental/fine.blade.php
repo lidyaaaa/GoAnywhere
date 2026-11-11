@@ -10,7 +10,7 @@
     <!-- ============================================ -->
     <style>
         * {
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .denda-section {
@@ -27,7 +27,6 @@
             overflow: hidden;
             box-shadow: 0 16px 50px rgba(0, 0, 0, 0.25), 0 8px 30px rgba(0, 0, 0, 0.12);
             border: 1px solid #e8e4de;
-            transition: all 0.4s ease;
         }
 
         .denda-card:hover {
@@ -74,6 +73,7 @@
             font-size: 16px;
             font-weight: 400;
             color: #7a4a4a;
+            margin-left: 8px;
         }
 
         .fine-box .fine-detail {
@@ -87,7 +87,7 @@
         }
 
         /* ===== PAYMENT METHODS ===== */
-        .payment-label {
+        .payment-label-title {
             font-weight: 700;
             color: #2c3e50;
             font-size: 15px;
@@ -101,7 +101,18 @@
             gap: 12px;
         }
 
-        .payment-btn {
+        .payment-option {
+            position: relative;
+        }
+
+        .payment-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .payment-option-label {
             padding: 14px 8px;
             border: 2px solid #e8e4de;
             border-radius: 12px;
@@ -115,14 +126,16 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
+            user-select: none;
         }
 
-        .payment-btn .icon {
-            font-size: 28px;
+        .payment-option-label .icon {
+            font-size: 24px;
+            line-height: 1;
         }
 
-        .payment-btn:hover {
+        .payment-option-label:hover {
             border-color: #43637E;
             background: rgba(67, 99, 126, 0.06);
             transform: translateY(-3px);
@@ -130,17 +143,14 @@
             color: #43637E;
         }
 
-        .payment-btn:focus {
-            outline: none;
+        /* When radio is checked */
+        .payment-option input[type="radio"]:checked + .payment-option-label {
             border-color: #43637E;
-            box-shadow: 0 0 0 4px rgba(67, 99, 126, 0.15);
-        }
-
-        .payment-btn.selected {
-            border-color: #43637E;
-            background: rgba(67, 99, 126, 0.1);
+            background: rgba(67, 99, 126, 0.12);
             color: #43637E;
-            box-shadow: 0 4px 15px rgba(67, 99, 126, 0.15);
+            font-weight: 700;
+            box-shadow: 0 4px 18px rgba(67, 99, 126, 0.25);
+            transform: translateY(-2px);
         }
 
         /* ===== SUBMIT BUTTON ===== */
@@ -149,52 +159,44 @@
             margin-top: 24px;
             background: #43637E;
             color: #ffffff;
+            border: none;
             padding: 16px;
             border-radius: 12px;
             font-weight: 700;
-            font-size: 16px;
-            letter-spacing: 1px;
+            font-size: 15px;
             text-transform: uppercase;
-            border: none;
+            letter-spacing: 1px;
             cursor: pointer;
-            transition: all 0.4s ease;
             box-shadow: 0 8px 30px rgba(67, 99, 126, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
         .btn-submit:hover {
             background: #36546b;
-            transform: translateY(-3px);
+            transform: translateY(-2px);
             box-shadow: 0 12px 40px rgba(67, 99, 126, 0.5);
-        }
-
-        .btn-submit:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
         }
 
         /* ===== BACK LINK ===== */
         .back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            color: #7a8a9a;
-            font-weight: 500;
-            font-size: 14px;
-            text-decoration: none;
-            transition: all 0.3s ease;
+            display: inline-block;
             margin-top: 20px;
-            padding: 8px 0;
+            color: #43637E;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
         }
 
         .back-link:hover {
-            color: #43637E;
-            transform: translateX(-4px);
+            text-decoration: underline;
         }
 
         /* ===== DARK MODE ===== */
         .dark .denda-section {
-            background: #1a2632;
+            background: #111a22;
         }
 
         .dark .denda-card {
@@ -237,34 +239,34 @@
             color: #d46a6a;
         }
 
-        .dark .payment-label {
+        .dark .payment-label-title {
             color: #f0ede8;
         }
 
-        .dark .payment-btn {
+        .dark .payment-option-label {
             background: #0f1a24;
             border-color: #2c3e50;
             color: #b0bec5;
         }
 
-        .dark .payment-btn:hover {
+        .dark .payment-option-label:hover {
             border-color: #43637E;
             background: rgba(67, 99, 126, 0.15);
             color: #f0e6d0;
         }
 
-        .dark .payment-btn.selected {
+        .dark .payment-option input[type="radio"]:checked + .payment-option-label {
             border-color: #43637E;
-            background: rgba(67, 99, 126, 0.2);
+            background: rgba(67, 99, 126, 0.3);
             color: #f0e6d0;
         }
 
         .dark .back-link {
-            color: #7a8a9a;
+            color: #8baac4;
         }
 
         .dark .back-link:hover {
-            color: #f0e6d0;
+            color: #f0ede8;
         }
 
         /* ===== RESPONSIVE ===== */
@@ -279,88 +281,23 @@
 
             .payment-grid {
                 grid-template-columns: repeat(3, 1fr);
-                gap: 10px;
+                gap: 8px;
             }
 
-            .payment-btn {
-                padding: 12px 8px;
+            .payment-option-label {
+                padding: 12px 6px;
                 font-size: 12px;
             }
 
-            .payment-btn .icon {
-                font-size: 24px;
-            }
-
-            .fine-box .fine-total {
+            .payment-option-label .icon {
                 font-size: 22px;
             }
         }
 
         @media (max-width: 480px) {
-            .denda-section {
-                padding: 24px 0 40px;
-            }
-
-            .denda-card .body {
-                padding: 18px 14px 22px;
-            }
-
-            .denda-card .body .vehicle-name {
-                font-size: 20px;
-            }
-
             .payment-grid {
                 grid-template-columns: repeat(2, 1fr);
-                gap: 8px;
             }
-
-            .payment-btn {
-                padding: 10px 6px;
-                font-size: 11px;
-            }
-
-            .payment-btn .icon {
-                font-size: 20px;
-            }
-
-            .fine-box {
-                padding: 16px 18px;
-            }
-
-            .fine-box .fine-total {
-                font-size: 20px;
-            }
-
-            .btn-submit {
-                font-size: 14px;
-                padding: 14px;
-            }
-        }
-
-        /* ===== SCROLLBAR ===== */
-        ::-webkit-scrollbar {
-            width: 10px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #f0ede8;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #43637E;
-            border-radius: 10px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #36546b;
-        }
-
-        .dark ::-webkit-scrollbar-track {
-            background: #1a2632;
-        }
-
-        .dark ::-webkit-scrollbar-thumb {
-            background: #43637E;
         }
     </style>
 
@@ -373,7 +310,7 @@
                 <div class="body">
                     <!-- Vehicle Info -->
                     <h3 class="vehicle-name">{{ $cart->vehicle->name }}</h3>
-                    <p class="vehicle-location">                     {{ $cart->vehicle->location }}</p>
+                    <p class="vehicle-location">📍 {{ $cart->vehicle->location }}</p>
 
                     <!-- Fine Box -->
                     <div class="fine-box">
@@ -382,41 +319,66 @@
                             <small>Total Denda</small>
                         </div>
                         <div class="fine-detail">
-                             Telat: <strong>{{ floor(($fine->late_minutes ?? 0) / 60) }} jam {{ ($fine->late_minutes ?? 0) % 60 }} menit</strong>
+                            Telat: <strong>{{ floor(($fine->late_minutes ?? 0) / 60) }} jam {{ ($fine->late_minutes ?? 0) % 60 }} menit</strong>
                         </div>
                     </div>
 
+                    @if($errors->has('payment_method'))
+                        <div class="mt-4 p-3 rounded-lg bg-red-100 border border-red-300 text-red-700 text-sm">
+                            {{ $errors->first('payment_method') }}
+                        </div>
+                    @endif
+
                     <!-- Payment Form -->
-                    <form action="{{ route('user.rental.payFine', $cart->id) }}" method="POST" style="margin-top: 28px;">
+                    <form id="finePaymentForm" action="{{ route('user.rental.payFine', $cart->id) }}" method="POST" style="margin-top: 28px;">
                         @csrf
 
-                        <span class="payment-label">Pilih Metode Pembayaran:</span>
+                        <span class="payment-label-title">Pilih Metode Pembayaran:</span>
 
                         <div class="payment-grid">
-                            <button type="submit" name="payment_method" value="qris" class="payment-btn">
-                                <span class="icon"></span>
-                                QRIS
-                            </button>
-                            <button type="submit" name="payment_method" value="bank_transfer" class="payment-btn">
-                                <span class="icon"></span>
-                                Transfer
-                            </button>
-                            <button type="submit" name="payment_method" value="gopay" class="payment-btn">
-                                <span class="icon"></span>
-                                GoPay
-                            </button>
-                            <button type="submit" name="payment_method" value="dana" class="payment-btn">
-                                <span class="icon"></span>
-                                DANA
-                            </button>
-                            <button type="submit" name="payment_method" value="ovo" class="payment-btn">
-                                <span class="icon"></span>
-                                OVO
-                            </button>
+                            <div class="payment-option">
+                                <input type="radio" name="payment_method" value="qris" id="method_qris" required>
+                                <label for="method_qris" class="payment-option-label">
+                                    <span class="icon">📱</span>
+                                    <span>QRIS</span>
+                                </label>
+                            </div>
+
+                            <div class="payment-option">
+                                <input type="radio" name="payment_method" value="bank_transfer" id="method_transfer" required>
+                                <label for="method_transfer" class="payment-option-label">
+                                    <span class="icon">🏦</span>
+                                    <span>Transfer</span>
+                                </label>
+                            </div>
+
+                            <div class="payment-option">
+                                <input type="radio" name="payment_method" value="gopay" id="method_gopay" required>
+                                <label for="method_gopay" class="payment-option-label">
+                                    <span class="icon">💚</span>
+                                    <span>GoPay</span>
+                                </label>
+                            </div>
+
+                            <div class="payment-option">
+                                <input type="radio" name="payment_method" value="dana" id="method_dana" required>
+                                <label for="method_dana" class="payment-option-label">
+                                    <span class="icon">💙</span>
+                                    <span>DANA</span>
+                                </label>
+                            </div>
+
+                            <div class="payment-option">
+                                <input type="radio" name="payment_method" value="ovo" id="method_ovo" required>
+                                <label for="method_ovo" class="payment-option-label">
+                                    <span class="icon">💜</span>
+                                    <span>OVO</span>
+                                </label>
+                            </div>
                         </div>
 
-                        <button type="submit" class="btn-submit">
-                             Bayar Denda
+                        <button type="submit" id="btnPayFine" class="btn-submit">
+                            Bayar Denda
                         </button>
                     </form>
 
@@ -428,4 +390,17 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('finePaymentForm');
+            form.addEventListener('submit', function(e) {
+                const selected = document.querySelector('input[name="payment_method"]:checked');
+                if (!selected) {
+                    e.preventDefault();
+                    alert('Silakan pilih salah satu metode pembayaran terlebih dahulu!');
+                }
+            });
+        });
+    </script>
 </x-app-layout>

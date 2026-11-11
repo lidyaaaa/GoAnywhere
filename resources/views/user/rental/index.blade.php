@@ -445,6 +445,41 @@
             box-shadow: 0 8px 28px rgba(74, 122, 90, 0.45);
         }
 
+        .btn-chat-action {
+            background: #ffffff;
+            color: #43637E;
+            border: 1.5px solid #43637E;
+            padding: 9px 18px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 13px;
+            text-align: center;
+            text-decoration: none;
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-chat-action:hover {
+            background: #43637E;
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 14px rgba(67, 99, 126, 0.25);
+        }
+
+        .dark .btn-chat-action {
+            background: #1a2632;
+            color: #8baac4;
+            border-color: #8baac4;
+        }
+
+        .dark .btn-chat-action:hover {
+            background: #43637E;
+            color: #ffffff;
+        }
+
         /* ===== EMPTY STATE ===== */
         .empty-state {
             background: #ffffff;
@@ -1110,10 +1145,15 @@
                                     <span class="location">📍 {{ $item->vehicle->location }}</span>
                                     <span class="price">💵 Rp {{ number_format($item->subtotal, 0, ',', '.') }}</span>
                                 </div>
+                                <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                                    <a href="{{ route('user.chat.start', ['vehicle_id' => $item->vehicle_id]) }}" class="btn-chat-action">
+                                        💬 Chat Manager
+                                    </a>
                                 <form action="{{ route('user.rental.cancel', $item->booking_code) }}" method="POST" onsubmit="return confirm('Batalkan booking ini?')">
                                     @csrf
                                     <button type="submit" class="btn-pickup">Batal Booking</button>
                                 </form>
+                                </div>
                             </div>
                             <div class="pending-meta">
                                 <span>🔑 Kode Booking: <strong>{{ $item->booking_code }}</strong></span>
@@ -1158,9 +1198,14 @@
                                 <span class="status-badge rental-countdown" data-end-time="{{ $endDate->toIso8601String() }}" data-tolerance-time="{{ $endDate->copy()->addMinutes(30)->toIso8601String() }}">Memuat waktu...</span>
                             </div>
                             <div class="rental-right">
-                                <a href="{{ route('user.rental.return', $rental->id) }}" class="btn-return">
-                                    📤 Kembalikan
-                                </a>
+                                <div style="display: flex; flex-direction: column; gap: 8px; width: 100%;">
+                                    <a href="{{ route('user.rental.return', $rental->id) }}" class="btn-return">
+                                        📤 Kembalikan
+                                    </a>
+                                    <a href="{{ route('user.chat.start', ['vehicle_id' => $rental->vehicle_id]) }}" class="btn-chat-action">
+                                        💬 Chat Manager
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>

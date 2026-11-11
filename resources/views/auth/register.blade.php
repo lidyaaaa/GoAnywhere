@@ -295,6 +295,16 @@
                 @endif
             </div>
 
+            <!-- Nomor WhatsApp -->
+            <div class="form-group">
+                <label for="phone">Nomor WhatsApp</label>
+                <input id="phone" type="text" inputmode="tel" name="phone" value="{{ old('phone') }}"
+                       placeholder="Contoh: 081234567890" required autocomplete="tel">
+                @if($errors->has('phone'))
+                    <div class="error-text">{{ $errors->first('phone') }}</div>
+                @endif
+            </div>
+
             <!-- Password -->
             <div class="form-group">
                 <label for="password">Password</label>

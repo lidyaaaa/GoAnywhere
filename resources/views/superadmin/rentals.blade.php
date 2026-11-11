@@ -9,9 +9,9 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Transaksi Aktif -->
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8">
-                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Transaksi Aktif</h3>
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Transaksi Aktif / Pending</h3>
                 
-                @if(count($rentals) > 0)
+                @if($rentals->count() > 0)
                     <div class="overflow-x-auto">
                         <table class="w-full">
                             <thead class="bg-gray-50 dark:bg-gray-700">
@@ -44,6 +44,16 @@
                             </tbody>
                         </table>
                     </div>
+                    @if($rentals->hasPages())
+                        <div class="mt-4 flex flex-col items-center gap-2">
+                            <div class="text-sm text-gray-500">
+                                Menampilkan {{ $rentals->firstItem() ?? 0 }} - {{ $rentals->lastItem() ?? 0 }} dari {{ $rentals->total() }} transaksi
+                            </div>
+                            <div>
+                                {{ $rentals->links() }}
+                            </div>
+                        </div>
+                    @endif
                 @else
                     <p class="text-gray-500 text-center py-4">Tidak ada transaksi aktif</p>
                 @endif
@@ -53,7 +63,7 @@
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
                 <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Riwayat Transaksi</h3>
                 
-                @if(count($history) > 0)
+                @if($history->count() > 0)
                     <div class="overflow-x-auto">
                         <table class="w-full">
                             <thead class="bg-gray-50 dark:bg-gray-700">
@@ -75,16 +85,23 @@
                                         <td class="px-4 py-3 text-sm">{{ $item->vehicle->location ?? 'N/A' }}</td>
                                         <td class="px-4 py-3 text-sm font-semibold">Rp {{ number_format($item->subtotal ?? 0, 0, ',', '.') }}</td>
                                         <td class="px-4 py-3 text-sm">
-                                                <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">Selesai</span>
+                                            <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">Selesai</span>
                                         </td>
                                     </tr>
                                 @endforeach
                             </tbody>
                         </table>
                     </div>
-                    <div class="mt-4">
-                        {{ $history->links() }}
-                    </div>
+                    @if($history->hasPages())
+                        <div class="mt-4 flex flex-col items-center gap-2">
+                            <div class="text-sm text-gray-500">
+                                Menampilkan {{ $history->firstItem() ?? 0 }} - {{ $history->lastItem() ?? 0 }} dari {{ $history->total() }} riwayat
+                            </div>
+                            <div>
+                                {{ $history->links() }}
+                            </div>
+                        </div>
+                    @endif
                 @else
                     <p class="text-gray-500 text-center py-4">Belum ada riwayat transaksi</p>
                 @endif

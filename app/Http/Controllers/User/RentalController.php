@@ -10,6 +10,7 @@ use App\Models\RentalHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
+use App\Services\LateFeeCalculator;
 use Illuminate\Support\Facades\DB;
 
 class RentalController extends Controller
@@ -60,22 +61,21 @@ class RentalController extends Controller
             ->where('status', 'active')
             ->firstOrFail();
 
-        $now = now();
-        $endDate = Carbon::parse($cart->rental_end_date);
-        $tolerance = $endDate->copy()->addMinutes(30);
+        $late = $this->calculateLateFee($cart, now());
 
-        // Cek telat
-        $isLate = $now > $tolerance;
-        $fineAmount = 0;
-        $lateMinutes = 0;
+        return view('user.rental.return', compact('cart', 'late'));
+    }
 
-        if ($isLate) {
-            $lateMinutes = $now->diffInMinutes($tolerance);
-            $hoursLate = ceil($lateMinutes / 60);
-            $fineAmount = $hoursLate * 50000; // Rp 50.000/jam
-        }
+    private const FINE_PER_HOUR = LateFeeCalculator::FINE_PER_HOUR;
 
-        return view('user.rental.return', compact('cart', 'isLate', 'fineAmount', 'lateMinutes'));
+    private function calculateLateFee(Cart $cart, Carbon $returnedAt): array
+    {
+        return LateFeeCalculator::calculate($cart, $returnedAt);
+    }
+
+    public static function rupiah(int|float $amount): string
+    {
+        return LateFeeCalculator::rupiah($amount);
     }
 
     public function cancelBooking($bookingCode)
@@ -120,18 +120,13 @@ class RentalController extends Controller
             ->firstOrFail();
 
         $now = now();
-        $endDate = Carbon::parse($cart->rental_end_date);
-        $tolerance = $endDate->copy()->addMinutes(30);
+        $late = $this->calculateLateFee($cart, $now);
 
-        $isLate = $now > $tolerance;
-        $fineAmount = 0;
-        $lateMinutes = 0;
+        $isLate = $late['is_late'];
+        $fineAmount = $late['fine_amount'];
+        $lateMinutes = $late['late_minutes'];
 
         if ($isLate) {
-            $lateMinutes = $now->diffInMinutes($tolerance);
-            $hoursLate = ceil($lateMinutes / 60);
-            $fineAmount = $hoursLate * 50000;
-
             // Simpan denda
             Fine::create([
                 'id' => Str::uuid(),
@@ -139,7 +134,7 @@ class RentalController extends Controller
                 'user_id' => auth()->id(),
                 'vehicle_id' => $cart->vehicle_id,
                 'late_minutes' => $lateMinutes,
-                'fine_per_hour' => 50000,
+                'fine_per_hour' => self::FINE_PER_HOUR,
                 'total_fine' => $fineAmount,
                 'payment_status' => 'pending',
             ]);

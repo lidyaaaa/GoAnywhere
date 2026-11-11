@@ -7,10 +7,12 @@ use App\Http\Controllers\User\ArmadaController;
 use App\Http\Controllers\User\CartController;
 use App\Http\Controllers\User\RentalController;
 use App\Http\Controllers\User\UserProfileController;
+use App\Http\Controllers\User\ChatController as UserChatController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Manager\DashboardController as ManagerDashboardController;
 use App\Http\Controllers\Manager\VehicleController as ManagerVehicleController;
 use App\Http\Controllers\Manager\RentalController as ManagerRentalController;
+use App\Http\Controllers\Manager\ChatController as ManagerChatController;
 use App\Http\Controllers\SuperAdmin\DashboardController as SuperAdminDashboardController;
 use App\Http\Controllers\SuperAdmin\UserController as SuperAdminUserController;
 use App\Http\Controllers\SuperAdmin\ManagerController as SuperAdminManagerController;
@@ -64,6 +66,13 @@ Route::middleware(['auth', 'verified', 'role:user'])->prefix('user')->name('user
     // PROFILE USER (di dropdown kanan atas)
     Route::get('/profile-user', [UserProfileController::class, 'index'])->name('profile.user');
     Route::put('/profile-user/update', [UserProfileController::class, 'update'])->name('profile.user.update');
+
+    // CHAT KE MANAGER ARMADA
+    Route::get('/chats', [UserChatController::class, 'index'])->name('chat.index');
+    Route::get('/chats/start', [UserChatController::class, 'start'])->name('chat.start');
+    Route::get('/chats/{id}', [UserChatController::class, 'show'])->name('chat.show');
+    Route::post('/chats/{id}/send', [UserChatController::class, 'send'])->name('chat.send');
+    Route::get('/chats/{id}/messages', [UserChatController::class, 'messages'])->name('chat.messages');
 });
 
 // =============================================
@@ -82,6 +91,15 @@ Route::middleware(['auth', 'verified', 'role:manager'])->prefix('manager')->name
     
     Route::get('/rentals', [ManagerRentalController::class, 'index'])->name('rentals');
     Route::post('/rentals/{booking_code}/approve', [ManagerRentalController::class, 'approve'])->name('rentals.approve');
+    Route::post('/rentals/{id}/complete', [ManagerRentalController::class, 'complete'])->name('rentals.complete');
+    Route::post('/rentals/{id}/flag', [ManagerRentalController::class, 'flag'])->name('rentals.flag');
+
+    // CHAT CUSTOMER
+    Route::get('/chats', [ManagerChatController::class, 'index'])->name('chat.index');
+    Route::get('/chats/start', [ManagerChatController::class, 'start'])->name('chat.start');
+    Route::get('/chats/{id}', [ManagerChatController::class, 'show'])->name('chat.show');
+    Route::post('/chats/{id}/send', [ManagerChatController::class, 'send'])->name('chat.send');
+    Route::get('/chats/{id}/messages', [ManagerChatController::class, 'messages'])->name('chat.messages');
 });
 
 // =============================================
@@ -91,6 +109,7 @@ Route::middleware(['auth', 'verified', 'role:superadmin'])->prefix('superadmin')
     Route::get('/dashboard', [SuperAdminDashboardController::class, 'index'])->name('dashboard');
     
     Route::get('/users', [SuperAdminUserController::class, 'index'])->name('users');
+    Route::post('/users/{id}/toggle-ban', [SuperAdminUserController::class, 'toggleBan'])->name('users.toggle-ban');
     
     Route::get('/managers', [SuperAdminManagerController::class, 'index'])->name('managers');
     Route::post('/managers', [SuperAdminManagerController::class, 'store'])->name('managers.store');

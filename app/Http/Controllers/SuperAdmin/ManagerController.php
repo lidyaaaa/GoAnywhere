@@ -4,6 +4,7 @@ namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Vehicle;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
@@ -12,7 +13,16 @@ class ManagerController extends Controller
 {
     public function index()
     {
-        $managers = User::where('role', 'manager')->get();
+        $managers = User::where('role', 'manager')
+            ->withCount('vehicles')
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+
+        // Jumlah armada yang dikelola dihitung murni berdasarkan relasi manager_id
+        foreach ($managers as $manager) {
+            $manager->assigned_vehicles_count = $manager->vehicles_count;
+        }
+
         $locations = ['Jakarta', 'Bogor', 'Depok', 'Tangerang', 'Bekasi'];
         return view('superadmin.managers', compact('managers', 'locations'));
     }
@@ -23,17 +33,17 @@ class ManagerController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'location' => 'required|in:Jakarta,Bogor,Depok,Tangerang,Bekasi',
+            'phone' => ['required', 'string', User::PHONE_REGEX],
             'password' => 'required|min:8',
-        ]);
-
-        // Cek apakah lokasi sudah ada managernya
-        $existingManager = User::where('role', 'manager')
-            ->where('location', $request->location)
-            ->exists();
-            
-        if ($existingManager) {
-            return back()->with('error', 'Lokasi ' . $request->location . ' sudah memiliki manager!');
-        }
+        ], array_merge(User::PHONE_MESSAGES, [
+            'password.required' => 'Password wajib diisi.',
+            'password.min' => 'Password minimal harus 8 karakter.',
+            'name.required' => 'Nama manager wajib diisi.',
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Format email tidak valid.',
+            'email.unique' => 'Email sudah terdaftar.',
+            'location.required' => 'Lokasi penugasan manager wajib dipilih.',
+        ]));
 
         User::create([
             'id' => Str::uuid(),
@@ -43,32 +53,28 @@ class ManagerController extends Controller
             'role' => 'manager',
             'location' => $request->location,
             'phone' => $request->phone,
-            'email_verified_at' => now(),
         ]);
 
         return redirect()->route('superadmin.managers')->with('success', 'Manager berhasil ditambahkan!');
     }
 
+    public function edit($id)
+    {
+        $manager = User::findOrFail($id);
+        $locations = ['Jakarta', 'Bogor', 'Depok', 'Tangerang', 'Bekasi'];
+        return view('superadmin.managers-edit', compact('manager', 'locations'));
+    }
+
     public function update(Request $request, $id)
     {
         $manager = User::findOrFail($id);
-        
+
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $id,
             'location' => 'required|in:Jakarta,Bogor,Depok,Tangerang,Bekasi',
-            'phone' => 'nullable|string|max:15',
+            'password' => 'nullable|min:8',
         ]);
-
-        // Cek apakah lokasi sudah ada managernya (kecuali dirinya sendiri)
-        $existingManager = User::where('role', 'manager')
-            ->where('location', $request->location)
-            ->where('id', '!=', $id)
-            ->exists();
-            
-        if ($existingManager) {
-            return back()->with('error', 'Lokasi ' . $request->location . ' sudah memiliki manager!');
-        }
 
         $manager->update([
             'name' => $request->name,
@@ -89,14 +95,14 @@ class ManagerController extends Controller
     {
         $manager = User::findOrFail($id);
         
-        // Cek apakah manager punya kendaraan
-        $hasVehicles = \App\Models\Vehicle::where('manager_id', $id)->exists();
+        // Cek apakah manager punya kendaraan yang dikelola langsung (manager_id)
+        $vehicleCount = Vehicle::where('manager_id', $id)->count();
         
-        if ($hasVehicles) {
-            return back()->with('error', 'Manager masih memiliki kendaraan, tidak bisa dihapus!');
+        if ($vehicleCount > 0) {
+            return back()->with('error', "Manager {$manager->name} tidak bisa dihapus karena masih mengelola {$vehicleCount} armada! Pindahkan atau hapus armadanya terlebih dahulu.");
         }
         
         $manager->delete();
-        return back()->with('success', 'Manager berhasil dihapus!');
+        return back()->with('success', "Manager {$manager->name} berhasil dihapus!");
     }
 }

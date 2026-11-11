@@ -21,12 +21,9 @@ class CartController extends Controller
         foreach ($carts as $cart) {
             $vehicle = Vehicle::find($cart->vehicle_id);
             if ($vehicle) {
-                $cartCount = Cart::where('vehicle_id', $cart->vehicle_id)
-                    ->where('id', '!=', $cart->id)
-                    ->whereIn('status', ['pending', 'paid'])
-                    ->sum('quantity_vehicle');
-                
-                $cart->available_stock = $vehicle->available_stock - $cartCount;
+                // Stock di database sekarang sudah merefleksikan pengurangan saat checkout (paid/active)
+                // Jadi available_stock murni adalah $vehicle->available_stock
+                $cart->available_stock = max(0, (int) $vehicle->available_stock);
                 $cart->is_stock_available = $cart->available_stock >= ($cart->quantity_vehicle ?? 1);
             } else {
                 $cart->available_stock = 0;
@@ -47,23 +44,35 @@ class CartController extends Controller
 
         $vehicle = Vehicle::findOrFail($request->vehicle_id);
 
-        $cartCount = Cart::where('vehicle_id', $vehicle->id)
-            ->whereIn('status', ['pending', 'paid'])
-            ->sum('quantity_vehicle');
-        
-        $availableStock = $vehicle->available_stock - $cartCount;
-
-        if ($availableStock < 1) {
-            return back()->with('error', 'Stok tidak mencukupi! Tersisa ' . $availableStock . ' unit.');
+        if ($vehicle->available_stock < 1) {
+            return back()->with('error', 'Stok tidak mencukupi! Tersisa ' . $vehicle->available_stock . ' unit.');
         }
 
-        $existingCart = Cart::where('user_id', auth()->id())
-            ->where('vehicle_id', $vehicle->id)
-            ->where('status', 'pending')
+        // 1. Cek apakah user sudah meminjam jenis armada ini (mobil / motor) yang sedang dibooking/sewa (paid atau active)
+        $hasActiveBookingOfType = Cart::where('user_id', auth()->id())
+            ->whereIn('status', ['paid', 'active'])
+            ->whereHas('vehicle', function ($q) use ($vehicle) {
+                $q->where('vehicle_type', $vehicle->vehicle_type);
+            })
             ->first();
 
-        if ($existingCart) {
-            return redirect()->route('user.cart')->with('info', 'Kendaraan sudah ada di keranjang! Silahkan update jumlah.');
+        if ($hasActiveBookingOfType) {
+            $typeLabel = $vehicle->vehicle_type === 'car' ? 'Mobil' : 'Motor';
+            $statusText = $hasActiveBookingOfType->status === 'paid' ? 'sedang menunggu persetujuan manager' : 'sedang aktif Anda sewa';
+            return back()->with('error', "Anda sudah memiliki 1 booking/sewa {$typeLabel} yang {$statusText}! Kebijakan rental: 1 akun maksimal meminjam 1 Mobil dan 1 Motor.");
+        }
+
+        // 2. Cek apakah di keranjang (pending) user sudah memasukkan jenis kendaraan ini (mobil / motor)
+        $hasPendingCartOfType = Cart::where('user_id', auth()->id())
+            ->where('status', 'pending')
+            ->whereHas('vehicle', function ($q) use ($vehicle) {
+                $q->where('vehicle_type', $vehicle->vehicle_type);
+            })
+            ->first();
+
+        if ($hasPendingCartOfType) {
+            $typeLabel = $vehicle->vehicle_type === 'car' ? 'Mobil' : 'Motor';
+            return redirect()->route('user.cart')->with('info', "Anda sudah memiliki 1 {$typeLabel} di dalam keranjang! Kebijakan rental: 1 akun maksimal meminjam 1 Mobil dan 1 Motor.");
         }
 
         // BOOKING CODE SEMENTARA (UNIQUE)
@@ -88,7 +97,7 @@ class CartController extends Controller
             'payment_deadline' => now()->addMinutes(30),
         ]);
 
-        return redirect()->route('user.cart')->with('success', 'Kendaraan berhasil ditambahkan ke cart!');
+        return redirect()->route('user.cart')->with('success', 'Kendaraan berhasil ditambahkan ke keranjang!');
     }
 
     public function update(Request $request, $id)
@@ -101,27 +110,20 @@ class CartController extends Controller
         $request->validate([
             'period' => 'required|in:daily,weekly',
             'quantity_days' => 'required|integer|min:1',
-            'quantity_vehicle' => 'required|integer|min:1',
+            'quantity_vehicle' => 'required|integer|min:1|max:1',
         ]);
 
         $vehicle = Vehicle::find($cart->vehicle_id);
         $period = $request->period;
         $quantityDays = (int) $request->quantity_days;
-        $quantityVehicle = (int) $request->quantity_vehicle;
+        $quantityVehicle = 1; // Ketentuan 1 akun hanya bisa meminjam 1 unit untuk tiap armada
 
         if ($period == 'daily' && $quantityDays > 7) {
             return back()->with('error', 'Untuk periode harian, maksimal 7 hari!');
         }
 
-        $cartCountOthers = Cart::where('vehicle_id', $cart->vehicle_id)
-            ->where('id', '!=', $cart->id)
-            ->whereIn('status', ['pending', 'paid'])
-            ->sum('quantity_vehicle');
-        
-        $availableStock = $vehicle->available_stock - $cartCountOthers;
-
-        if ($quantityVehicle > $availableStock) {
-            return back()->with('error', 'Stok tidak mencukupi! Tersedia ' . $availableStock . ' unit.');
+        if ($vehicle->available_stock < $quantityVehicle) {
+            return back()->with('error', 'Stok tidak mencukupi! Tersedia ' . $vehicle->available_stock . ' unit.');
         }
 
         $totalDays = $period == 'weekly' ? 7 : $quantityDays;
@@ -159,17 +161,39 @@ class CartController extends Controller
             return redirect()->route('user.cart')->with('error', 'Keranjang kosong!');
         }
 
+        // Cek validasi kuota 1 mobil 1 motor
+        $carPendingCount = 0;
+        $motorcyclePendingCount = 0;
+
         foreach ($carts as $cart) {
             $vehicle = Vehicle::find($cart->vehicle_id);
-            $cartCount = Cart::where('vehicle_id', $cart->vehicle_id)
-                ->where('id', '!=', $cart->id)
-                ->whereIn('status', ['pending', 'paid'])
-                ->sum('quantity_vehicle');
-            $availableStock = $vehicle->available_stock - $cartCount;
-            
-            if ($availableStock < ($cart->quantity_vehicle ?? 1)) {
-                return redirect()->route('user.cart')->with('error', 'Stok kendaraan ' . $vehicle->name . ' tidak mencukupi!');
+            if (!$vehicle || $vehicle->available_stock < ($cart->quantity_vehicle ?? 1)) {
+                return redirect()->route('user.cart')->with('error', 'Stok kendaraan ' . ($vehicle->name ?? 'item') . ' tidak mencukupi!');
             }
+
+            if ($vehicle->vehicle_type === 'car') {
+                $carPendingCount += ($cart->quantity_vehicle ?? 1);
+            } elseif ($vehicle->vehicle_type === 'motorcycle') {
+                $motorcyclePendingCount += ($cart->quantity_vehicle ?? 1);
+            }
+        }
+
+        if ($carPendingCount > 1 || $motorcyclePendingCount > 1) {
+            return redirect()->route('user.cart')->with('error', 'Kebijakan rental: 1 akun hanya dapat meminjam maksimal 1 Mobil dan 1 Motor sekaligus.');
+        }
+
+        // Cek juga apakah user punya booking aktif di luar keranjang
+        $userActiveCars = Cart::where('user_id', auth()->id())
+            ->whereIn('status', ['paid', 'active'])
+            ->whereHas('vehicle', fn($q) => $q->where('vehicle_type', 'car'))
+            ->count();
+        $userActiveMotors = Cart::where('user_id', auth()->id())
+            ->whereIn('status', ['paid', 'active'])
+            ->whereHas('vehicle', fn($q) => $q->where('vehicle_type', 'motorcycle'))
+            ->count();
+
+        if (($userActiveCars + $carPendingCount) > 1 || ($userActiveMotors + $motorcyclePendingCount) > 1) {
+            return redirect()->route('user.cart')->with('error', 'Anda sudah memiliki peminjaman Mobil atau Motor yang aktif/menunggu persetujuan!');
         }
 
         $total = $carts->sum('subtotal');
@@ -197,25 +221,19 @@ class CartController extends Controller
             return redirect()->route('user.cart')->with('error', 'Keranjang kosong!');
         }
 
-        $total = $carts->sum('subtotal');
-
-        // Cek stok
+        // Cek stok kendaraan sebelum commit
         foreach ($carts as $cart) {
             $vehicle = Vehicle::find($cart->vehicle_id);
-            $cartCount = Cart::where('vehicle_id', $cart->vehicle_id)
-                ->where('id', '!=', $cart->id)
-                ->whereIn('status', ['pending', 'paid'])
-                ->sum('quantity_vehicle');
-            $availableStock = $vehicle->available_stock - $cartCount;
-            
-            if ($availableStock < ($cart->quantity_vehicle ?? 1)) {
-                return redirect()->route('user.cart')->with('error', 'Stok kendaraan ' . $vehicle->name . ' habis!');
+            if (!$vehicle || $vehicle->available_stock < ($cart->quantity_vehicle ?? 1)) {
+                return redirect()->route('user.cart')->with('error', 'Stok kendaraan ' . ($vehicle->name ?? 'item') . ' habis!');
             }
         }
 
+        $total = $carts->sum('subtotal');
+
         DB::beginTransaction();
         try {
-            // 🔥 STEP 1: SET SEMUA BOOKING_CODE CART INI KE NULL DULU
+            // STEP 1: SET SEMUA BOOKING_CODE CART INI KE NULL DULU
             foreach ($carts as $cart) {
                 DB::table('carts')
                     ->where('id', $cart->id)
@@ -225,7 +243,7 @@ class CartController extends Controller
                     ]);
             }
 
-            // 🔥 STEP 2: BUAT PAYMENT RECORD
+            // STEP 2: BUAT PAYMENT RECORD
             $payment = Payment::create([
                 'id' => Str::uuid(),
                 'cart_id' => $carts->first()->id,
@@ -238,26 +256,23 @@ class CartController extends Controller
                 'expired_at' => now()->addMinutes(30),
             ]);
 
-            // 🔥 STEP 3: UPDATE SETIAP CART DENGAN BOOKING CODE UNIQUE (SUFFIX)
+            // STEP 3: UPDATE SETIAP CART DENGAN STATUS 'paid' (MENUNGGU PERSETUJUAN)
+            // DAN KURANGI STOK ARMADA LANGSUNG SAAT CHECKOUT/SELESAI PEMBAYARAN INI
             $baseBookingCode = 'BK-' . strtoupper(Str::random(8));
             $counter = 1;
             $firstBookingCode = null;
 
             foreach ($carts as $cart) {
-                // Kalo cuma 1 cart, pake base code
-                // Kalo lebih dari 1, tambahin suffix biar unik
                 if ($carts->count() == 1) {
                     $bookingCode = $baseBookingCode;
                 } else {
                     $bookingCode = $baseBookingCode . '-' . $counter;
                 }
 
-                // Pastikan unik
                 while (Cart::where('booking_code', $bookingCode)->exists()) {
                     $bookingCode = $baseBookingCode . '-' . strtoupper(Str::random(4));
                 }
 
-                // Simpan booking code pertama buat redirect
                 if ($counter == 1) {
                     $firstBookingCode = $bookingCode;
                 }
@@ -271,10 +286,13 @@ class CartController extends Controller
                         'updated_at' => now(),
                     ]);
 
-                // Kurangi stok
+                // 🔥 STOK ARMADA LANGSUNG BERKURANG SAAT CHECKOUT (STATUS PAID / MENUNGGU PERSETUJUAN)
                 $vehicle = Vehicle::find($cart->vehicle_id);
-                $vehicle->available_stock -= ($cart->quantity_vehicle ?? 1);
-                $vehicle->save();
+                if ($vehicle) {
+                    $qtyToDeduct = $cart->quantity_vehicle ?? 1;
+                    $vehicle->available_stock = max(0, $vehicle->available_stock - $qtyToDeduct);
+                    $vehicle->save();
+                }
                 
                 $counter++;
             }
@@ -282,7 +300,7 @@ class CartController extends Controller
             DB::commit();
 
             return redirect()->route('user.payment.success', ['booking_code' => $firstBookingCode])
-                ->with('success', 'Pembayaran menunggu konfirmasi manager.');
+                ->with('success', 'Pembayaran berhasil dikirim! Menunggu konfirmasi manager armada.');
 
         } catch (\Exception $e) {
             DB::rollBack();

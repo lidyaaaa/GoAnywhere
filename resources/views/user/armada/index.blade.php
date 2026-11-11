@@ -912,14 +912,37 @@
                                 <a href="{{ route('user.armada.detail', $vehicle->id) }}" class="btn-detail">
                                     Detail
                                 </a>
-                                <form action="{{ route('user.cart.add') }}" method="POST" style="margin:0; width:100%;">
-                                    @csrf
-                                    <input type="hidden" name="vehicle_id" value="{{ $vehicle->id }}">
-                                    <input type="hidden" name="quantity" value="1">
-                                    <button type="submit" class="btn-booking" style="width:100%;">
+                                @php
+                                    $userRentalStatus = $userBookedVehicles[$vehicle->id] ?? null;
+                                    $typeLimitReached = ($vehicle->vehicle_type === 'car' && ($hasActiveCar ?? false)) ||
+                                                         ($vehicle->vehicle_type === 'motorcycle' && ($hasActiveMotorcycle ?? false));
+                                @endphp
+                                @if($userRentalStatus === 'paid')
+                                    <button type="button" class="btn-booking" disabled style="width:100%; opacity:0.75; cursor:not-allowed; background:#eab308; color:#fff;" title="Booking Anda sedang menunggu persetujuan manager">
+                                        Menunggu Acc
+                                    </button>
+                                @elseif($userRentalStatus === 'active')
+                                    <button type="button" class="btn-booking" disabled style="width:100%; opacity:0.75; cursor:not-allowed; background:#64748b; color:#fff;" title="Armada ini sedang dalam masa sewa aktif Anda">
+                                        Sedang Disewa
+                                    </button>
+                                @elseif($typeLimitReached)
+                                    <button type="button" class="btn-booking" disabled style="width:100%; opacity:0.65; cursor:not-allowed; background:#64748b; color:#fff;" title="Batas kuota tercapai: 1 akun hanya dapat meminjam 1 {{ $vehicle->vehicle_type === 'car' ? 'Mobil' : 'Motor' }}">
                                         Booking
                                     </button>
-                                </form>
+                                @elseif($vehicle->available_stock <= 0)
+                                    <button type="button" class="btn-booking" disabled style="width:100%; opacity:0.6; cursor:not-allowed; background:#94a3b8; color:#fff;">
+                                        Habis
+                                    </button>
+                                @else
+                                    <form action="{{ route('user.cart.add') }}" method="POST" style="margin:0; width:100%;">
+                                        @csrf
+                                        <input type="hidden" name="vehicle_id" value="{{ $vehicle->id }}">
+                                        <input type="hidden" name="quantity" value="1">
+                                        <button type="submit" class="btn-booking" style="width:100%;">
+                                            Booking
+                                        </button>
+                                    </form>
+                                @endif
                             </div>
                         </div>
                     </div>

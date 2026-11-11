@@ -63,16 +63,31 @@
                         
                         <!-- Actions -->
                         <div class="border-t border-slate-100 pt-4 mt-auto">
-                            <form action="{{ route('superadmin.vehicles.destroy', $vehicle->id) }}" method="POST" onsubmit="return confirm('Hapus kendaraan ini?')">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="w-full bg-red-50 hover:bg-red-100 text-red-600 font-semibold py-2.5 px-4 rounded-xl transition duration-200 text-sm flex items-center justify-center space-x-1.5 border border-red-200">
+                            @php
+                                $cannotDelete = ($vehicle->available_stock > 0 || $vehicle->total_stock > 0) || in_array($vehicle->id, $inCartOrBooked ?? []);
+                                $deleteReason = ($vehicle->available_stock > 0 || $vehicle->total_stock > 0) 
+                                    ? 'Stok belum 0' 
+                                    : 'Sedang di keranjang / dibooking user';
+                            @endphp
+                            @if($cannotDelete)
+                                <button type="button" disabled class="w-full bg-slate-100 text-slate-400 font-semibold py-2.5 px-4 rounded-xl text-sm flex items-center justify-center space-x-1.5 border border-slate-200 cursor-not-allowed opacity-60" title="Tidak dapat dihapus: {{ $deleteReason }}">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                     </svg>
-                                    <span>Hapus Armada</span>
+                                    <span>Hapus ({{ $deleteReason }})</span>
                                 </button>
-                            </form>
+                            @else
+                                <form action="{{ route('superadmin.vehicles.destroy', $vehicle->id) }}" method="POST" onsubmit="return confirm('Hapus kendaraan ini?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="w-full bg-red-50 hover:bg-red-100 text-red-600 font-semibold py-2.5 px-4 rounded-xl transition duration-200 text-sm flex items-center justify-center space-x-1.5 border border-red-200">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                        </svg>
+                                        <span>Hapus Armada</span>
+                                    </button>
+                                </form>
+                            @endif
                         </div>
                     </div>
                 @empty
@@ -81,6 +96,17 @@
                     </div>
                 @endforelse
             </div>
+
+            @if($vehicles->hasPages())
+                <div class="mt-8 flex flex-col items-center gap-2">
+                    <div class="text-sm text-gray-500">
+                        Menampilkan <strong>{{ $vehicles->firstItem() ?? 0 }}</strong> - <strong>{{ $vehicles->lastItem() ?? 0 }}</strong> dari <strong>{{ $vehicles->total() }}</strong> kendaraan
+                    </div>
+                    <div>
+                        {{ $vehicles->links() }}
+                    </div>
+                </div>
+            @endif
         </div>
     </div>
 </x-app-layout>

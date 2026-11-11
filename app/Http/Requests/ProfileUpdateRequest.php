@@ -26,6 +26,17 @@ class ProfileUpdateRequest extends FormRequest
                 'max:255',
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
+            // Nomor WA wajib untuk penyewa agar manager bisa menghubungi via WhatsApp.
+            'phone' => [
+                $this->user()->role === 'user' ? 'required' : 'nullable',
+                'string',
+                User::PHONE_REGEX,
+            ],
         ];
+    }
+
+    public function messages(): array
+    {
+        return User::PHONE_MESSAGES;
     }
 }

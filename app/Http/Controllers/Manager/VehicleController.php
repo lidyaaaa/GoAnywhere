@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Manager;
 
 use App\Http\Controllers\Controller;
 use App\Models\Vehicle;
+use App\Models\Cart;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
@@ -14,7 +15,18 @@ class VehicleController extends Controller
     {
         $location = auth()->user()->location;
         $vehicles = Vehicle::where('location', $location)->paginate(10); // 10 per halaman (2x5)
-        return view('manager.vehicles', compact('vehicles'));
+
+        // Hitung kendaraan mana saja yang tidak bisa dihapus:
+        // 1. Stok belum 0 (available_stock > 0 atau total_stock > 0)
+        // 2. Ada di keranjang user (pending) atau sedang dibooking/sewa (paid, active)
+        $vehicleIds = $vehicles->pluck('id')->toArray();
+        $inCartOrBooked = Cart::whereIn('vehicle_id', $vehicleIds)
+            ->whereIn('status', ['pending', 'paid', 'active'])
+            ->pluck('vehicle_id')
+            ->unique()
+            ->toArray();
+
+        return view('manager.vehicles', compact('vehicles', 'inCartOrBooked'));
     }
 
     public function create()
@@ -48,12 +60,13 @@ class VehicleController extends Controller
 
         Vehicle::create([
             'id' => Str::uuid(),
+            'manager_id' => auth()->id(),
             'name' => $request->name,
             'vehicle_type' => $request->vehicle_type,
             'brand' => $request->brand,
             'type' => $request->type,
             'year' => $request->year,
-            'transmission' => $request->transmission,
+            'transmission' => $request->transmission ?? $request->transmission_motor,
             'transmission_motor' => $request->transmission_motor,
             'capacity' => $request->capacity,
             'color' => $request->color,
@@ -63,9 +76,8 @@ class VehicleController extends Controller
             'total_stock' => $request->total_stock,
             'available_stock' => $request->total_stock,
             'location' => auth()->user()->location,
-            'manager_id' => auth()->id(),
-            'status' => 'available',
             'image' => $imagePath,
+            'status' => 'available',
         ]);
 
         return redirect()->route('manager.vehicles')->with('success', 'Kendaraan berhasil ditambahkan!');
@@ -101,8 +113,7 @@ class VehicleController extends Controller
             if ($vehicle->image) {
                 Storage::disk('public')->delete($vehicle->image);
             }
-            $imagePath = $request->file('image')->store('vehicles', 'public');
-            $vehicle->image = $imagePath;
+            $vehicle->image = $request->file('image')->store('vehicles', 'public');
         }
 
         $vehicle->update([
@@ -111,7 +122,7 @@ class VehicleController extends Controller
             'brand' => $request->brand,
             'type' => $request->type,
             'year' => $request->year,
-            'transmission' => $request->transmission,
+            'transmission' => $request->transmission ?? $request->transmission_motor,
             'transmission_motor' => $request->transmission_motor,
             'capacity' => $request->capacity,
             'color' => $request->color,
@@ -120,7 +131,7 @@ class VehicleController extends Controller
             'description' => $request->description,
         ]);
 
-        return redirect()->route('manager.vehicles')->with('success', 'Kendaraan berhasil diperbarui!');
+        return redirect()->route('manager.vehicles')->with('success', 'Kendaraan berhasil diupdate!');
     }
 
     public function addStock(Request $request, $id)
@@ -142,12 +153,27 @@ class VehicleController extends Controller
     {
         $vehicle = Vehicle::where('location', auth()->user()->location)->findOrFail($id);
         
-        $hasActiveRental = \App\Models\Cart::where('vehicle_id', $id)
-            ->whereIn('status', ['active', 'paid'])
+        // 1. Cek apakah stok kendaraan belum 0
+        if ($vehicle->available_stock > 0 || $vehicle->total_stock > 0) {
+            return back()->with('error', 'Kendaraan tidak bisa dihapus karena stok belum 0 (Stok tersedia: ' . $vehicle->available_stock . ', total: ' . $vehicle->total_stock . ')!');
+        }
+
+        // 2. Cek apakah ada di keranjang user (pending)
+        $inPendingCart = Cart::where('vehicle_id', $id)
+            ->where('status', 'pending')
+            ->exists();
+
+        if ($inPendingCart) {
+            return back()->with('error', 'Kendaraan sedang berada di keranjang belanja user, tidak bisa dihapus!');
+        }
+
+        // 3. Cek apakah sedang dibooking / disewa (paid, active)
+        $hasActiveRental = Cart::where('vehicle_id', $id)
+            ->whereIn('status', ['paid', 'active'])
             ->exists();
 
         if ($hasActiveRental) {
-            return back()->with('error', 'Kendaraan sedang disewa, tidak bisa dihapus!');
+            return back()->with('error', 'Kendaraan sedang dibooking / aktif disewa oleh user, tidak bisa dihapus!');
         }
 
         if ($vehicle->image) {

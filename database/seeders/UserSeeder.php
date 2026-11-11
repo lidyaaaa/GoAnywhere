@@ -5,23 +5,23 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 class UserSeeder extends Seeder
 {
     public function run(): void
     {
         // SUPERADMIN
-        User::create([
-            'id' => Str::uuid(),
+        User::firstOrCreate(
+            ['email' => 'superadmin@goanywhere.com'],
+            [
             'name' => 'Super Admin',
-            'email' => 'superadmin@goanywhere.com',
             'password' => Hash::make('password'),
             'role' => 'superadmin',
             'location' => null,
             'phone' => '081234567890',
             'email_verified_at' => now(),
-        ]);
+            ]
+        );
 
         // MANAGERS (5 lokasi)
         $managers = [
@@ -33,16 +33,17 @@ class UserSeeder extends Seeder
         ];
 
         foreach ($managers as $manager) {
-            User::create([
-                'id' => Str::uuid(),
-                'name' => 'Manager ' . $manager['name'],
-                'email' => $manager['email'],
-                'password' => Hash::make('password'),
-                'role' => 'manager',
-                'location' => $manager['name'],
-                'phone' => '08' . rand(1000000000, 9999999999),
-                'email_verified_at' => now(),
-            ]);
+            User::firstOrCreate(
+                ['email' => $manager['email']],
+                [
+                    'name' => 'Manager ' . $manager['name'],
+                    'password' => Hash::make('password'),
+                    'role' => 'manager',
+                    'location' => $manager['name'],
+                    'phone' => '08' . rand(1000000000, 9999999999),
+                    'email_verified_at' => now(),
+                ]
+            );
         }
 
     }

@@ -96,11 +96,39 @@
             margin-top: 4px;
         }
 
+        .remember-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 4px;
+            margin-bottom: 6px;
+        }
+
         .remember-group {
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-top: 4px;
+        }
+
+        .forgot-link {
+            font-size: 13px;
+            color: #43637E;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .forgot-link:hover {
+            color: #2c3e50;
+            text-decoration: underline;
+        }
+
+        .dark .forgot-link {
+            color: #8baac4;
+        }
+
+        .dark .forgot-link:hover {
+            color: #f0ede8;
         }
 
         .remember-group input[type="checkbox"] {
@@ -342,9 +370,14 @@
                 @endif
             </div>
 
-            <div class="remember-group">
-                <input id="remember_me" type="checkbox" name="remember">
-                <label for="remember_me">Ingat saya</label>
+            <div class="remember-row">
+                <div class="remember-group">
+                    <input id="remember_me" type="checkbox" name="remember">
+                    <label for="remember_me">Ingat saya</label>
+                </div>
+                <a class="forgot-link" href="{{ route('password.request') }}">
+                    Lupa Password?
+                </a>
             </div>
 
             <div class="login-actions">

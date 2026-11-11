@@ -281,10 +281,20 @@
                                         <td>{{ $item->user->name ?? 'N/A' }}</td>
                                         <td>Rp {{ number_format($item->subtotal ?? 0, 0, ',', '.') }}</td>
                                         <td>
-                                            <form action="{{ route('manager.rentals.approve', $item->booking_code) }}" method="POST">
-                                                @csrf
-                                                <button type="submit" class="approve-btn" onclick="return confirm('Setujui booking ini?')">Setujui Booking</button>
-                                            </form>
+                                            <div style="display:flex; align-items:center; gap:8px;">
+                                                <form action="{{ route('manager.rentals.approve', $item->booking_code) }}" method="POST" style="margin:0;">
+                                                    @csrf
+                                                    <button type="submit" class="approve-btn" onclick="return confirm('Setujui booking ini?')">Setujui Booking</button>
+                                                </form>
+                                                <a href="{{ route('manager.chat.start', ['user_id' => $item->user_id, 'vehicle_id' => $item->vehicle_id]) }}" 
+                                                   style="display:inline-flex; align-items:center; gap:6px; padding:7px 12px; background:#43637E; color:#ffffff; border-radius:8px; font-size:12px; font-weight:600; text-decoration:none; transition:all 0.2s ease; border:1px solid #43637E;"
+                                                   title="Chat dengan {{ $item->user->name ?? 'Penyewa' }}">
+                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                                                    </svg>
+                                                    <span>Chat</span>
+                                                </a>
+                                            </div>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -300,54 +310,7 @@
             </div>
 
             <!-- ===== SEWA AKTIF ===== -->
-            <div class="section-card">
-                    <h3 class="section-title"><span class="icon"></span> Sewa Aktif</h3>
-
-                @if(count($rentals) > 0)
-                    <div class="table-wrap">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Kendaraan</th>
-                                    <th>Penyewa</th>
-                                    <th>Tanggal Sewa</th>
-                                    <th>Durasi</th>
-                                    <th>Sisa</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($rentals as $rental)
-                                    @php
-                                        $remaining = now()->startOfDay()->diffInDays(\Carbon\Carbon::parse($rental->rental_end_date)->startOfDay(), false);
-                                        if ($remaining > 0) {
-                                            $statusClass = 'active';
-                                            $statusText = $remaining . ' hari';
-                                        } elseif ($remaining == 0) {
-                                            $statusClass = 'warning';
-                                            $statusText = 'Hari terakhir!';
-                                        } else {
-                                            $statusClass = 'danger';
-                                            $statusText = 'Telat ' . abs($remaining) . ' hari!';
-                                        }
-                                    @endphp
-                                    <tr>
-                                        <td class="vehicle-name">{{ $rental->vehicle->name ?? 'N/A' }}</td>
-                                        <td>{{ $rental->user->name ?? 'N/A' }}</td>
-                                        <td>{{ \Carbon\Carbon::parse($rental->rental_start_date)->format('d M Y') }}</td>
-                                        <td>{{ $rental->quantity }} hari</td>
-                                        <td><span class="status-badge {{ $statusClass }}">{{ $statusText }}</span></td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                @else
-                    <div class="empty-state">
-                        <span class="icon"></span>
-                        <p>Tidak ada sewa aktif</p>
-                    </div>
-                @endif
-            </div>
+            @include('manager.partials.active-rentals')
 
             <!-- ===== RIWAYAT TRANSAKSI ===== -->
             <div class="section-card">

@@ -1,17 +1,47 @@
+@php
+    $navUserId = auth()->id();
+    $navUserRole = auth()->user()?->role;
+
+    // Badge Chat Belum Dibaca
+    $navUnreadChatCount = 0;
+    if ($navUserId) {
+        $navUnreadChatCount = \App\Models\Message::where('receiver_id', $navUserId)
+            ->where('is_read', false)
+            ->count();
+    }
+
+    // Badge Rental Menunggu Persetujuan (Manager)
+    $navPendingApprovalCount = 0;
+    if ($navUserRole === 'manager') {
+        $navLocation = auth()->user()->location;
+        $navPendingApprovalCount = \App\Models\Cart::where('status', 'paid')
+            ->whereHas('vehicle', function($q) use ($navLocation) {
+                $q->where('location', $navLocation);
+            })->count();
+    }
+
+    // Badge Sewa Aktif / Sedang Berjalan (User)
+    $navActiveRentalCount = 0;
+    if ($navUserRole === 'user') {
+        $navActiveRentalCount = \App\Models\Cart::where('user_id', $navUserId)
+            ->whereIn('status', ['paid', 'active'])
+            ->count();
+    }
+@endphp
 <nav x-data="{ open: false }" class="navbar">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-            <div class="flex">
-                <!-- Logo -->
-                <div class="shrink-0 flex items-center">
-                    <a href="{{ route('user.home') }}" class="brand-link">
-                        <span class="brand-text"><span class="highlight">GoAnywhere</span></span>
-                    </a>
-                </div>
+        <div class="flex items-center justify-between h-16 relative">
+            <!-- Logo (Kiri) -->
+            <div class="shrink-0 flex items-center">
+                <a href="{{ route('user.home') }}" class="brand-link">
+                    <span class="brand-text"><span class="highlight">GoAnywhere</span></span>
+                </a>
+            </div>
 
-                <!-- Navigation Links -->
-                <div class="hidden space-x-2 sm:-my-px sm:ms-10 sm:flex items-center">
+            <!-- Navigation Links (Tepat di Tengah) -->
+            <div class="hidden sm:flex items-center justify-center space-x-2 flex-1 mx-4">
+                <div class="flex items-center space-x-2">
                     @auth
                         @if(Auth::user()->role == 'user')
                             <x-nav-link :href="route('user.home')" :active="request()->routeIs('user.home')" class="nav-link">
@@ -24,10 +54,19 @@
                         Armada
                             </x-nav-link>
                             <x-nav-link :href="route('user.rental')" :active="request()->routeIs('user.rental')" class="nav-link">
-                                Sewa Saya
+                                <span>Sewa Saya</span>
+                                @if($navActiveRentalCount > 0)
+                                    <span class="nav-pill-badge nav-pill-badge--primary" title="{{ $navActiveRentalCount }} sewa aktif / menunggu">{{ $navActiveRentalCount }}</span>
+                                @endif
                             </x-nav-link>
                             <x-nav-link :href="route('user.profile')" :active="request()->routeIs('user.profile')" class="nav-link">
                                 Profile
+                            </x-nav-link>
+                            <x-nav-link :href="route('user.chat.index')" :active="request()->routeIs('user.chat.*')" class="nav-link">
+                                <span>Chat</span>
+                                @if($navUnreadChatCount > 0)
+                                    <span class="nav-pill-badge nav-pill-badge--danger" title="{{ $navUnreadChatCount }} pesan belum dibaca">{{ $navUnreadChatCount }}</span>
+                                @endif
                             </x-nav-link>
                         @elseif(Auth::user()->role == 'manager')
                             <x-nav-link :href="route('manager.dashboard')" :active="request()->routeIs('manager.dashboard')" class="nav-link">
@@ -37,7 +76,16 @@
                                 Kelola Armada
                             </x-nav-link>
                             <x-nav-link :href="route('manager.rentals')" :active="request()->routeIs('manager.rentals')" class="nav-link">
-                        Transaksi
+                                <span>Transaksi</span>
+                                @if($navPendingApprovalCount > 0)
+                                    <span class="nav-pill-badge nav-pill-badge--warning" title="{{ $navPendingApprovalCount }} menunggu persetujuan">{{ $navPendingApprovalCount }}</span>
+                                @endif
+                            </x-nav-link>
+                            <x-nav-link :href="route('manager.chat.index')" :active="request()->routeIs('manager.chat.*')" class="nav-link">
+                                <span>Chat Customer</span>
+                                @if($navUnreadChatCount > 0)
+                                    <span class="nav-pill-badge nav-pill-badge--danger" title="{{ $navUnreadChatCount }} pesan baru">{{ $navUnreadChatCount }}</span>
+                                @endif
                             </x-nav-link>
                         @elseif(Auth::user()->role == 'superadmin')
                             <x-nav-link :href="route('superadmin.dashboard')" :active="request()->routeIs('superadmin.dashboard')" class="nav-link">
@@ -60,17 +108,18 @@
                 </div>
             </div>
 
-            <!-- Settings Dropdown -->
+            <!-- Settings Dropdown (Kanan) -->
             <div class="hidden sm:flex sm:items-center sm:ms-6">
                 <!-- Cart Icon (User only) -->
                 @auth
                     @if(Auth::user()->role == 'user')
-                        <a href="{{ route('user.cart') }}" class="cart-btn" title="Keranjang">
+                        <a href="{{ route('user.cart') }}" class="cart-btn" title="Keranjang" aria-label="Keranjang">
                             @php
                                 $cartCount = \App\Models\Cart::where('user_id', auth()->id())
                                     ->where('status', 'pending')
                                     ->count();
                             @endphp
+                            <span class="cart-icon" aria-hidden="true">🛒</span>
                             @if($cartCount > 0)
                                 <span class="cart-badge">{{ $cartCount }}</span>
                             @endif
@@ -138,10 +187,23 @@
                         Armada
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('user.rental')" :active="request()->routeIs('user.rental')" class="responsive-link">
-                        Sewa Saya
+                        <div class="flex items-center justify-between">
+                            <span>Sewa Saya</span>
+                            @if($navActiveRentalCount > 0)
+                                <span class="nav-pill-badge nav-pill-badge--primary">{{ $navActiveRentalCount }}</span>
+                            @endif
+                        </div>
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('user.profile')" :active="request()->routeIs('user.profile')" class="responsive-link">
                         Profile
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('user.chat.index')" :active="request()->routeIs('user.chat.*')" class="responsive-link">
+                        <div class="flex items-center justify-between">
+                            <span>Chat</span>
+                            @if($navUnreadChatCount > 0)
+                                <span class="nav-pill-badge nav-pill-badge--danger">{{ $navUnreadChatCount }}</span>
+                            @endif
+                        </div>
                     </x-responsive-nav-link>
                 @elseif(Auth::user()->role == 'manager')
                     <x-responsive-nav-link :href="route('manager.dashboard')" :active="request()->routeIs('manager.dashboard')" class="responsive-link">
@@ -151,7 +213,20 @@
                         Kelola Armada
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('manager.rentals')" :active="request()->routeIs('manager.rentals')" class="responsive-link">
-                        Transaksi
+                        <div class="flex items-center justify-between">
+                            <span>Transaksi</span>
+                            @if($navPendingApprovalCount > 0)
+                                <span class="nav-pill-badge nav-pill-badge--warning">{{ $navPendingApprovalCount }}</span>
+                            @endif
+                        </div>
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('manager.chat.index')" :active="request()->routeIs('manager.chat.*')" class="responsive-link">
+                        <div class="flex items-center justify-between">
+                            <span>Chat Customer</span>
+                            @if($navUnreadChatCount > 0)
+                                <span class="nav-pill-badge nav-pill-badge--danger">{{ $navUnreadChatCount }}</span>
+                            @endif
+                        </div>
                     </x-responsive-nav-link>
                 @elseif(Auth::user()->role == 'superadmin')
                     <x-responsive-nav-link :href="route('superadmin.dashboard')" :active="request()->routeIs('superadmin.dashboard')" class="responsive-link">
@@ -255,8 +330,11 @@
         border-bottom: 3px solid transparent;
         transition: all 0.3s ease;
         text-decoration: none;
-        display: inline-block;
+        display: inline-flex;
+        align-items: center;
+        white-space: nowrap;
         letter-spacing: 0.3px;
+        flex-shrink: 0;
     }
 
     .nav-link:hover {
@@ -281,16 +359,24 @@
         width: 40px;
         height: 40px;
         border-radius: 10px;
-        font-size: 20px;
         color: #5a6a7a;
         text-decoration: none;
         transition: all 0.3s ease;
         margin-right: 6px;
+        overflow: visible;
     }
 
     .cart-btn:hover {
         background: rgba(67, 99, 126, 0.08);
         color: #43637E;
+    }
+
+    .cart-btn .cart-icon {
+        font-size: 22px;
+        line-height: 1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .cart-btn .cart-badge {
@@ -308,6 +394,7 @@
         align-items: center;
         justify-content: center;
         box-shadow: 0 2px 8px rgba(176, 74, 74, 0.3);
+        padding: 0 4px;
     }
 
     /* ===== DROPDOWN TRIGGER ===== */
@@ -614,5 +701,36 @@
             height: 36px;
             font-size: 18px;
         }
+    }
+
+    /* ===== NAVIGATION BADGE NOTIFIKASI ===== */
+    .nav-pill-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 18px;
+        height: 18px;
+        padding: 0 5px;
+        font-size: 11px;
+        font-weight: 700;
+        line-height: 1;
+        border-radius: 999px;
+        margin-left: 6px;
+        transition: transform 0.2s ease;
+    }
+    .nav-pill-badge--danger {
+        background: #ef4444;
+        color: #ffffff;
+        box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
+    }
+    .nav-pill-badge--warning {
+        background: #f59e0b;
+        color: #ffffff;
+        box-shadow: 0 2px 6px rgba(245, 158, 11, 0.4);
+    }
+    .nav-pill-badge--primary {
+        background: #43637E;
+        color: #ffffff;
+        box-shadow: 0 2px 6px rgba(67, 99, 126, 0.35);
     }
 </style>

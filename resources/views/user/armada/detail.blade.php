@@ -323,6 +323,101 @@
             box-shadow: 0 12px 40px rgba(67, 99, 126, 0.5);
         }
 
+        .btn-booking-lg.disabled,
+        .btn-booking-lg:disabled {
+            background: #94a3b8 !important;
+            color: #ffffff !important;
+            cursor: not-allowed !important;
+            box-shadow: none !important;
+            transform: none !important;
+        }
+
+        .user-booking-status {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 14px 18px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            font-size: 13px;
+        }
+
+        .user-booking-status.pending {
+            background: #fffbeb;
+            border: 1.5px solid #fde047;
+            color: #854d0e;
+        }
+
+        .user-booking-status.active {
+            background: #eff6ff;
+            border: 1.5px solid #93c5fd;
+            color: #1e40af;
+        }
+
+        .user-booking-status .status-icon {
+            font-size: 24px;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+
+        .user-booking-status .status-title {
+            font-weight: 700;
+            font-size: 14px;
+            margin-bottom: 2px;
+        }
+
+        .user-booking-status .status-desc {
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        .dark .user-booking-status.pending {
+            background: #2d2613;
+            border-color: #854d0e;
+            color: #fde047;
+        }
+
+        .dark .user-booking-status.active {
+            background: #172554;
+            border-color: #1e40af;
+            color: #93c5fd;
+        }
+
+        .btn-chat-manager {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 13px 20px;
+            background: #ffffff;
+            color: #43637E;
+            border: 2px solid #43637E;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-chat-manager:hover {
+            background: rgba(67, 99, 126, 0.08);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(67, 99, 126, 0.2);
+        }
+
+        .dark .btn-chat-manager {
+            background: #1a2632;
+            color: #8baac4;
+            border-color: #8baac4;
+        }
+
+        .dark .btn-chat-manager:hover {
+            background: rgba(139, 170, 196, 0.15);
+        }
+
         /* ===== BACK LINK ===== */
         .back-link {
             display: inline-flex;
@@ -680,6 +775,70 @@
 
                     <hr class="divider">
 
+                    <!-- Status Booking / Rental User -->
+                    @php
+                        $typeLimitReached = ($vehicle->vehicle_type === 'car' && ($hasActiveCar ?? false)) ||
+                                             ($vehicle->vehicle_type === 'motorcycle' && ($hasActiveMotorcycle ?? false));
+                    @endphp
+
+                    @if(isset($userActiveRental) && $userActiveRental)
+                        @if($userActiveRental->status === 'paid')
+                            <div class="user-booking-status pending">
+                                <span class="status-icon">⏳</span>
+                                <div>
+                                    <div class="status-title">Booking Menunggu Persetujuan</div>
+                                    <p class="status-desc">
+                                        Anda sudah membooking armada ini (Kode: <strong>{{ $userActiveRental->booking_code }}</strong>) dan sedang menunggu persetujuan manager.
+                                    </p>
+                                </div>
+                            </div>
+                            <button type="button" class="btn-booking-lg disabled" disabled style="width: 100%;">
+                                Menunggu Persetujuan Manager
+                            </button>
+                        @elseif($userActiveRental->status === 'active')
+                            <div class="user-booking-status active">
+                                <span class="status-icon">🚗</span>
+                                <div>
+                                    <div class="status-title">Armada Sedang Aktif Anda Sewa</div>
+                                    <p class="status-desc">
+                                        Anda saat ini sedang menyewa armada ini (Kode: <strong>{{ $userActiveRental->booking_code }}</strong>). Anda dapat meminjam kembali setelah transaksi sewa selesai.
+                                    </p>
+                                </div>
+                            </div>
+                            <button type="button" class="btn-booking-lg disabled" disabled style="width: 100%;">
+                                Sedang Anda Sewa
+                            </button>
+                        @endif
+                        <div style="text-align: center; margin-top: 8px;">
+                            <a href="{{ route('user.rental') }}" style="font-size: 13px; color: #43637E; font-weight: 600; text-decoration: underline;">
+                                Cek Status di Sewa Saya →
+                            </a>
+                        </div>
+                    @elseif($typeLimitReached)
+                        <div class="user-booking-status" style="background:#f1f5f9; border:1.5px solid #cbd5e1; color:#334155;">
+                            <span class="status-icon">ℹ️</span>
+                            <div>
+                                <div class="status-title">Batas Kuota {{ $vehicle->vehicle_type === 'car' ? 'Mobil' : 'Motor' }} Tercapai</div>
+                                <p class="status-desc">
+                                    Kebijakan rental: 1 akun maksimal meminjam 1 Mobil dan 1 Motor. Anda sudah memiliki peminjaman/booking untuk kategori {{ $vehicle->vehicle_type === 'car' ? 'mobil' : 'motor' }}.
+                                </p>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-booking-lg disabled" disabled style="width: 100%; opacity:0.65; cursor:not-allowed; background:#64748b; color:#fff;" title="Batas kuota tercapai: 1 akun hanya dapat meminjam 1 {{ $vehicle->vehicle_type === 'car' ? 'Mobil' : 'Motor' }}">
+                            Booking Sekarang
+                        </button>
+                    @elseif($availableStock <= 0)
+                        <div class="user-booking-status" style="background:#fef2f2; border:1.5px solid #fca5a5; color:#991b1b;">
+                            <span class="status-icon">❌</span>
+                            <div>
+                                <div class="status-title">Stok Habis</div>
+                                <p class="status-desc">Maaf, unit kendaraan ini sedang tidak tersedia untuk dibooking.</p>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-booking-lg disabled" disabled style="width: 100%;">
+                            Stok Habis
+                        </button>
+                    @else
                     <!-- Booking Form -->
                     <form action="{{ route('user.cart.add') }}" method="POST" class="booking-form">
                         @csrf
@@ -692,6 +851,17 @@
                              Booking Sekarang
                         </button>
                     </form>
+                    @endif
+
+                    <!-- Chat Manager Armada -->
+                    <div style="margin-top: 14px; margin-bottom: 10px;">
+                        <a href="{{ route('user.chat.start', ['vehicle_id' => $vehicle->id]) }}" class="btn-chat-manager">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                            </svg>
+                            <span>Chat Manager Armada</span>
+                        </a>
+                    </div>
 
                     <!-- Back Link -->
                     <a href="{{ route('user.armada') }}" class="back-link">

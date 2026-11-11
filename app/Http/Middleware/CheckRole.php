@@ -14,6 +14,15 @@ class CheckRole
             return redirect('/login');
         }
 
+        // Jika akun ditangguhkan / diban, langsung logout dan tolak akses
+        if (Auth::user()->suspended_at && Auth::user()->role === 'user') {
+            $reason = Auth::user()->suspended_reason ?: 'Akun Anda ditangguhkan.';
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            return redirect('/login')->withErrors(['email' => $reason]);
+        }
+
         $userRole = Auth::user()->role;
 
         if (in_array($userRole, $roles)) {

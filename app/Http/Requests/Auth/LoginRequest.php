@@ -50,6 +50,15 @@ class LoginRequest extends FormRequest
             ]);
         }
 
+        // Akun yang di-blacklist manager tidak boleh login.
+        if (Auth::user()->suspended_at) {
+            Auth::logout();
+
+            throw ValidationException::withMessages([
+                'email' => 'Akun Anda ditangguhkan. Silakan hubungi GoAnywhere untuk penyelesaian.',
+            ]);
+        }
+
         RateLimiter::clear($this->throttleKey());
     }
 

@@ -23,10 +23,19 @@ class UserProfileController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
-            'phone' => 'nullable|string|max:15',
+            'phone' => ['required', 'string', \App\Models\User::PHONE_REGEX],
             'current_password' => 'nullable|required_with:new_password|current_password',
             'new_password' => 'nullable|min:8|confirmed',
-        ]);
+        ], array_merge(\App\Models\User::PHONE_MESSAGES, [
+            'name.required' => 'Nama lengkap wajib diisi.',
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Format email tidak valid.',
+            'email.unique' => 'Email sudah terdaftar.',
+            'current_password.required_with' => 'Password saat ini wajib diisi jika ingin mengubah password baru.',
+            'current_password.current_password' => 'Password saat ini tidak sesuai.',
+            'new_password.min' => 'Password baru minimal harus 8 karakter.',
+            'new_password.confirmed' => 'Konfirmasi password baru tidak cocok.',
+        ]));
 
         $user->name = $request->name;
         $user->email = $request->email;

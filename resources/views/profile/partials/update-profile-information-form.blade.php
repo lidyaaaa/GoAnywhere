@@ -47,6 +47,15 @@
             @endif
         </div>
 
+        <div>
+            <x-input-label for="phone" value="Nomor WhatsApp" />
+            <x-text-input id="phone" name="phone" type="tel" inputmode="tel" class="mt-1 block w-full"
+                          :value="old('phone', $user->phone ? '0' . substr($user->phone, 2) : '')"
+                          placeholder="081234567890" autocomplete="tel" :required="$user->role === 'user'" />
+            <p class="mt-1 text-xs text-gray-500">Dipakai petugas GoAnywhere untuk menghubungi Anda via WhatsApp terkait sewa.</p>
+            <x-input-error class="mt-2" :messages="$errors->get('phone')" />
+        </div>
+
         <div class="flex items-center gap-4">
             <x-primary-button>{{ __('Save') }}</x-primary-button>
 

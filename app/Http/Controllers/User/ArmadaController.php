@@ -4,6 +4,7 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\Vehicle;
+use App\Models\Cart;
 use Illuminate\Http\Request;
 
 class ArmadaController extends Controller
@@ -71,24 +72,85 @@ class ArmadaController extends Controller
 
         $locations = ['Jakarta', 'Bogor', 'Depok', 'Tangerang', 'Bekasi'];
         
-        // Ambil range harga untuk slider
+        // Range harga untuk slider
         $minPrice = Vehicle::min('price_per_day') ?? 0;
         $maxPrice = Vehicle::max('price_per_day') ?? 1000000;
 
-        return view('user.armada.index', compact('vehicles', 'locations', 'minPrice', 'maxPrice'));
+        // Ambil status booking/sewa user yang sedang aktif atau menunggu persetujuan (per vehicle)
+        // Serta cek kuota jenis kendaraan (1 mobil, 1 motor)
+        $userBookedVehicles = [];
+        $hasActiveCar = false;
+        $hasActiveMotorcycle = false;
+
+        if (auth()->check()) {
+            $userCarts = Cart::with('vehicle')
+                ->where('user_id', auth()->id())
+                ->whereIn('status', ['pending', 'paid', 'active'])
+                ->get();
+
+            foreach ($userCarts as $c) {
+                if (in_array($c->status, ['paid', 'active'])) {
+                    $userBookedVehicles[$c->vehicle_id] = $c->status;
+                }
+
+                $type = $c->vehicle?->vehicle_type;
+                if ($type === 'car') {
+                    $hasActiveCar = true;
+                } elseif ($type === 'motorcycle') {
+                    $hasActiveMotorcycle = true;
+                }
+            }
+        }
+
+        return view('user.armada.index', compact(
+            'vehicles',
+            'locations',
+            'minPrice',
+            'maxPrice',
+            'userBookedVehicles',
+            'hasActiveCar',
+            'hasActiveMotorcycle'
+        ));
     }
 
     public function detail($id)
     {
         $vehicle = Vehicle::with('manager')->findOrFail($id);
         
-        // Cek stok di cart
-        $cartCount = \App\Models\Cart::where('vehicle_id', $id)
-            ->whereIn('status', ['pending', 'paid'])
-            ->sum('quantity');
-        
-        $availableStock = $vehicle->available_stock - $cartCount;
+        // Stok murni dari database (sudah langsung dipotong saat checkout)
+        $availableStock = max(0, (int) $vehicle->available_stock);
 
-        return view('user.armada.detail', compact('vehicle', 'availableStock'));
+        // Cek apakah user sedang booking (paid/menunggu persetujuan) atau sewa sedang aktif
+        $userActiveRental = null;
+        $hasActiveCar = false;
+        $hasActiveMotorcycle = false;
+
+        if (auth()->check()) {
+            $userCarts = Cart::with('vehicle')
+                ->where('user_id', auth()->id())
+                ->whereIn('status', ['pending', 'paid', 'active'])
+                ->get();
+
+            foreach ($userCarts as $c) {
+                if ($c->vehicle_id == $id && in_array($c->status, ['paid', 'active'])) {
+                    $userActiveRental = $c;
+                }
+
+                $type = $c->vehicle?->vehicle_type;
+                if ($type === 'car') {
+                    $hasActiveCar = true;
+                } elseif ($type === 'motorcycle') {
+                    $hasActiveMotorcycle = true;
+                }
+            }
+        }
+
+        return view('user.armada.detail', compact(
+            'vehicle',
+            'availableStock',
+            'userActiveRental',
+            'hasActiveCar',
+            'hasActiveMotorcycle'
+        ));
     }
 }

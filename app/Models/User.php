@@ -23,6 +23,24 @@ class User extends Authenticatable
         'phone',
     ];
 
+    /** Format nomor WA Indonesia: 08xx / 628xx / +628xx (spasi & strip diperbolehkan). */
+    public const PHONE_REGEX = 'regex:/^(\+?62|0)8[0-9\s\-]{7,15}$/';
+
+    public const PHONE_MESSAGES = [
+        'phone.required' => 'Nomor WhatsApp wajib diisi.',
+        'phone.regex'    => 'Format nomor WhatsApp tidak valid. Contoh: 081234567890.',
+    ];
+
+    /** Simpan nomor dalam format internasional (628xxx) agar langsung bisa dipakai wa.me. */
+    public function setPhoneAttribute(?string $value): void
+    {
+        $digits = preg_replace('/\D/', '', (string) $value);
+        if (str_starts_with($digits, '0')) {
+            $digits = '62' . substr($digits, 1);
+        }
+        $this->attributes['phone'] = $digits !== '' ? $digits : null;
+    }
+
     protected $hidden = [
         'password',
         'remember_token',
@@ -59,5 +77,25 @@ class User extends Authenticatable
     public function rentalHistories()
     {
         return $this->hasMany(RentalHistory::class);
+    }
+
+    public function userConversations()
+    {
+        return $this->hasMany(Conversation::class, 'user_id');
+    }
+
+    public function managerConversations()
+    {
+        return $this->hasMany(Conversation::class, 'manager_id');
+    }
+
+    public function sentMessages()
+    {
+        return $this->hasMany(Message::class, 'sender_id');
+    }
+
+    public function receivedMessages()
+    {
+        return $this->hasMany(Message::class, 'receiver_id');
     }
 }

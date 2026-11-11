@@ -524,13 +524,25 @@
                                     <a href="{{ route('manager.vehicles.edit', $vehicle->id) }}" class="btn-edit">
                                          Edit
                                     </a>
-                                    <form action="{{ route('manager.vehicles.destroy', $vehicle->id) }}" method="POST" style="margin:0; width:100%;">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn-delete" onclick="return confirm('Hapus kendaraan {{ $vehicle->name }}?')">
+                                    @php
+                                        $cannotDelete = ($vehicle->available_stock > 0 || $vehicle->total_stock > 0) || in_array($vehicle->id, $inCartOrBooked ?? []);
+                                        $deleteReason = ($vehicle->available_stock > 0 || $vehicle->total_stock > 0) 
+                                            ? 'Stok belum 0' 
+                                            : 'Sedang di keranjang / dibooking user';
+                                    @endphp
+                                    @if($cannotDelete)
+                                        <button type="button" class="btn-delete" disabled style="opacity:0.45; cursor:not-allowed; background:#cbd5e1; color:#64748b; border-color:#cbd5e1;" title="Tidak dapat dihapus: {{ $deleteReason }}">
                                              Hapus
                                         </button>
-                                    </form>
+                                    @else
+                                        <form action="{{ route('manager.vehicles.destroy', $vehicle->id) }}" method="POST" style="margin:0; width:100%;">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn-delete" onclick="return confirm('Hapus kendaraan {{ $vehicle->name }}?')">
+                                                 Hapus
+                                            </button>
+                                        </form>
+                                    @endif
                                 </div>
 
                                 <form action="{{ route('manager.vehicles.addStock', $vehicle->id) }}" method="POST" class="add-stock-form">

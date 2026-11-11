@@ -139,6 +139,64 @@
             background: #4a7a5a;
         }
 
+        .status-badge.banned {
+            background: #fce8e8;
+            color: #b04a4a;
+            border: 1px solid #f5c2c2;
+        }
+
+        .status-badge.banned .dot {
+            background: #b04a4a;
+        }
+
+        .btn-ban {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #fff0f0;
+            color: #b04a4a;
+            border: 1px solid #f5c2c2;
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-ban:hover {
+            background: #b04a4a;
+            color: #ffffff;
+            border-color: #b04a4a;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(176, 74, 74, 0.25);
+        }
+
+        .btn-unban {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #e8f4ec;
+            color: #2e6940;
+            border: 1px solid #b7dfc3;
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-unban:hover {
+            background: #2e6940;
+            color: #ffffff;
+            border-color: #2e6940;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(46, 105, 64, 0.25);
+        }
+
         .status-badge .dot {
             width: 8px;
             height: 8px;
@@ -245,6 +303,27 @@
             margin-top: 4px;
         }
 
+        /* ===== PAGINATION ===== */
+        .pagination-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            margin-top: 20px;
+            padding-bottom: 8px;
+        }
+
+        .pagination-wrapper .info-text {
+            font-size: 14px;
+            color: #7a8a9a;
+            font-weight: 300;
+        }
+
+        .pagination-wrapper .info-text strong {
+            color: #43637E;
+            font-weight: 600;
+        }
+
         /* ===== DARK MODE ===== */
         .dark .user-section { background: #1a2632; }
         .dark .alert-success { background: #1e3d2e; border-color: #4a7a5a; color: #8abd9a; }
@@ -313,7 +392,9 @@
                                 <th>Email</th>
                                 <th>No HP</th>
                                 <th>Total Sewa</th>
-                                <th>Status</th>
+                                <th>Status Sewa</th>
+                                <th>Status Akun</th>
+                                <th style="text-align: center;">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -351,10 +432,49 @@
                                             </span>
                                         @endif
                                     </td>
+                                    <td>
+                                        @if($user->suspended_at)
+                                            <span class="status-badge banned" title="Diban sejak: {{ $user->suspended_at }}">
+                                                <span class="dot"></span> Disband / Banned
+                                            </span>
+                                            @if($user->suspended_reason)
+                                                <div style="font-size: 11px; color: #b04a4a; margin-top: 4px; max-width: 220px;">
+                                                    {{ $user->suspended_reason }}
+                                                </div>
+                                            @endif
+                                        @else
+                                            <span class="status-badge inactive">
+                                                <span class="dot"></span> Aktif
+                                            </span>
+                                        @endif
+                                    </td>
+                                    <td style="text-align: center;">
+                                        @if($user->suspended_at)
+                                            <form action="{{ route('superadmin.users.toggle-ban', $user->id) }}" method="POST" style="display: inline-block;" onsubmit="return confirm('Aktifkan kembali akun user {{ $user->name }}?')">
+                                                @csrf
+                                                <button type="submit" class="btn-unban">
+                                                    <svg style="width:14px;height:14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                    </svg>
+                                                    <span>Unban Akun</span>
+                                                </button>
+                                            </form>
+                                        @else
+                                            <form action="{{ route('superadmin.users.toggle-ban', $user->id) }}" method="POST" style="display: inline-block;" onsubmit="return confirm('Yakin ingin men-disband / ban akun user {{ $user->name }}? User ini tidak akan bisa login ke aplikasi.')">
+                                                @csrf
+                                                <button type="submit" class="btn-ban">
+                                                    <svg style="width:14px;height:14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+                                                    </svg>
+                                                    <span>Disband Akun</span>
+                                                </button>
+                                            </form>
+                                        @endif
+                                    </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5">
+                                    <td colspan="7">
                                         <div class="empty-state">
                                             <span class="icon"></span>
                                             <h4>Belum Ada User</h4>
@@ -365,6 +485,19 @@
                             @endforelse
                         </tbody>
                     </table>
+                </div>
+
+                @if($users->hasPages())
+                    <div class="pagination-wrapper">
+                        <div class="info-text">
+                            Menampilkan <strong>{{ $users->firstItem() ?? 0 }}</strong> - <strong>{{ $users->lastItem() ?? 0 }}</strong> dari <strong>{{ $users->total() }}</strong> user
+                        </div>
+                        <div>
+                            {{ $users->links() }}
+                        </div>
+                    </div>
+                @endif
+
                 </div>
             </div>
 
