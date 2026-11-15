@@ -266,7 +266,7 @@
     <div class="register-container">
         <!-- Header -->
         <div class="register-header">
-            <span class="icon"></span>
+            <img src="{{ asset('GoAnywhereLogo.png') }}" alt="GoAnywhere" class="w-16 h-16 mx-auto mb-3 object-contain drop-shadow-md">
             <h2 class="title">Daftar <span class="highlight">GoAnywhere</span></h2>
             <p class="subtitle">Buat akun untuk mulai menyewa kendaraan</p>
         </div>
@@ -302,6 +302,31 @@
                        placeholder="Contoh: 081234567890" required autocomplete="tel">
                 @if($errors->has('phone'))
                     <div class="error-text">{{ $errors->first('phone') }}</div>
+                @endif
+            </div>
+
+            <!-- Kota Wilayah (Jabodetabek) -->
+            <div class="form-group">
+                <label for="location">📍 Kota Domisili (Jabodetabek)</label>
+                <select id="location" name="location" required class="w-full px-4 py-3 rounded-xl border-[1.5px] border-[#e8e4de] text-[15px] bg-[#faf8f5] text-[#2c3e50] focus:border-[#43637E] focus:bg-white focus:outline-none transition">
+                    <option value="" disabled {{ old('location') ? '' : 'selected' }}>-- Pilih Kota Wilayah Anda --</option>
+                    @foreach(['Jakarta', 'Bogor', 'Depok', 'Tangerang', 'Bekasi'] as $city)
+                        <option value="{{ $city }}" {{ old('location') === $city ? 'selected' : '' }}>{{ $city }}</option>
+                    @endforeach
+                </select>
+                @if($errors->has('location'))
+                    <div class="error-text">{{ $errors->first('location') }}</div>
+                @endif
+            </div>
+
+            <!-- Detail Alamat -->
+            <div class="form-group">
+                <label for="address">🏠 Detail Alamat Lengkap</label>
+                <textarea id="address" name="address" rows="2" required
+                          placeholder="Nama jalan, RT/RW, No. rumah, Kelurahan/Kecamatan (untuk titik antar unit)"
+                          class="w-full px-4 py-3 rounded-xl border-[1.5px] border-[#e8e4de] text-[15px] bg-[#faf8f5] text-[#2c3e50] focus:border-[#43637E] focus:bg-white focus:outline-none transition">{{ old('address') }}</textarea>
+                @if($errors->has('address'))
+                    <div class="error-text">{{ $errors->first('address') }}</div>
                 @endif
             </div>
 

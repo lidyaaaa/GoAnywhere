@@ -208,43 +208,46 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 4px;
-            background: #f0ede8;
-            color: #2c3e50;
-            padding: 7px;
-            border-radius: 8px;
-            font-weight: 600;
+            gap: 6px;
+            background: #004B87 !important;
+            color: #ffffff !important;
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-weight: 700;
             font-size: 13px;
             text-decoration: none;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(0, 75, 135, 0.2);
         }
 
         .vehicle-card .body .actions .btn-edit:hover {
-            background: #e0dcd5;
+            background: #002D55 !important;
             transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 75, 135, 0.3);
         }
 
         .vehicle-card .body .actions .btn-delete {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 4px;
-            background: transparent;
-            color: #b04a4a;
-            border: 1.5px solid #b04a4a;
-            padding: 7px;
-            border-radius: 8px;
-            font-weight: 600;
+            gap: 6px;
+            background: #fff1f2 !important;
+            color: #e11d48 !important;
+            border: 1px solid #fecdd3 !important;
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-weight: 700;
             font-size: 13px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             width: 100%;
         }
 
         .vehicle-card .body .actions .btn-delete:hover {
-            background: #b04a4a;
-            color: #ffffff;
+            background: #e11d48 !important;
+            color: #ffffff !important;
             transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(225, 29, 72, 0.25);
         }
 
         .vehicle-card .body .add-stock-form {
@@ -509,16 +512,47 @@
                                 <h4 class="name">{{ $vehicle->name }}</h4>
                                 <div class="specs">{{ $vehicle->brand }} • {{ $vehicle->year }}</div>
                                 <div class="price">
-                                    Rp {{ number_format($vehicle->price_per_day, 0, ',', '.') }}
-                                    <small>/ hari</small>
+                                    <div class="text-base font-bold text-[#002D55] dark:text-blue-300">
+                                        Rp {{ number_format($vehicle->price_per_day, 0, ',', '.') }}
+                                        <small class="text-xs text-gray-500">/ hari</small>
+                                    </div>
+                                    @if($vehicle->price_per_week > 0)
+                                        <div class="text-xs text-emerald-600 dark:text-emerald-400 font-semibold mt-0.5">
+                                            🎁 Paket 7 Hari: Rp {{ number_format($vehicle->price_per_week, 0, ',', '.') }}
+                                        </div>
+                                    @endif
                                 </div>
 
-                                <div class="stock-info">
-                                    <span>                                     Stok: <strong>{{ $vehicle->available_stock }}</strong>/{{ $vehicle->total_stock }}</span>
-                                    <span class="status-text {{ $vehicle->available_stock > 0 ? 'available' : 'empty' }}">
-                                         {{ $vehicle->available_stock > 0 ? 'Tersedia' : 'Habis' }}
-                                    </span>
+                                @php
+                                    $rentedCount = max(0, $vehicle->total_stock - $vehicle->available_stock - $vehicle->damaged_stock);
+                                @endphp
+                                <div class="grid grid-cols-2 gap-2 my-2.5 text-xs">
+                                    <div style="background: #f1f5f9; color: #1e293b; border: 1px solid #cbd5e1;" class="flex items-center justify-between p-2 rounded-xl shadow-sm">
+                                        <span class="flex items-center gap-1 font-semibold">📦 Total</span>
+                                        <strong class="font-extrabold text-sm">{{ $vehicle->total_stock }}</strong>
+                                    </div>
+                                    <div style="background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0;" class="flex items-center justify-between p-2 rounded-xl shadow-sm">
+                                        <span class="flex items-center gap-1 font-semibold">✅ Siap</span>
+                                        <strong class="font-extrabold text-sm">{{ $vehicle->available_stock }} unit</strong>
+                                    </div>
+                                    <div style="background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe;" class="flex items-center justify-between p-2 rounded-xl shadow-sm">
+                                        <span class="flex items-center gap-1 font-semibold">🚗 Disewa</span>
+                                        <strong class="font-extrabold text-sm">{{ $rentedCount }} unit</strong>
+                                    </div>
+                                    <div style="{{ $vehicle->damaged_stock > 0 ? 'background: #fff1f2; color: #9f1239; border: 1px solid #fecdd3;' : 'background: #f8fafc; color: #94a3b8; border: 1px solid #e2e8f0;' }}" class="flex items-center justify-between p-2 rounded-xl shadow-sm">
+                                        <span class="flex items-center gap-1 font-semibold">🛠️ Rusak</span>
+                                        <strong class="font-extrabold text-sm">{{ $vehicle->damaged_stock }} unit</strong>
+                                    </div>
                                 </div>
+
+                                @if($vehicle->damaged_stock > 0)
+                                    <form action="{{ route('manager.vehicles.repair', $vehicle->id) }}" method="POST" class="mb-2">
+                                        @csrf
+                                        <button type="submit" class="w-full py-1.5 px-3 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-sm" onclick="return confirm('Konfirmasi: 1 unit {{ $vehicle->name }} telah selesai direparasi dan siap kembali disewakan?')">
+                                            <span>🛠️</span> Betulkan 1 Unit Rusak (Stok Rusak: {{ $vehicle->damaged_stock }})
+                                        </button>
+                                    </form>
+                                @endif
 
                                 <div class="actions">
                                     <a href="{{ route('manager.vehicles.edit', $vehicle->id) }}" class="btn-edit">

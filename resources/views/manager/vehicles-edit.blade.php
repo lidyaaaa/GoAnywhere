@@ -315,10 +315,16 @@
                                 <input type="text" name="fuel" value="{{ $vehicle->fuel }}" required placeholder="Bensin/Diesel/Pertalite">
                             </div>
 
-                            <!-- Harga -->
+                            <!-- Harga Harian -->
                             <div class="form-group">
-                                <label>Harga / Hari</label>
+                                <label>Harga / Hari (Rp)</label>
                                 <input type="number" name="price_per_day" value="{{ $vehicle->price_per_day }}" required min="0" placeholder="500000">
+                            </div>
+
+                            <!-- Harga Mingguan -->
+                            <div class="form-group">
+                                <label>Harga / Minggu (Paket Hemat 7 Hari)</label>
+                                <input type="number" name="price_per_week" value="{{ $vehicle->price_per_week }}" required min="0" placeholder="2800000">
                             </div>
 
                             <!-- Deskripsi -->

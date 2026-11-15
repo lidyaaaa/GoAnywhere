@@ -738,12 +738,22 @@
 
                         <!-- Harga -->
                         <div class="price-box">
-                            <div class="price-value">
-                                Rp {{ number_format($vehicle->price_per_day, 0, ',', '.') }}
-                                <small>/ hari</small>
-                            </div>
-                            <div class="price-note">
-                                Maksimal sewa <strong>7 hari</strong>
+                            <div class="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
+                                <div>
+                                    <div class="price-value">
+                                        Rp {{ number_format($vehicle->price_per_day, 0, ',', '.') }}
+                                        <small>/ hari</small>
+                                    </div>
+                                    <div class="price-note">
+                                        Pilihan durasi harian <strong>1 s/d 7 hari</strong>
+                                    </div>
+                                </div>
+                                @if($vehicle->price_per_week > 0)
+                                    <div class="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-xl px-3 py-2 text-right">
+                                        <div class="text-[11px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">🎁 Paket Hemat 7 Hari</div>
+                                        <div class="text-base font-extrabold text-emerald-600 dark:text-emerald-300">Rp {{ number_format($vehicle->price_per_week, 0, ',', '.') }}</div>
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -814,6 +824,42 @@
                                 Cek Status di Sewa Saya →
                             </a>
                         </div>
+                    @elseif(auth()->check() && (empty(auth()->user()->location) || empty(auth()->user()->address) || empty(auth()->user()->phone)))
+                        <div class="user-booking-status" style="background:#fffbeb; border:1.5px solid #fcd34d; color:#92400e;">
+                            <span class="status-icon">📝</span>
+                            <div>
+                                <div class="status-title font-bold text-amber-900">Profil Belum Lengkap</div>
+                                <p class="status-desc text-amber-800 font-medium">
+                                    Anda wajib melengkapi Nomor Telepon, Kota Domisili Jabodetabek, dan Detail Alamat sebelum melakukan penyewaan.
+                                </p>
+                                <div class="mt-2.5">
+                                    <a href="{{ route('user.profile.user') }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-lg shadow-sm transition">
+                                        <span>⚙️</span> Lengkapi Profil Sekarang &rarr;
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-booking-lg disabled" disabled style="width: 100%; opacity:0.6; cursor:not-allowed; background:#94a3b8; color:#fff;">
+                            Lengkapi Profil Terlebih Dahulu
+                        </button>
+                    @elseif(auth()->check() && auth()->user()->location !== $vehicle->location)
+                        <div class="user-booking-status" style="background:#fffbeb; border:1.5px solid #fcd34d; color:#92400e;">
+                            <span class="status-icon">📍</span>
+                            <div>
+                                <div class="status-title font-bold text-amber-900">Peringatan Lokasi Wilayah</div>
+                                <p class="status-desc text-amber-800 font-medium leading-relaxed">
+                                    Anda berada di <strong>{{ auth()->user()->location }}</strong>. Silakan ganti lokasi Anda ke <strong>{{ $vehicle->location }}</strong> di menu profil terlebih dahulu.
+                                </p>
+                                <div class="mt-2.5">
+                                    <a href="{{ route('user.profile.user') }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#004B87] hover:bg-[#002D55] text-white text-xs font-bold rounded-lg shadow-sm transition">
+                                        <span>📍</span> Ganti Lokasi ke {{ $vehicle->location }} di Profil &rarr;
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-booking-lg disabled" disabled style="width: 100%; opacity:0.6; cursor:not-allowed; background:#94a3b8; color:#fff;" title="Ubah lokasi Anda ke {{ $vehicle->location }} untuk menyewa">
+                            Booking Tidak Tersedia (Beda Wilayah)
+                        </button>
                     @elseif($typeLimitReached)
                         <div class="user-booking-status" style="background:#f1f5f9; border:1.5px solid #cbd5e1; color:#334155;">
                             <span class="status-icon">ℹ️</span>
@@ -840,17 +886,98 @@
                         </button>
                     @else
                     <!-- Booking Form -->
-                    <form action="{{ route('user.cart.add') }}" method="POST" class="booking-form">
+                    <form action="{{ route('user.cart.add') }}" method="POST" class="booking-form" id="bookingForm">
                         @csrf
                         <input type="hidden" name="vehicle_id" value="{{ $vehicle->id }}">
-                        <div class="form-group">
-                             <label>Jumlah Hari (Max 7)</label>
-                            <input type="number" name="quantity" value="1" min="1" max="7">
+                        
+                        <!-- Pilihan Paket Layanan (Harian vs Mingguan) -->
+                        <div class="mb-3">
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">Pilih Paket Sewa</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <label class="cursor-pointer border-2 rounded-xl p-2.5 text-center transition border-[#004B87] bg-blue-50/50 dark:bg-blue-950/20" id="cardDaily">
+                                    <input type="radio" name="package_type" value="daily" checked class="sr-only" onchange="togglePackage('daily')">
+                                    <div class="text-xs font-bold text-slate-800 dark:text-slate-200">☀️ Harian</div>
+                                    <div class="text-[11px] text-slate-500">1 - 7 Hari</div>
+                                </label>
+                                <label class="cursor-pointer border-2 rounded-xl p-2.5 text-center transition border-slate-200 dark:border-slate-700 hover:border-[#004B87]" id="cardWeekly">
+                                    <input type="radio" name="package_type" value="weekly" class="sr-only" onchange="togglePackage('weekly')">
+                                    <div class="text-xs font-bold text-emerald-600 dark:text-emerald-400">🎁 Mingguan</div>
+                                    <div class="text-[11px] text-slate-500">Paket 7 Hari</div>
+                                </label>
+                            </div>
                         </div>
+
+                        <div class="form-group mb-3" id="dailyDaysGroup">
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">Jumlah Hari (Max 7 Hari)</label>
+                            <input type="number" id="inputDays" name="quantity_days" value="1" min="1" max="7" class="w-full rounded-xl border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm" oninput="calculateTotal()">
+                        </div>
+
+                        <!-- Ringkasan Biaya & Ongkir Otomatis -->
+                        @php
+                            $estDelivery = $vehicle->vehicle_type === 'car' ? 50000 : 25000;
+                        @endphp
+                        <div class="p-3 mb-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700 text-xs space-y-1.5">
+                            <div class="flex justify-between items-center text-slate-600 dark:text-slate-400">
+                                <span>Biaya Sewa:</span>
+                                <strong id="displaySubtotal" class="font-bold text-slate-900 dark:text-white">Rp {{ number_format($vehicle->price_per_day, 0, ',', '.') }}</strong>
+                            </div>
+                            <div class="flex justify-between items-center text-slate-500">
+                                <span>Ongkos Kirim Unit ({{ $vehicle->vehicle_type === 'car' ? 'Mobil' : 'Motor' }}):</span>
+                                <span class="font-semibold text-emerald-600 dark:text-emerald-400">+Rp {{ number_format($estDelivery, 0, ',', '.') }}</span>
+                            </div>
+                            <div class="border-t border-slate-200 dark:border-slate-700 pt-1.5 flex justify-between items-center font-bold text-sm text-[#002D55] dark:text-blue-300">
+                                <span>Total Estimasi:</span>
+                                <span id="displayGrandTotal">Rp {{ number_format($vehicle->price_per_day + $estDelivery, 0, ',', '.') }}</span>
+                            </div>
+                        </div>
+
                         <button type="submit" class="btn-booking-lg">
-                             Booking Sekarang
+                            🛒 Tambah ke Keranjang
                         </button>
                     </form>
+
+                    <script>
+                        const pricePerDay = {{ (float) $vehicle->price_per_day }};
+                        const pricePerWeek = {{ (float) ($vehicle->price_per_week > 0 ? $vehicle->price_per_week : ($vehicle->price_per_day * 7)) }};
+                        const deliveryFee = {{ (float) $estDelivery }};
+                        let currentPackage = 'daily';
+
+                        function togglePackage(type) {
+                            currentPackage = type;
+                            const cardDaily = document.getElementById('cardDaily');
+                            const cardWeekly = document.getElementById('cardWeekly');
+                            const daysGroup = document.getElementById('dailyDaysGroup');
+
+                            if (type === 'weekly') {
+                                cardDaily.classList.remove('border-[#004B87]', 'bg-blue-50/50', 'dark:bg-blue-950/20');
+                                cardDaily.classList.add('border-slate-200', 'dark:border-slate-700');
+                                cardWeekly.classList.add('border-[#004B87]', 'bg-blue-50/50', 'dark:bg-blue-950/20');
+                                cardWeekly.classList.remove('border-slate-200', 'dark:border-slate-700');
+                                daysGroup.style.display = 'none';
+                            } else {
+                                cardWeekly.classList.remove('border-[#004B87]', 'bg-blue-50/50', 'dark:bg-blue-950/20');
+                                cardWeekly.classList.add('border-slate-200', 'dark:border-slate-700');
+                                cardDaily.classList.add('border-[#004B87]', 'bg-blue-50/50', 'dark:bg-blue-950/20');
+                                cardDaily.classList.remove('border-slate-200', 'dark:border-slate-700');
+                                daysGroup.style.display = 'block';
+                            }
+                            calculateTotal();
+                        }
+
+                        function calculateTotal() {
+                            let subtotal = 0;
+                            if (currentPackage === 'weekly') {
+                                subtotal = pricePerWeek;
+                            } else {
+                                const days = parseInt(document.getElementById('inputDays').value) || 1;
+                                const validDays = Math.min(7, Math.max(1, days));
+                                subtotal = pricePerDay * validDays;
+                            }
+                            const grand = subtotal + deliveryFee;
+                            document.getElementById('displaySubtotal').innerText = 'Rp ' + subtotal.toLocaleString('id-ID');
+                            document.getElementById('displayGrandTotal').innerText = 'Rp ' + grand.toLocaleString('id-ID');
+                        }
+                    </script>
                     @endif
 
                     <!-- Chat Manager Armada -->

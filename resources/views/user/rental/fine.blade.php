@@ -315,11 +315,28 @@
                     <!-- Fine Box -->
                     <div class="fine-box">
                         <div class="fine-total">
-                            Rp {{ number_format($fine->total_fine ?? 0, 0, ',', '.') }}
-                            <small>Total Denda</small>
+                            Rp {{ number_format($fine->total_fine ?? ($cart->fine_amount + $cart->damage_fee), 0, ',', '.') }}
+                            <small>Total Tagihan Penyelesaian</small>
                         </div>
-                        <div class="fine-detail">
-                            Telat: <strong>{{ floor(($fine->late_minutes ?? 0) / 60) }} jam {{ ($fine->late_minutes ?? 0) % 60 }} menit</strong>
+                        <div class="space-y-1.5 mt-2.5 text-xs text-rose-900 dark:text-rose-200">
+                            @if(($cart->damage_fee ?? 0) > 0)
+                                <div class="flex justify-between items-center py-1 border-b border-rose-200 dark:border-rose-800">
+                                    <span>🛠️ Biaya Reparasi Kerusakan:</span>
+                                    <strong class="font-bold">Rp {{ number_format($cart->damage_fee, 0, ',', '.') }}</strong>
+                                </div>
+                                @if($cart->damage_note)
+                                    <div class="text-[11px] text-slate-600 dark:text-slate-300 italic">
+                                        Catatan Kerusakan: "{{ $cart->damage_note }}"
+                                    </div>
+                                @endif
+                            @endif
+
+                            @if(($cart->fine_amount ?? 0) > 0)
+                                <div class="flex justify-between items-center py-1 border-b border-rose-200 dark:border-rose-800">
+                                    <span>⏳ Denda Keterlambatan ({{ floor(($fine->late_minutes ?? $cart->late_minutes ?? 0) / 60) }} jam {{ ($fine->late_minutes ?? $cart->late_minutes ?? 0) % 60 }} menit):</span>
+                                    <strong class="font-bold">Rp {{ number_format($cart->fine_amount, 0, ',', '.') }}</strong>
+                                </div>
+                            @endif
                         </div>
                     </div>
 

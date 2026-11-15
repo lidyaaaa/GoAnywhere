@@ -91,13 +91,37 @@ class ChatController extends Controller
             ->where('is_read', false)
             ->update(['is_read' => true]);
 
+        // Hitung kuota pesan berturut-turut user (maksimal 3x sebelum dibalas manager)
+        $consecutiveUserMsgs = $this->getConsecutiveUserMessagesCount($conversation->id, $userId);
+        $remainingQuota = max(0, 3 - $consecutiveUserMsgs);
+
         // Daftar percakapan untuk sidebar
         $conversations = Conversation::where('user_id', $userId)
             ->with(['manager', 'vehicle', 'latestMessage'])
             ->orderByRaw('COALESCE(last_message_at, updated_at) DESC')
             ->get();
 
-        return view('user.chat.show', compact('conversation', 'conversations'));
+        return view('user.chat.show', compact('conversation', 'conversations', 'remainingQuota', 'consecutiveUserMsgs'));
+    }
+
+    /**
+     * Hitung berapa pesan user dikirim berturut-turut sejak pesan terakhir dari manager.
+     */
+    protected function getConsecutiveUserMessagesCount($conversationId, $userId): int
+    {
+        $lastManagerMsg = Message::where('conversation_id', $conversationId)
+            ->where('sender_id', '!=', $userId)
+            ->latest()
+            ->first();
+
+        $query = Message::where('conversation_id', $conversationId)
+            ->where('sender_id', $userId);
+
+        if ($lastManagerMsg) {
+            $query->where('created_at', '>', $lastManagerMsg->created_at);
+        }
+
+        return $query->count();
     }
 
     /**
@@ -114,6 +138,20 @@ class ChatController extends Controller
             ->where('user_id', $userId)
             ->firstOrFail();
 
+        // VALIDASI KUOTA 3X CHAT SEBELUM DIBALAS MANAGER
+        $consecutive = $this->getConsecutiveUserMessagesCount($conversation->id, $userId);
+        if ($consecutive >= 3) {
+            $err = 'Batas chat tercapai (3/3 pesan). Mohon tunggu balasan dari Manager sebelum mengirim pesan lagi.';
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $err,
+                    'remaining_quota' => 0,
+                ], 422);
+            }
+            return back()->with('error', $err);
+        }
+
         $message = Message::create([
             'conversation_id' => $conversation->id,
             'sender_id' => $userId,
@@ -126,9 +164,13 @@ class ChatController extends Controller
             'last_message_at' => now(),
         ]);
 
+        $newConsecutive = $consecutive + 1;
+        $remainingQuota = max(0, 3 - $newConsecutive);
+
         if ($request->expectsJson() || $request->ajax()) {
             return response()->json([
                 'success' => true,
+                'remaining_quota' => $remainingQuota,
                 'message' => [
                     'id' => $message->id,
                     'message' => $message->message,
@@ -172,8 +214,12 @@ class ChatController extends Controller
                 ];
             });
 
+        $consecutive = $this->getConsecutiveUserMessagesCount($conversation->id, $userId);
+        $remainingQuota = max(0, 3 - $consecutive);
+
         return response()->json([
             'success' => true,
+            'remaining_quota' => $remainingQuota,
             'messages' => $messages,
         ]);
     }

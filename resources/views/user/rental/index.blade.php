@@ -1,1321 +1,790 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            🚗 Sewa Saya
-        </h2>
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="font-bold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+                    Transaksi & Sewa Saya - GoAnywhere
+                </h2>
+                <p class="text-xs text-gray-500 mt-1">Pantau progres persetujuan, armada OTW diantar, masa aktif sewa, hingga riwayat selesai.</p>
+            </div>
+            <span class="px-3 py-1 bg-[#004B87]/10 text-[#004B87] dark:text-blue-300 font-bold text-xs rounded-full">
+                📍 Domisili: {{ Auth::user()->location ?? 'Jabodetabek' }}
+            </span>
+        </div>
     </x-slot>
 
-    <!-- ============================================ -->
-    <!-- STYLE ELEGAN - #43637E + SHADOW HITAM TEBEL -->
-    <!-- ============================================ -->
     <style>
-        * {
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .sewa-section {
-            padding: 40px 0 60px;
-            background: #eef1f4;
-            position: relative;
+        .transaksi-user-section {
+            padding: 30px 0 60px;
+            background: #F0F4F8;
             min-height: 100vh;
         }
-
-        .sewa-section::after {
-            content: '✦';
-            position: absolute;
-            bottom: 40px;
-            right: 40px;
-            font-size: 60px;
-            color: rgba(67, 99, 126, 0.06);
-            pointer-events: none;
+        .dark .transaksi-user-section {
+            background: #001F3F;
         }
-
-        /* ===== ALERT ===== */
-        .alert-success {
-            background: #e8f4ec;
-            border: 1px solid #4a7a5a;
-            color: #4a7a5a;
-            padding: 14px 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 0 4px 15px rgba(74, 122, 90, 0.15);
-        }
-
-        .alert-warning {
-            background: #fdf6e8;
-            border: 1px solid #b08a3a;
-            color: #b08a3a;
-            padding: 14px 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 0 4px 15px rgba(176, 138, 58, 0.15);
-        }
-
-        /* ===== STATISTIK ===== */
-        .stat-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 24px;
-            margin-bottom: 40px;
-        }
-
-        .stat-card {
-            background: #ffffff;
-            border-radius: 20px;
-            padding: 32px 20px 28px;
-            text-align: center;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.10), 0 2px 8px rgba(0, 0, 0, 0.06);
-            border: 1px solid rgba(232, 228, 222, 0.6);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, transparent, #43637E, transparent);
-            opacity: 0;
-            transition: all 0.5s ease;
-        }
-
-        .stat-card:hover::before {
-            opacity: 1;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18), 0 8px 24px rgba(0, 0, 0, 0.10);
-            border-color: rgba(67, 99, 126, 0.3);
-        }
-
-        .stat-card .stat-icon {
-            font-size: 32px;
-            display: block;
-            margin-bottom: 8px;
-        }
-
-        .stat-card .number {
-            font-size: 38px;
-            font-weight: 700;
-            font-family: 'Georgia', serif;
-            letter-spacing: 0.5px;
-        }
-
-        .stat-card .number.blue {
-            color: #43637E;
-        }
-
-        .stat-card .number.green {
-            color: #4a7a5a;
-        }
-
-        .stat-card .number.purple {
-            color: #7a5a8a;
-        }
-
-        .stat-card .label {
-            font-size: 14px;
-            color: #7a8a9a;
-            font-weight: 500;
-            margin-top: 6px;
-            letter-spacing: 0.5px;
-        }
-
-        /* ===== SECTION TITLE ===== */
-        .section-title {
-            font-size: 24px;
-            font-weight: 700;
-            color: #2c3e50;
-            font-family: 'Georgia', serif;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            letter-spacing: 0.3px;
-        }
-
-        .section-title .icon {
-            font-size: 26px;
-        }
-
-        /* ===== PENDING PICKUP ===== */
-        .pending-box {
+        .section-card {
             background: #ffffff;
             border-radius: 20px;
             padding: 24px 28px;
-            margin-bottom: 32px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.10), 0 2px 8px rgba(0, 0, 0, 0.06);
-            border: 1px solid rgba(232, 228, 222, 0.6);
-            border-left: 5px solid #b08a3a;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .pending-box::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, transparent, #b08a3a, transparent);
-            opacity: 0;
-            transition: all 0.5s ease;
-        }
-
-        .pending-box:hover::before {
-            opacity: 1;
-        }
-
-        .pending-box:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18), 0 8px 24px rgba(0, 0, 0, 0.10);
-            border-color: rgba(67, 99, 126, 0.3);
-        }
-
-        .pending-box .pending-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-
-        .pending-box .pending-header .icon {
-            font-size: 28px;
-            animation: pulse-delivery 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse-delivery {
-            0%, 100% { transform: scale(1) rotate(0deg); }
-            50% { transform: scale(1.1) rotate(-5deg); }
-        }
-
-        .pending-box .pending-header h3 {
-            font-size: 18px;
-            font-weight: 700;
-            color: #b08a3a;
-            font-family: 'Georgia', serif;
-        }
-
-        .pending-item {
-            background: #faf8f5;
-            border-radius: 14px;
-            padding: 16px 20px;
-            margin-bottom: 12px;
-            border: 1px solid #f0ede8;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(15, 23, 42, 0.08);
             transition: all 0.3s ease;
         }
-
-        .pending-item:last-child {
-            margin-bottom: 0;
+        .dark .section-card {
+            background: #0f172a;
+            border-color: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
         }
-
-        .pending-item:hover {
-            border-color: #b08a3a;
-            background: #fdf8f0;
-            transform: translateX(4px);
-            box-shadow: 0 4px 16px rgba(176, 138, 58, 0.12);
-        }
-
-        .pending-item .pending-content {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .pending-item .pending-content .vehicle-info {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 8px 16px;
-        }
-
-        .pending-item .pending-content .vehicle-info .name {
+        .section-title {
+            font-size: 17px;
             font-weight: 700;
-            color: #2c3e50;
-            font-size: 15px;
-        }
-
-        .pending-item .pending-content .vehicle-info .location {
-            font-size: 13px;
-            color: #7a8a9a;
+            color: #002D55;
             display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .pending-item .pending-content .vehicle-info .price {
-            font-weight: 700;
-            color: #b08a3a;
-            font-size: 15px;
-        }
-
-        .pending-item .pending-content .btn-pickup {
-            background: linear-gradient(135deg, #43637E, #36546b);
-            color: #ffffff;
-            padding: 10px 28px;
-            border-radius: 10px;
-            font-weight: 700;
-            font-size: 13px;
-            text-decoration: none;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 16px rgba(67, 99, 126, 0.3);
-            letter-spacing: 0.5px;
-            white-space: nowrap;
-            display: inline-flex;
             align-items: center;
             gap: 8px;
+            margin-bottom: 6px;
         }
-
-        .pending-item .pending-content .btn-pickup:hover {
-            background: linear-gradient(135deg, #36546b, #2a445a);
-            transform: translateY(-2px) scale(1.02);
-            box-shadow: 0 8px 28px rgba(67, 99, 126, 0.4);
+        .dark .section-title {
+            color: #f8fafc;
         }
-
-        .pending-item .pending-meta {
-            font-size: 12px;
-            color: #9aabbb;
-            margin-top: 8px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            flex-wrap: wrap;
-        }
-
-        .pending-item .pending-meta strong {
-            color: #43637E;
-        }
-
-        /* ===== RENTAL CARD ===== */
-        .rental-card {
-            background: #ffffff;
-            border-radius: 20px;
-            padding: 24px 28px;
-            margin-bottom: 16px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.10), 0 2px 8px rgba(0, 0, 0, 0.06);
-            border: 1px solid rgba(232, 228, 222, 0.6);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .rental-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, transparent, #43637E, transparent);
-            opacity: 0;
-            transition: all 0.5s ease;
-        }
-
-        .rental-card:hover::before {
-            opacity: 1;
-        }
-
-        .rental-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18), 0 8px 24px rgba(0, 0, 0, 0.10);
-            border-color: rgba(67, 99, 126, 0.3);
-        }
-
-        .rental-card .rental-content {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .rental-card .rental-left {
-            flex: 1;
-        }
-
-        .rental-card .rental-left .vehicle-name {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .rental-card .rental-left .vehicle-name .icon {
-            font-size: 32px;
-        }
-
-        .rental-card .rental-left .vehicle-name h4 {
-            font-size: 18px;
-            font-weight: 700;
-            color: #2c3e50;
-            font-family: 'Georgia', serif;
-        }
-
-        .rental-card .rental-left .detail-row {
-            font-size: 14px;
-            color: #7a8a9a;
-            margin-top: 4px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 4px 20px;
-            padding: 2px 0;
-        }
-
-        .rental-card .rental-left .detail-row .label {
-            color: #9aabbb;
-        }
-
-        .rental-card .rental-left .status-badge {
-            display: inline-block;
-            padding: 6px 20px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 600;
-            margin-top: 8px;
-            letter-spacing: 0.3px;
-        }
-
-        .rental-card .rental-left .status-badge.green {
-            background: #e8f4ec;
-            color: #4a7a5a;
-            box-shadow: 0 2px 8px rgba(74, 122, 90, 0.15);
-        }
-
-        .rental-card .rental-left .status-badge.yellow {
-            background: #fdf6e8;
-            color: #b08a3a;
-            box-shadow: 0 2px 8px rgba(176, 138, 58, 0.15);
-        }
-
-        .rental-card .rental-left .status-badge.red {
-            background: #fce8e8;
-            color: #b04a4a;
-            box-shadow: 0 2px 8px rgba(176, 74, 74, 0.15);
-            animation: pulse-danger 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse-danger {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-
-        .rental-card .rental-right {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            align-items: flex-end;
-        }
-
-        .rental-card .rental-right .btn-return {
-            background: linear-gradient(135deg, #4a7a5a, #3a6a4a);
-            color: #ffffff;
-            padding: 12px 36px;
-            border-radius: 12px;
-            font-weight: 700;
-            font-size: 14px;
-            text-align: center;
-            text-decoration: none;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 16px rgba(74, 122, 90, 0.35);
-            letter-spacing: 0.5px;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .rental-card .rental-right .btn-return:hover {
-            background: linear-gradient(135deg, #3a6a4a, #2a5a3a);
-            transform: translateY(-2px) scale(1.02);
-            box-shadow: 0 8px 28px rgba(74, 122, 90, 0.45);
-        }
-
-        .btn-chat-action {
-            background: #ffffff;
-            color: #43637E;
-            border: 1.5px solid #43637E;
-            padding: 9px 18px;
-            border-radius: 10px;
-            font-weight: 700;
-            font-size: 13px;
-            text-align: center;
-            text-decoration: none;
-            transition: all 0.25s ease;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-
-        .btn-chat-action:hover {
-            background: #43637E;
-            color: #ffffff;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 14px rgba(67, 99, 126, 0.25);
-        }
-
-        .dark .btn-chat-action {
-            background: #1a2632;
-            color: #8baac4;
-            border-color: #8baac4;
-        }
-
-        .dark .btn-chat-action:hover {
-            background: #43637E;
-            color: #ffffff;
-        }
-
-        /* ===== EMPTY STATE ===== */
-        .empty-state {
-            background: #ffffff;
-            border-radius: 20px;
-            padding: 48px 20px;
-            text-align: center;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.10), 0 2px 8px rgba(0, 0, 0, 0.06);
-            border: 1px solid rgba(232, 228, 222, 0.6);
-            transition: all 0.4s ease;
-        }
-
-        .empty-state:hover {
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18), 0 8px 24px rgba(0, 0, 0, 0.10);
-            border-color: rgba(67, 99, 126, 0.3);
-            transform: translateY(-4px);
-        }
-
-        .empty-state .icon {
-            font-size: 56px;
-            margin-bottom: 16px;
-            display: block;
-        }
-
-        .empty-state p {
-            color: #7a8a9a;
-            font-size: 16px;
-        }
-
-        /* ===== TABLE ===== */
         .table-wrap {
-            background: #ffffff;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.10), 0 2px 8px rgba(0, 0, 0, 0.06);
-            border: 1px solid rgba(232, 228, 222, 0.6);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-x: auto;
         }
-
-        .table-wrap:hover {
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18), 0 8px 24px rgba(0, 0, 0, 0.10);
-            border-color: rgba(67, 99, 126, 0.3);
-        }
-
         .table-wrap table {
             width: 100%;
             border-collapse: collapse;
         }
-
-        .table-wrap thead {
-            background: #eef1f4;
-        }
-
         .table-wrap thead th {
-            padding: 16px 20px;
+            padding: 12px 16px;
             text-align: left;
             font-size: 11px;
             font-weight: 700;
-            color: #43637E;
+            color: #004B87;
             text-transform: uppercase;
-            letter-spacing: 0.8px;
-        }
-
-        .table-wrap tbody td {
-            padding: 14px 20px;
-            font-size: 14px;
-            color: #5a6a7a;
-            border-top: 1px solid #f0ede8;
-            vertical-align: middle;
-        }
-
-        .table-wrap tbody tr {
-            transition: all 0.3s ease;
-        }
-
-        .table-wrap tbody tr:hover {
-            background: rgba(67, 99, 126, 0.04);
-        }
-
-        .table-wrap tbody td .status-badge-sm {
-            display: inline-block;
-            padding: 4px 16px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .table-wrap tbody td .status-badge-sm.completed {
-            background: #e8f4ec;
-            color: #4a7a5a;
-        }
-
-        .table-wrap tbody td .status-badge-sm.cancelled {
-            background: #fce8e8;
-            color: #b04a4a;
-        }
-
-        .table-wrap tbody td .booking-code {
-            font-weight: 600;
-            color: #43637E;
-            font-family: 'Courier New', monospace;
-            font-size: 13px;
             letter-spacing: 0.5px;
-            background: rgba(67, 99, 126, 0.06);
-            padding: 2px 10px;
-            border-radius: 4px;
+            background: #F8FAFC;
         }
-
-        .table-wrap tbody td .fine-amount {
-            color: #b04a4a;
-            font-weight: 600;
+        .dark .table-wrap thead th {
+            background: #1e293b;
+            color: #93c5fd;
         }
-
-        .table-wrap tbody td .fine-amount.none {
-            color: #4a7a5a;
-            font-weight: 400;
+        .table-wrap tbody td {
+            padding: 14px 16px;
+            font-size: 13px;
+            color: #334155;
+            border-top: 1px solid #f1f5f9;
         }
-
-        /* ===== PAGINATION ===== */
-        .pagination-wrapper {
-            margin-top: 20px;
+        .dark .table-wrap tbody td {
+            color: #cbd5e1;
+            border-top-color: #1e293b;
         }
-
-        .pagination-wrapper nav {
-            display: flex;
-            gap: 6px;
-            align-items: center;
-            justify-content: center;
+        .table-wrap tbody tr:hover {
+            background: rgba(106, 155, 209, 0.05);
         }
-
-        .pagination-wrapper nav .page-link {
+        .btn-action-primary {
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #ffffff;
+            background: #004B87;
             display: inline-flex;
             align-items: center;
-            justify-content: center;
-            min-width: 42px;
-            height: 42px;
-            padding: 0 16px;
-            border-radius: 12px;
-            background: #ffffff;
-            color: #2c3e50;
-            font-weight: 600;
-            font-size: 14px;
+            gap: 6px;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
             text-decoration: none;
-            border: 1.5px solid #e8e4de;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
-
-        .pagination-wrapper nav .page-link:hover {
-            background: #43637E;
+        .btn-action-primary:hover {
+            background: #002D55;
+            transform: translateY(-1px);
+        }
+        .btn-action-danger {
+            padding: 8px 14px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #e11d48;
+            background: #ffe4e6;
+            border: 1px solid #fecdd3;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .btn-action-danger:hover {
+            background: #f43f5e;
             color: #ffffff;
-            border-color: #43637E;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(67, 99, 126, 0.3);
+        }
+        .btn-chat-link {
+            padding: 8px 14px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            background: #f1f5f9;
+            color: #334155;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .btn-chat-link:hover {
+            background: #e2e8f0;
+            color: #0f172a;
+        }
+        .dark .btn-chat-link {
+            background: #1e293b;
+            color: #94a3b8;
+        }
+        .dark .btn-chat-link:hover {
+            background: #334155;
+            color: #f8fafc;
+        }
+        .empty-box {
+            padding: 36px 20px;
+            text-align: center;
+            color: #94a3b8;
+            font-size: 13px;
         }
 
-        .pagination-wrapper nav .page-link.active {
-            background: #43637E;
-            color: #ffffff;
-            border-color: #43637E;
-            box-shadow: 0 8px 25px rgba(67, 99, 126, 0.35);
+        /* Stat cards */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
         }
-
-        .pagination-wrapper nav .page-link.disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            pointer-events: none;
+        .stat-card-clean {
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 18px 22px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(15, 23, 42, 0.06);
+            display: flex;
+            align-items: center;
+            gap: 16px;
         }
-
-        /* ===== DARK MODE ===== */
-        .dark .sewa-section {
-            background: #1a2632;
+        .dark .stat-card-clean {
+            background: #0f172a;
+            border-color: rgba(255, 255, 255, 0.06);
         }
-
-        .dark .sewa-section::after {
-            color: rgba(67, 99, 126, 0.08);
+        .stat-card-clean .icon-wrap {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0;
         }
-
-        .dark .alert-success {
-            background: #1e3d2e;
-            border-color: #4a7a5a;
-            color: #8abd9a;
-        }
-
-        .dark .alert-warning {
-            background: #3d3a1e;
-            border-color: #b08a3a;
-            color: #d4b86a;
-        }
-
-        .dark .stat-card {
-            background: #1a2632;
-            border-color: #2c3e50;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-        }
-
-        .dark .stat-card:hover {
-            border-color: #43637E;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-        }
-
-        .dark .stat-card .label {
-            color: #b0bec5;
-        }
-
-        .dark .section-title {
-            color: #f0ede8;
-        }
-
-        .dark .pending-box {
-            background: #1a2632;
-            border-color: #2c3e50;
-            border-left-color: #b08a3a;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-        }
-
-        .dark .pending-box:hover {
-            border-color: #43637E;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-        }
-
-        .dark .pending-box .pending-header h3 {
-            color: #d4b86a;
-        }
-
-        .dark .pending-item {
-            background: #0f1a24;
-            border-color: #2c3e50;
-        }
-
-        .dark .pending-item:hover {
-            border-color: #b08a3a;
-            background: #1a2632;
-        }
-
-        .dark .pending-item .pending-content .vehicle-info .name {
-            color: #f0ede8;
-        }
-
-        .dark .pending-item .pending-content .vehicle-info .location {
-            color: #b0bec5;
-        }
-
-        .dark .pending-item .pending-meta {
-            color: #5a6a7a;
-        }
-
-        .dark .pending-item .pending-meta strong {
-            color: #f0e6d0;
-        }
-
-        .dark .rental-card {
-            background: #1a2632;
-            border-color: #2c3e50;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-        }
-
-        .dark .rental-card:hover {
-            border-color: #43637E;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-        }
-
-        .dark .rental-card .rental-left .vehicle-name h4 {
-            color: #f0ede8;
-        }
-
-        .dark .rental-card .rental-left .detail-row {
-            color: #b0bec5;
-        }
-
-        .dark .rental-card .rental-left .detail-row .label {
-            color: #5a6a7a;
-        }
-
-        .dark .rental-card .rental-left .status-badge.green {
-            background: #1e3d2e;
-            color: #8abd9a;
-        }
-
-        .dark .rental-card .rental-left .status-badge.yellow {
-            background: #3d3a1e;
-            color: #d4b86a;
-        }
-
-        .dark .rental-card .rental-left .status-badge.red {
-            background: #3d1e1e;
-            color: #d46a6a;
-        }
-
-        .dark .empty-state {
-            background: #1a2632;
-            border-color: #2c3e50;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-        }
-
-        .dark .empty-state:hover {
-            border-color: #43637E;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-        }
-
-        .dark .empty-state p {
-            color: #b0bec5;
-        }
-
-        .dark .table-wrap {
-            background: #1a2632;
-            border-color: #2c3e50;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-        }
-
-        .dark .table-wrap:hover {
-            border-color: #43637E;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-        }
-
-        .dark .table-wrap thead {
-            background: #0f1a24;
-        }
-
-        .dark .table-wrap thead th {
-            color: #f0e6d0;
-        }
-
-        .dark .table-wrap tbody td {
-            color: #b0bec5;
-            border-top-color: #2c3e50;
-        }
-
-        .dark .table-wrap tbody tr:hover {
-            background: rgba(67, 99, 126, 0.08);
-        }
-
-        .dark .table-wrap tbody td .booking-code {
-            color: #f0e6d0;
-            background: rgba(67, 99, 126, 0.15);
-        }
-
-        .dark .table-wrap tbody td .status-badge-sm.completed {
-            background: #1e3d2e;
-            color: #8abd9a;
-        }
-
-        .dark .table-wrap tbody td .status-badge-sm.cancelled {
-            background: #3d1e1e;
-            color: #d46a6a;
-        }
-
-        .dark .table-wrap tbody td .fine-amount {
-            color: #d46a6a;
-        }
-
-        .dark .table-wrap tbody td .fine-amount.none {
-            color: #8abd9a;
-        }
-
-        .dark .pagination-wrapper nav .page-link {
-            background: #1a2632;
-            color: #f0ede8;
-            border-color: #2c3e50;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        .dark .pagination-wrapper nav .page-link:hover {
-            background: #43637E;
-            color: #ffffff;
-            border-color: #43637E;
-        }
-
-        .dark .pagination-wrapper nav .page-link.active {
-            background: #43637E;
-            color: #ffffff;
-            border-color: #43637E;
-        }
-
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 992px) {
-            .stat-grid {
-                gap: 16px;
-            }
-        }
-
         @media (max-width: 768px) {
             .stat-grid {
-                grid-template-columns: 1fr 1fr;
-                gap: 16px;
+                grid-template-columns: 1fr;
             }
-
-            .stat-card .number {
-                font-size: 28px;
-            }
-
-            .stat-card .stat-icon {
-                font-size: 26px;
-            }
-
-            .rental-card {
-                padding: 20px 20px;
-            }
-
-            .rental-card .rental-content {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .rental-card .rental-right {
-                flex-direction: row;
-                margin-top: 8px;
-                align-items: stretch;
-            }
-
-            .rental-card .rental-right .btn-return {
-                flex: 1;
-                text-align: center;
-                padding: 10px 20px;
-                justify-content: center;
-            }
-
-            .pending-item .pending-content {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .pending-item .pending-content .btn-pickup {
-                text-align: center;
-                justify-content: center;
-            }
-
-            .table-wrap {
-                overflow-x: auto;
-            }
-
-            .table-wrap table {
-                min-width: 600px;
-            }
-
-            .section-title {
-                font-size: 20px;
-            }
-
-            .section-title .icon {
-                font-size: 22px;
-            }
-
-            .pending-box {
-                padding: 18px 20px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .sewa-section {
-                padding: 24px 0 40px;
-            }
-
-            .stat-grid {
-                grid-template-columns: 1fr 1fr;
-                gap: 12px;
-            }
-
-            .stat-card {
-                padding: 20px 12px 18px;
-                border-radius: 16px;
-            }
-
-            .stat-card .number {
-                font-size: 22px;
-            }
-
-            .stat-card .stat-icon {
-                font-size: 22px;
-                margin-bottom: 4px;
-            }
-
-            .stat-card .label {
-                font-size: 12px;
-            }
-
-            .pending-box {
-                padding: 14px 16px;
-            }
-
-            .pending-box .pending-header .icon {
-                font-size: 22px;
-            }
-
-            .pending-box .pending-header h3 {
-                font-size: 16px;
-            }
-
-            .pending-item {
-                padding: 12px 14px;
-            }
-
-            .pending-item .pending-content .vehicle-info {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 4px;
-            }
-
-            .pending-item .pending-meta {
-                flex-direction: column;
-                gap: 4px;
-                align-items: flex-start;
-            }
-
-            .rental-card {
-                padding: 14px 16px;
-                border-radius: 16px;
-            }
-
-            .rental-card .rental-left .vehicle-name h4 {
-                font-size: 16px;
-            }
-
-            .rental-card .rental-left .vehicle-name .icon {
-                font-size: 26px;
-            }
-
-            .rental-card .rental-left .detail-row {
-                font-size: 13px;
-                flex-direction: column;
-                gap: 2px;
-            }
-
-            .rental-card .rental-right .btn-return {
-                font-size: 12px;
-                padding: 10px 16px;
-                border-radius: 10px;
-            }
-
-            .rental-card .rental-left .status-badge {
-                font-size: 12px;
-                padding: 4px 14px;
-            }
-
-            .section-title {
-                font-size: 18px;
-                margin-bottom: 14px;
-            }
-
-            .section-title .icon {
-                font-size: 20px;
-            }
-
-            .table-wrap {
-                border-radius: 16px;
-            }
-
-            .table-wrap thead th {
-                padding: 10px 14px;
-                font-size: 10px;
-            }
-
-            .table-wrap tbody td {
-                padding: 10px 14px;
-                font-size: 12px;
-            }
-
-            .table-wrap tbody td .booking-code {
-                font-size: 11px;
-            }
-
-            .table-wrap tbody td .status-badge-sm {
-                font-size: 10px;
-                padding: 3px 12px;
-            }
-
-            .empty-state {
-                padding: 32px 16px;
-                border-radius: 16px;
-            }
-
-            .empty-state .icon {
-                font-size: 40px;
-            }
-
-            .empty-state p {
-                font-size: 14px;
-            }
-
-            .pagination-wrapper nav .page-link {
-                min-width: 36px;
-                height: 36px;
-                font-size: 12px;
-                padding: 0 12px;
-            }
-        }
-
-        /* ===== SCROLLBAR ===== */
-        ::-webkit-scrollbar {
-            width: 10px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #f0ede8;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: linear-gradient(135deg, #43637E, #5a7a9a);
-            border-radius: 10px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(135deg, #36546b, #4a6a8a);
-        }
-
-        .dark ::-webkit-scrollbar-track {
-            background: #1a2632;
-        }
-
-        .dark ::-webkit-scrollbar-thumb {
-            background: linear-gradient(135deg, #43637E, #5a7a9a);
         }
     </style>
 
-    <!-- ============================================ -->
-    <!-- SEWA SECTION                                -->
-    <!-- ============================================ -->
-    <div class="sewa-section">
+    <div class="transaksi-user-section">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-            <!-- ===== ALERT ===== -->
+            {{-- Flash Alerts --}}
             @if(session('success'))
-                <div class="alert-success">
-                    ✅ {{ session('success') }}
+                <div class="p-4 mb-5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-semibold flex items-center gap-2">
+                    <span>✅</span> {{ session('success') }}
                 </div>
             @endif
             @if(session('warning'))
-                <div class="alert-warning">
-                    ⚠️ {{ session('warning') }}
+                <div class="p-4 mb-5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 text-sm font-semibold flex items-center gap-2">
+                    <span>⚠️</span> {{ session('warning') }}
+                </div>
+            @endif
+            @if(session('error'))
+                <div class="p-4 mb-5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-sm font-semibold flex items-center gap-2">
+                    <span>❌</span> {{ session('error') }}
                 </div>
             @endif
 
-            <!-- ===== STATISTIK ===== -->
+            {{-- STATISTIK SINGKAT --}}
             <div class="stat-grid">
-                <div class="stat-card">
-                    <span class="stat-icon">📊</span>
-                    <div class="number blue">{{ $totalRentals }}</div>
-                    <div class="label">Total Sewa</div>
+                <div class="stat-card-clean">
+                    <div class="icon-wrap bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-300">
+                        🚗
+                    </div>
+                    <div>
+                        <div class="text-xs text-slate-500 font-semibold uppercase tracking-wider">Sewa Berjalan</div>
+                        <div class="text-2xl font-extrabold text-slate-900 dark:text-white mt-0.5">
+                            {{ $counts['paid'] + $counts['approved'] + $counts['active'] + $counts['pending_return'] + $counts['pending_payment'] }}
+                        </div>
+                    </div>
                 </div>
-                <div class="stat-card">
-                    <span class="stat-icon">🟢</span>
-                    <div class="number green">{{ count($activeRentals) }}</div>
-                    <div class="label">Sewa Aktif</div>
+
+                <div class="stat-card-clean">
+                    <div class="icon-wrap bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-300">
+                        ✅
+                    </div>
+                    <div>
+                        <div class="text-xs text-slate-500 font-semibold uppercase tracking-wider">Transaksi Selesai</div>
+                        <div class="text-2xl font-extrabold text-slate-900 dark:text-white mt-0.5">
+                            {{ $counts['completed'] }}
+                        </div>
+                    </div>
                 </div>
-                <div class="stat-card">
-                    <span class="stat-icon">💰</span>
-                    <div class="number purple">Rp {{ number_format($totalSpent, 0, ',', '.') }}</div>
-                    <div class="label">Total Belanja</div>
+
+                <div class="stat-card-clean">
+                    <div class="icon-wrap bg-purple-50 text-purple-600 dark:bg-purple-950/60 dark:text-purple-300">
+                        💰
+                    </div>
+                    <div>
+                        <div class="text-xs text-slate-500 font-semibold uppercase tracking-wider">Total Pengeluaran</div>
+                        <div class="text-2xl font-extrabold text-slate-900 dark:text-white mt-0.5">
+                            Rp {{ number_format($totalSpent, 0, ',', '.') }}
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- ===== KENDARAAN BELUM DIAMBIL ===== -->
-            @if(count($pendingPickup) > 0)
-                <div class="pending-box">
-                    <div class="pending-header">
-                        <span class="icon">🚚</span>
-                        <h3>Menunggu Persetujuan Manager</h3>
+            {{-- SEARCH & FILTER STATUS BAR (LENGKAP SEPERTI ADMIN) --}}
+            <div class="bg-white dark:bg-slate-900 rounded-2xl p-5 mb-6 border border-slate-200 dark:border-slate-800 shadow-sm">
+                <form action="{{ route('user.rental') }}" method="GET" class="flex flex-col lg:flex-row gap-3 items-stretch lg:items-center justify-between">
+                    {{-- Search Input --}}
+                    <div class="relative flex-1">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
+                            🔍
+                        </span>
+                        <input type="text" name="search" value="{{ $search }}" placeholder="Cari Kode Booking (misal: BK-...), Nama Kendaraan, atau Gerai Cabang..." class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm focus:ring-2 focus:ring-[#004B87] focus:outline-none">
                     </div>
-                    @foreach($pendingPickup as $item)
-                        <div class="pending-item">
-                            <div class="pending-content">
-                                <div class="vehicle-info">
-                                    <span class="name">{{ $item->vehicle->name }}</span>
-                                    <span class="location">📍 {{ $item->vehicle->location }}</span>
-                                    <span class="price">💵 Rp {{ number_format($item->subtotal, 0, ',', '.') }}</span>
-                                </div>
-                                <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-                                    <a href="{{ route('user.chat.start', ['vehicle_id' => $item->vehicle_id]) }}" class="btn-chat-action">
-                                        💬 Chat Manager
-                                    </a>
-                                <form action="{{ route('user.rental.cancel', $item->booking_code) }}" method="POST" onsubmit="return confirm('Batalkan booking ini?')">
-                                    @csrf
-                                    <button type="submit" class="btn-pickup">Batal Booking</button>
-                                </form>
-                                </div>
-                            </div>
-                            <div class="pending-meta">
-                                <span>🔑 Kode Booking: <strong>{{ $item->booking_code }}</strong></span>
-                                <span>⏰ Estimasi Pengantaran: <strong>{{ \Carbon\Carbon::parse($item->payment_deadline)->format('d M Y H:i') }}</strong></span>
-                            </div>
-                        </div>
+
+                    {{-- Dropdown Status Filter & Button --}}
+                    <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+                        <select name="status" onchange="this.form.submit()" class="py-2.5 px-3.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-[#004B87] focus:outline-none">
+                            <option value="all" {{ $statusFilter === 'all' ? 'selected' : '' }}>📌 Semua Status ({{ $counts['all'] }})</option>
+                            <option value="paid" {{ $statusFilter === 'paid' ? 'selected' : '' }}>⏳ Menunggu Persetujuan ({{ $counts['paid'] }})</option>
+                            <option value="approved" {{ $statusFilter === 'approved' ? 'selected' : '' }}>🚚 Armada OTW ({{ $counts['approved'] }})</option>
+                            <option value="active" {{ $statusFilter === 'active' ? 'selected' : '' }}>🚗 Sewa Aktif ({{ $counts['active'] }})</option>
+                            <option value="pending_return" {{ $statusFilter === 'pending_return' ? 'selected' : '' }}>🔍 Cek Fisik Unit ({{ $counts['pending_return'] }})</option>
+                            <option value="pending_payment" {{ $statusFilter === 'pending_payment' ? 'selected' : '' }}>💳 Menunggu Denda ({{ $counts['pending_payment'] }})</option>
+                            <option value="completed" {{ $statusFilter === 'completed' ? 'selected' : '' }}>✅ Selesai ({{ $counts['completed'] }})</option>
+                            <option value="cancelled" {{ $statusFilter === 'cancelled' ? 'selected' : '' }}>❌ Dibatalkan ({{ $counts['cancelled'] }})</option>
+                            <option value="rejected" {{ $statusFilter === 'rejected' ? 'selected' : '' }}>🚫 Ditolak ({{ $counts['rejected'] }})</option>
+                        </select>
+                        <button type="submit" class="px-5 py-2.5 bg-[#004B87] hover:bg-[#002D55] text-white rounded-xl text-sm font-bold shadow-sm transition">
+                            Cari
+                        </button>
+                        @if(!empty($search) || $statusFilter !== 'all')
+                            <a href="{{ route('user.rental') }}" class="px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl text-sm font-semibold transition" title="Reset filter">
+                                ↺ Reset
+                            </a>
+                        @endif
+                    </div>
+                </form>
+
+                {{-- Status Pills Tabs --}}
+                <div class="flex items-center gap-2 overflow-x-auto pt-3.5 mt-3 border-t border-slate-100 dark:border-slate-800 text-xs font-semibold no-scrollbar">
+                    @php
+                        $filterTabs = [
+                            'all' => ['label' => 'Semua', 'icon' => '📌', 'count' => $counts['all']],
+                            'paid' => ['label' => 'Menunggu Approve', 'icon' => '⏳', 'count' => $counts['paid']],
+                            'approved' => ['label' => 'Armada OTW', 'icon' => '🚚', 'count' => $counts['approved']],
+                            'active' => ['label' => 'Sewa Aktif', 'icon' => '🚗', 'count' => $counts['active']],
+                            'pending_return' => ['label' => 'Cek Fisik Unit', 'icon' => '🔍', 'count' => $counts['pending_return']],
+                            'pending_payment' => ['label' => 'Menunggu Denda', 'icon' => '💳', 'count' => $counts['pending_payment']],
+                            'completed' => ['label' => 'Selesai', 'icon' => '✅', 'count' => $counts['completed']],
+                            'cancelled' => ['label' => 'Dibatalkan', 'icon' => '❌', 'count' => $counts['cancelled']],
+                            'rejected' => ['label' => 'Ditolak', 'icon' => '🚫', 'count' => $counts['rejected']],
+                        ];
+                    @endphp
+                    @foreach($filterTabs as $tabKey => $tab)
+                        <a href="{{ route('user.rental', array_merge(request()->query(), ['status' => $tabKey])) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl whitespace-nowrap transition {{ $statusFilter === $tabKey ? 'bg-[#004B87] text-white shadow-sm' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200' }}">
+                            <span>{{ $tab['icon'] }}</span>
+                            <span>{{ $tab['label'] }}</span>
+                            <span class="px-1.5 py-0.5 rounded-full text-[10px] {{ $statusFilter === $tabKey ? 'bg-white/20 text-white' : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200' }} font-bold">{{ $tab['count'] }}</span>
+                        </a>
                     @endforeach
                 </div>
-            @endif
+            </div>
 
-            <!-- ===== SEWA AKTIF ===== -->
-            <h3 class="section-title"><span class="icon">🚚</span> Kendaraan Sedang Diantar / Sewa Aktif</h3>
-
-            @if(count($activeRentals) > 0)
-                @foreach($activeRentals as $rental)
-                    @php
-                        $endDate = \Carbon\Carbon::parse($rental->rental_end_date);
-                    @endphp
-
-                    <div class="rental-card">
-                        <div class="rental-content">
-                            <div class="rental-left">
-                                <div class="vehicle-name">
-                                    <span class="icon">{{ $rental->vehicle->vehicle_type == 'car' ? '🚗' : '🏍️' }}</span>
-                                    <h4>{{ $rental->vehicle->name }}</h4>
-                                </div>
-                                <div class="detail-row">
-                                    <span>📅 {{ \Carbon\Carbon::parse($rental->rental_start_date)->format('d M Y') }} → {{ \Carbon\Carbon::parse($rental->rental_end_date)->format('d M Y') }}</span>
-                                </div>
-                                <div class="detail-row">
-                                    <span class="label">⏰ Wajib kembali:</span>
-                                    <span>{{ \Carbon\Carbon::parse($rental->rental_end_date)->format('d M Y H:i') }}</span>
-                                </div>
-                                <div class="detail-row">
-                                    <span class="label">⏳ Batas Akhir Pengembalian:</span>
-                                    <span>{{ \Carbon\Carbon::parse($rental->rental_end_date)->addMinutes(30)->format('d M Y H:i') }}</span>
-                                </div>
-                                <div class="detail-row">
-                                    <span class="label">💸 Denda telat:</span>
-                                    <span>Rp 50.000/jam</span>
-                                </div>
-                                <span class="status-badge rental-countdown" data-end-time="{{ $endDate->toIso8601String() }}" data-tolerance-time="{{ $endDate->copy()->addMinutes(30)->toIso8601String() }}">Memuat waktu...</span>
-                            </div>
-                            <div class="rental-right">
-                                <div style="display: flex; flex-direction: column; gap: 8px; width: 100%;">
-                                    <a href="{{ route('user.rental.return', $rental->id) }}" class="btn-return">
-                                        📤 Kembalikan
-                                    </a>
-                                    <a href="{{ route('user.chat.start', ['vehicle_id' => $rental->vehicle_id]) }}" class="btn-chat-action">
-                                        💬 Chat Manager
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                @endforeach
-            @else
-                <div class="empty-state">
-                    <span class="icon">🛋️</span>
-                    <p>Tidak ada sewa aktif</p>
+            <!-- ======================================================== -->
+            <!-- 1. MENUNGGU PERSETUJUAN (STATUS: PAID)                   -->
+            <!-- ======================================================== -->
+            @if($statusFilter === 'all' || $statusFilter === 'paid')
+            <div class="section-card border-l-4 border-l-amber-500">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="section-title text-amber-700 dark:text-amber-400">
+                        <span>⏳</span> Menunggu Persetujuan Booking (Paid)
+                    </h3>
+                    <span class="text-xs font-bold px-2.5 py-1 bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 rounded-full">
+                        {{ count($pendingApprovals) }} Booking Baru
+                    </span>
                 </div>
-            @endif
+                <p class="text-xs text-slate-500 mb-4">Pembayaran Anda telah diterima. Manager armada sedang memverifikasi pesanan sebelum armada diberangkatkan.</p>
 
-            <!-- ===== RIWAYAT ===== -->
-            <h3 class="section-title" style="margin-top: 40px;"><span class="icon">📜</span> Riwayat Transaksi</h3>
-
-            @if(count($history) > 0)
-                <div class="table-wrap">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>🔑 Kode</th>
-                                <th>🚗 Kendaraan</th>
-                                <th>📅 Tanggal</th>
-                                <th>💰 Total</th>
-                                <th>💸 Denda</th>
-                                <th>📌 Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($history as $item)
+                @if(count($pendingApprovals) > 0)
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
                                 <tr>
-                                    <td><span class="booking-code">{{ $item->booking_code }}</span></td>
-                                    <td>{{ $item->vehicle->name ?? 'N/A' }}</td>
-                                    <td>{{ \Carbon\Carbon::parse($item->created_at)->format('d M Y') }}</td>
-                                    <td style="font-weight: 600; color: #43637E;">Rp {{ number_format($item->subtotal, 0, ',', '.') }}</td>
-                                    <td>
-                                        @if($item->fine_amount > 0)
-                                            <span class="fine-amount">Rp {{ number_format($item->fine_amount, 0, ',', '.') }}</span>
-                                        @else
-                                            <span class="fine-amount none">-</span>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        @if($item->status == 'completed')
-                                            <span class="status-badge-sm completed">✅ Selesai</span>
-                                        @else
-                                            <span class="status-badge-sm cancelled">❌ Batal</span>
-                                        @endif
-                                    </td>
+                                    <th>Kode Booking</th>
+                                    <th>Kendaraan</th>
+                                    <th>Durasi Sewa</th>
+                                    <th>Titik Antar</th>
+                                    <th>Total Bayar (+Ongkir)</th>
+                                    <th>Aksi Pelanggan</th>
                                 </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                @foreach($pendingApprovals as $item)
+                                    <tr>
+                                        <td><span class="font-mono font-bold text-[#004B87] dark:text-blue-300">{{ $item->booking_code }}</span></td>
+                                        <td>
+                                            <div class="font-bold text-slate-900 dark:text-white">{{ $item->vehicle->name }}</div>
+                                            <div class="text-xs text-slate-500">📍 Gerai {{ $item->vehicle->location }}</div>
+                                        </td>
+                                        <td>
+                                            <span class="px-2 py-0.5 rounded text-xs font-semibold {{ $item->period === 'weekly' ? 'bg-purple-100 text-purple-800' : 'bg-slate-100 text-slate-800' }}">
+                                                {{ $item->period === 'weekly' ? '🎁 Paket 7 Hari' : $item->quantity_days . ' Hari' }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="text-xs text-slate-600 dark:text-slate-300 max-w-xs truncate" title="{{ $item->pickup_location }}">
+                                                📍 {{ $item->pickup_location }}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="font-bold text-slate-900 dark:text-white">
+                                                Rp {{ number_format($item->total_payment > 0 ? $item->total_payment : $item->subtotal, 0, ',', '.') }}
+                                            </div>
+                                            <div class="text-[11px] text-emerald-600 font-medium">Termasuk Ongkir</div>
+                                        </td>
+                                        <td>
+                                            <div class="flex items-center gap-2">
+                                                <form action="{{ route('user.rental.cancel', $item->booking_code) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan booking ini? Dana pembayaran Anda akan otomatis diproses untuk pengembalian dana penuh.')">
+                                                    @csrf
+                                                    <button type="submit" class="btn-action-danger">
+                                                        <span>❌</span> Batalkan Pesanan
+                                                    </button>
+                                                </form>
+                                                <a href="{{ route('user.chat.start', ['vehicle_id' => $item->vehicle_id]) }}" class="btn-chat-link">
+                                                    💬 Chat Manager
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <div class="empty-box">Tidak ada booking yang sedang menunggu persetujuan manager.</div>
+                @endif
+            </div>
+            @endif
+
+            <!-- ======================================================== -->
+            <!-- 2. ARMADA DISETUJUI / OTW (STATUS: APPROVED)             -->
+            <!-- ======================================================== -->
+            @if($statusFilter === 'all' || $statusFilter === 'approved')
+            <div class="section-card border-l-4 border-l-blue-600">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="section-title text-blue-800 dark:text-blue-300">
+                        <span>🚚</span> Armada Disetujui & Sedang Diantar (OTW)
+                    </h3>
+                    <span class="text-xs font-bold px-2.5 py-1 bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-200 rounded-full animate-pulse">
+                        {{ count($approvedOtw) }} Unit OTW
+                    </span>
                 </div>
-                <div class="pagination-wrapper">
-                    {{ $history->links() }}
+                <p class="text-xs text-slate-500 mb-4">Manager cabang telah menyetujui booking dan sedang dalam perjalanan mengantarkan kendaraan ke lokasi Anda. Harap siapkan <strong>KTP Fisik Asli</strong> untuk difoto saat serah terima.</p>
+
+                @if(count($approvedOtw) > 0)
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Kode Booking</th>
+                                    <th>Kendaraan</th>
+                                    <th>Titik Antar</th>
+                                    <th>Instruksi Serah Terima</th>
+                                    <th>Kontak Manager</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($approvedOtw as $item)
+                                    <tr>
+                                        <td><span class="font-mono font-bold text-blue-700 dark:text-blue-300">{{ $item->booking_code }}</span></td>
+                                        <td>
+                                            <div class="font-bold text-slate-900 dark:text-white">{{ $item->vehicle->name }}</div>
+                                            <div class="text-xs text-slate-500">{{ $item->vehicle->brand }}</div>
+                                        </td>
+                                        <td>
+                                            <span class="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                                                📍 {{ $item->pickup_location }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="text-xs text-blue-800 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/50 p-2 rounded-lg block font-medium">
+                                                📸 Tunjukkan KTP Asli saat staff tiba. Masa aktif sewa dimulai dari waktu serah terima.
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a href="{{ route('user.chat.start', ['vehicle_id' => $item->vehicle_id]) }}" class="btn-action-primary bg-blue-600 hover:bg-blue-700">
+                                                💬 Hubungi Driver/Staff
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <div class="empty-box">Tidak ada armada yang sedang dalam perjalanan pengantaran saat ini.</div>
+                @endif
+            </div>
+            @endif
+
+            <!-- ======================================================== -->
+            <!-- 3. SEWA AKTIF / MASA BERJALAN (STATUS: ACTIVE)           -->
+            <!-- ======================================================== -->
+            @if($statusFilter === 'all' || $statusFilter === 'active')
+            <div class="section-card border-l-4 border-l-emerald-600">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="section-title text-emerald-800 dark:text-emerald-300">
+                        <span>🚗</span> Sewa Aktif / Sedang Digunakan
+                    </h3>
+                    <span class="text-xs font-bold px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-full">
+                        {{ count($activeRentals) }} Kendaraan Aktif
+                    </span>
                 </div>
-            @else
-                <div class="empty-state">
-                    <span class="icon">📭</span>
-                    <p>Belum ada riwayat transaksi</p>
+                <p class="text-xs text-slate-500 mb-4">Kendaraan sedang dalam penggunaan Anda. Kembalikan kendaraan tepat waktu ke gerai cabang sebelum batas waktu pengembalian berakhir.</p>
+
+                @if(count($activeRentals) > 0)
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Kode Booking</th>
+                                    <th>Kendaraan</th>
+                                    <th>Mulai Sewa (Handover)</th>
+                                    <th>Batas Wajib Kembali</th>
+                                    <th>Status Waktu</th>
+                                    <th>Aksi Pengembalian</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($activeRentals as $item)
+                                    @php
+                                        $late = $item->late ?? \App\Services\LateFeeCalculator::calculate($item);
+                                    @endphp
+                                    <tr>
+                                        <td><span class="font-mono font-bold text-emerald-800 dark:text-emerald-300">{{ $item->booking_code }}</span></td>
+                                        <td>
+                                            <div class="font-bold text-slate-900 dark:text-white">{{ $item->vehicle->name }}</div>
+                                            <div class="text-xs text-slate-500">📍 Gerai {{ $item->vehicle->location }}</div>
+                                        </td>
+                                        <td class="text-xs">
+                                            {{ $item->handover_at ? \Carbon\Carbon::parse($item->handover_at)->format('d M Y, H:i') : \Carbon\Carbon::parse($item->rental_start_date)->format('d M Y, H:i') }}
+                                        </td>
+                                        <td class="text-xs font-bold text-slate-800 dark:text-slate-100">
+                                            {{ \Carbon\Carbon::parse($item->rental_end_date)->format('d M Y, H:i') }}
+                                        </td>
+                                        <td>
+                                            @if($late['is_late'])
+                                                <span class="px-2.5 py-1 bg-rose-100 text-rose-800 text-xs font-bold rounded-lg inline-flex items-center gap-1">
+                                                    ⚠️ Terlambat {{ $late['duration_label'] }}
+                                                </span>
+                                            @else
+                                                <span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-lg inline-flex items-center gap-1">
+                                                    ⏱️ Masa Sewa Berjalan
+                                                </span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <div class="flex items-center gap-2">
+                                                <a href="{{ route('user.rental.return', $item->id) }}" class="btn-action-primary bg-emerald-600 hover:bg-emerald-700">
+                                                    <span>🏁</span> Kembalikan Unit
+                                                </a>
+                                                <a href="{{ route('user.chat.start', ['vehicle_id' => $item->vehicle_id]) }}" class="btn-chat-link">
+                                                    💬 Chat
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <div class="empty-box">Anda belum memiliki kendaraan yang sedang aktif disewa saat ini.</div>
+                @endif
+            </div>
+            @endif
+
+            <!-- ======================================================== -->
+            <!-- 4. MENUNGGU CEK FISIK UNIT (STATUS: PENDING_RETURN)      -->
+            <!-- ======================================================== -->
+            @if($statusFilter === 'all' || $statusFilter === 'pending_return')
+            <div class="section-card border-l-4 border-l-purple-600">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="section-title text-purple-800 dark:text-purple-300">
+                        <span>🔍</span> Menunggu Pengecekan Fisik Unit (Pending Return)
+                    </h3>
+                    <span class="text-xs font-bold px-2.5 py-1 bg-purple-100 dark:bg-purple-950 text-purple-800 dark:text-purple-200 rounded-full">
+                        {{ count($pendingReturns) }} Menunggu Inspeksi
+                    </span>
                 </div>
+                <p class="text-xs text-slate-500 mb-4">Anda telah mengembalikan kendaraan ke gerai. Manager cabang sedang melakukan cek fisik unit secara real-time (Aman / Rusak).</p>
+
+                @if(count($pendingReturns) > 0)
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Kode Booking</th>
+                                    <th>Kendaraan</th>
+                                    <th>Waktu Pengembalian</th>
+                                    <th>Status Pemeriksaan</th>
+                                    <th>Bantuan</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($pendingReturns as $item)
+                                    <tr>
+                                        <td><span class="font-mono font-bold text-purple-700">{{ $item->booking_code }}</span></td>
+                                        <td class="font-bold">{{ $item->vehicle->name }}</td>
+                                        <td class="text-xs">
+                                            {{ $item->return_date ? \Carbon\Carbon::parse($item->return_date)->format('d M Y, H:i') : '-' }}
+                                        </td>
+                                        <td>
+                                            <span class="px-2.5 py-1 bg-purple-50 dark:bg-purple-950/60 text-purple-800 dark:text-purple-200 text-xs font-semibold rounded-lg inline-flex items-center gap-1.5">
+                                                <span>⏳</span> Sedang diinspeksi oleh Manager di gerai cabang
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a href="{{ route('user.chat.start', ['vehicle_id' => $item->vehicle_id]) }}" class="btn-chat-link">
+                                                💬 Chat Manager
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <div class="empty-box">Tidak ada kendaraan yang sedang menunggu pengecekan fisik gerai.</div>
+                @endif
+            </div>
+            @endif
+
+            <!-- ======================================================== -->
+            <!-- 5. MENUNGGU PEMBAYARAN DENDA (STATUS: PENDING_PAYMENT)   -->
+            <!-- ======================================================== -->
+            @if($statusFilter === 'all' || $statusFilter === 'pending_payment')
+            @if(count($pendingPayments) > 0 || $statusFilter === 'pending_payment')
+            <div class="section-card border-l-4 border-l-rose-500">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="section-title text-rose-700 dark:text-rose-400">
+                        <span>💳</span> Menunggu Pembayaran Tagihan Denda / Reparasi
+                    </h3>
+                    <span class="text-xs font-bold px-2.5 py-1 bg-rose-100 text-rose-800 rounded-full animate-bounce">
+                        {{ count($pendingPayments) }} Tagihan Belum Lunas
+                    </span>
+                </div>
+                <p class="text-xs text-slate-500 mb-4">Pengecekan fisik kendaraan telah selesai. Silakan lunasi tagihan denda keterlambatan atau biaya reparasi unit untuk menyelesaikan transaksi sewa Anda.</p>
+
+                @if(count($pendingPayments) > 0)
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Kode Booking</th>
+                                    <th>Kendaraan</th>
+                                    <th>Rincian Tagihan</th>
+                                    <th>Total Yang Harus Dibayar</th>
+                                    <th>Aksi Pelunasan</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($pendingPayments as $item)
+                                    @php
+                                        $totalBill = ($item->fine->total_fine ?? 0) > 0 ? $item->fine->total_fine : ($item->fine_amount + $item->damage_fee);
+                                    @endphp
+                                    <tr>
+                                        <td><span class="font-mono font-bold text-rose-700">{{ $item->booking_code }}</span></td>
+                                        <td class="font-bold">{{ $item->vehicle->name }}</td>
+                                        <td class="text-xs space-y-1">
+                                            @if($item->damage_fee > 0)
+                                                <div class="text-rose-700 font-bold">🛠️ Reparasi: Rp {{ number_format($item->damage_fee, 0, ',', '.') }} ({{ $item->damage_note }})</div>
+                                            @endif
+                                            @if($item->fine_amount > 0)
+                                                <div class="text-amber-700 font-semibold">⚠️ Denda Telat: Rp {{ number_format($item->fine_amount, 0, ',', '.') }}</div>
+                                            @endif
+                                        </td>
+                                        <td class="font-extrabold text-base text-rose-600">
+                                            Rp {{ number_format($totalBill, 0, ',', '.') }}
+                                        </td>
+                                        <td>
+                                            <a href="{{ route('user.rental.fine', $item->id) }}" class="btn-action-primary bg-rose-600 hover:bg-rose-700 shadow-md shadow-rose-600/20">
+                                                <span>💳</span> Bayar Denda Sekarang
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <div class="empty-box">Selamat! Anda tidak memiliki tagihan denda atau reparasi unit saat ini.</div>
+                @endif
+            </div>
+            @endif
+            @endif
+
+            <!-- ======================================================== -->
+            <!-- 6. RIWAYAT TRANSAKSI (COMPLETED / CANCELLED / REJECTED)  -->
+            <!-- ======================================================== -->
+            @if($statusFilter === 'all' || in_array($statusFilter, ['completed', 'cancelled', 'rejected']))
+            <div class="section-card">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="section-title">
+                        <span>📜</span> Riwayat Transaksi Selesai & Dibatalkan
+                    </h3>
+                    <span class="text-xs font-bold px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-full">
+                        {{ $history->total() ?? count($history) }} Total Riwayat
+                    </span>
+                </div>
+                <p class="text-xs text-slate-500 mb-4">Arsip seluruh transaksi rental kendaraan Anda yang telah tuntas, dibatalkan, atau ditolak.</p>
+
+                @if(count($history) > 0)
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Kode Booking</th>
+                                    <th>Kendaraan</th>
+                                    <th>Tanggal Booking</th>
+                                    <th>Durasi Sewa</th>
+                                    <th>Total Pembayaran</th>
+                                    <th>Denda / Reparasi</th>
+                                    <th>Status Akhir</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($history as $item)
+                                    <tr>
+                                        <td><span class="font-mono text-xs font-bold text-slate-900 dark:text-white">{{ $item->booking_code }}</span></td>
+                                        <td>
+                                            <div class="font-bold text-slate-900 dark:text-white">{{ $item->vehicle->name ?? 'N/A' }}</div>
+                                            <div class="text-xs text-slate-500">📍 Gerai {{ $item->vehicle->location ?? '-' }}</div>
+                                        </td>
+                                        <td>{{ \Carbon\Carbon::parse($item->created_at)->format('d M Y') }}</td>
+                                        <td>
+                                            <span class="px-2 py-0.5 rounded text-xs font-semibold {{ $item->period === 'weekly' ? 'bg-purple-100 text-purple-800' : 'bg-slate-100 text-slate-800' }}">
+                                                {{ $item->period === 'weekly' ? '🎁 Paket 7 Hari' : ($item->quantity_days ?? 1) . ' Hari' }}
+                                            </span>
+                                        </td>
+                                        <td class="font-bold text-[#004B87] dark:text-blue-300">
+                                            Rp {{ number_format($item->total_payment > 0 ? $item->total_payment : $item->subtotal, 0, ',', '.') }}
+                                        </td>
+                                        <td>
+                                            @if(($item->damage_fee + $item->fine_amount) > 0)
+                                                <span class="text-rose-600 font-bold text-xs">Rp {{ number_format($item->damage_fee + $item->fine_amount, 0, ',', '.') }}</span>
+                                            @else
+                                                <span class="text-slate-400 text-xs">-</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($item->status === 'completed')
+                                                <span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full">✅ Selesai</span>
+                                            @elseif($item->status === 'rejected')
+                                                <span class="px-2.5 py-1 bg-rose-100 text-rose-800 text-xs font-bold rounded-full" title="Alasan: {{ $item->reject_reason ?? 'Ditolak Manager' }}">🚫 Ditolak</span>
+                                            @else
+                                                <span class="px-2.5 py-1 bg-slate-100 text-slate-700 text-xs font-bold rounded-full">❌ Dibatalkan</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-4">
+                        {{ $history->links() }}
+                    </div>
+                @else
+                    <div class="empty-box">Belum ada riwayat transaksi selesai atau yang sesuai dengan filter pencarian Anda.</div>
+                @endif
+            </div>
             @endif
 
         </div>
     </div>
+
+    <!-- ======================================================== -->
+    <!-- POPUP 1: DENDA LUNAS                                     -->
+    <!-- ======================================================== -->
+    @if(session('just_paid_fine'))
+        <div id="modalPaidFine" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+            <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-6 text-center shadow-2xl border border-slate-200 dark:border-slate-800 transform animate-scale-up">
+                <div class="w-16 h-16 bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 shadow-inner">
+                    ✅
+                </div>
+                <h3 class="text-xl font-extrabold text-slate-900 dark:text-white mb-2">
+                    Denda Lunas. Terima kasih!
+                </h3>
+                <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-6">
+                    Pembayaran tagihan denda & biaya reparasi unit telah berhasil kami terima. Transaksi sewa Anda kini telah berstatus <strong>Selesai (Completed)</strong>.
+                </p>
+                <button type="button" onclick="document.getElementById('modalPaidFine').remove()" class="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm transition shadow-lg shadow-emerald-600/30">
+                    Tutup & Lanjutkan
+                </button>
+            </div>
+        </div>
+    @endif
+
+    <!-- ======================================================== -->
+    <!-- POPUP 2: TERIMA KASIH (SELESAI TANPA DENDA)             -->
+    <!-- ======================================================== -->
+    @if(session('just_completed_smooth'))
+        <div id="modalSmoothComplete" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+            <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-6 text-center shadow-2xl border border-slate-200 dark:border-slate-800 transform animate-scale-up">
+                <div class="w-16 h-16 bg-amber-100 dark:bg-amber-950/60 text-amber-500 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 shadow-inner">
+                    ⭐
+                </div>
+                <h3 class="text-xl font-extrabold text-slate-900 dark:text-white mb-2">
+                    Makasih ya udah percaya sama GoAnywhere! ⭐⭐⭐⭐⭐
+                </h3>
+                <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-6">
+                    Unit kendaraan telah diperiksa dan diserahkan kembali dalam kondisi sangat baik tanpa denda. Sampai jumpa di perjalanan berikutnya!
+                </p>
+                <button type="button" onclick="document.getElementById('modalSmoothComplete').remove()" class="w-full py-3 px-4 bg-[#004B87] hover:bg-[#002D55] text-white rounded-xl font-bold text-sm transition shadow-lg shadow-blue-800/30">
+                    Sama-Sama!
+                </button>
+            </div>
+        </div>
+    @endif
+
+    <!-- ======================================================== -->
+    <!-- POPUP 3: PEMBATALAN BERHASIL                             -->
+    <!-- ======================================================== -->
+    @if(session('just_cancelled'))
+        <div id="modalCancelled" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+            <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-6 text-center shadow-2xl border border-slate-200 dark:border-slate-800 transform animate-scale-up">
+                <div class="w-16 h-16 bg-rose-100 dark:bg-rose-950/60 text-rose-600 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 shadow-inner">
+                    ↩️
+                </div>
+                <h3 class="text-xl font-extrabold text-slate-900 dark:text-white mb-2">
+                    Pesanan Dibatalkan
+                </h3>
+                <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-6">
+                    Booking Anda telah berhasil dibatalkan sebelum persetujuan manager. Pengembalian dana otomatis berhasil diproses ke rekening/metode pembayaran Anda.
+                </p>
+                <button type="button" onclick="document.getElementById('modalCancelled').remove()" class="w-full py-3 px-4 bg-slate-800 hover:bg-slate-900 text-white rounded-xl font-bold text-sm transition">
+                    Mengerti
+                </button>
+            </div>
+        </div>
+    @endif
+
 </x-app-layout>
-
-<script>
-    function formatRemainingTime(totalSeconds) {
-        const days = Math.floor(totalSeconds / 86400);
-        const hours = Math.floor((totalSeconds % 86400) / 3600);
-        const minutes = Math.floor((totalSeconds % 3600) / 60);
-        const seconds = totalSeconds % 60;
-        const parts = [];
-
-        if (days > 0) parts.push(`${days} hari`);
-        if (hours > 0 || days > 0) parts.push(`${hours} jam`);
-        if (minutes > 0 || hours > 0 || days > 0) parts.push(`${minutes} menit`);
-        parts.push(`${seconds} detik`);
-
-        return parts.join(' ');
-    }
-
-    function updateRentalCountdowns() {
-        const now = Date.now();
-
-        document.querySelectorAll('.rental-countdown').forEach((element) => {
-            const endTime = new Date(element.dataset.endTime).getTime();
-            const toleranceTime = new Date(element.dataset.toleranceTime).getTime();
-            const secondsUntilEnd = Math.max(0, Math.floor((endTime - now) / 1000));
-
-            if (now <= endTime) {
-                element.className = 'status-badge rental-countdown green';
-                element.textContent = `⏳ Sisa ${formatRemainingTime(secondsUntilEnd)}`;
-                return;
-            }
-
-            const secondsUntilTolerance = Math.max(0, Math.floor((toleranceTime - now) / 1000));
-            if (now <= toleranceTime) {
-                element.className = 'status-badge rental-countdown yellow';
-                element.textContent = `⚠️ Masa toleransi ${formatRemainingTime(secondsUntilTolerance)}`;
-                return;
-            }
-
-            const lateSeconds = Math.floor((now - toleranceTime) / 1000);
-            element.className = 'status-badge rental-countdown red';
-            element.textContent = `⚠️ Telat ${formatRemainingTime(lateSeconds)}`;
-        });
-    }
-
-    updateRentalCountdowns();
-    setInterval(updateRentalCountdowns, 1000);
-</script>

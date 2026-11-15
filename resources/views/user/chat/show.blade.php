@@ -367,11 +367,30 @@
                         @endforelse
                     </div>
 
+                    <!-- KUOTA INDIKATOR (3x Pesan sebelum dibalas Manager) -->
+                    <div id="quotaBanner" class="px-4 py-2 text-xs font-semibold flex items-center justify-between border-t transition-all {{ ($remainingQuota ?? 3) <= 0 ? 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:text-rose-300' : 'bg-slate-50 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-300' }}">
+                        <div class="flex items-center gap-1.5">
+                            <span id="quotaIcon">{{ ($remainingQuota ?? 3) <= 0 ? '⚠️' : '💬' }}</span>
+                            <span id="quotaText">
+                                @if(($remainingQuota ?? 3) <= 0)
+                                    Batas chat tercapai (3/3). Tunggu balasan dari Manager untuk mengirim pesan lagi.
+                                @else
+                                    Sisa kuota: <strong>{{ $remainingQuota ?? 3 }}/3</strong> pesan sebelum dibalas Manager.
+                                @endif
+                            </span>
+                        </div>
+                        <span class="text-[11px] opacity-75 font-normal">Maks. 3x chat berturut-turut</span>
+                    </div>
+
                     <!-- CHAT INPUT -->
                     <form id="chatForm" action="{{ route('user.chat.send', $conversation->id) }}" method="POST" class="chat-input-bar">
                         @csrf
-                        <input type="text" id="messageInput" name="message" placeholder="Ketik pesan Anda untuk Manager armada..." autocomplete="off" required>
-                        <button type="submit" class="btn-send" title="Kirim Pesan">
+                        <input type="text" id="messageInput" name="message" 
+                               placeholder="{{ ($remainingQuota ?? 3) <= 0 ? 'Tunggu balasan dari Manager sebelum mengirim lagi...' : 'Ketik pesan Anda untuk Manager armada...' }}" 
+                               autocomplete="off" required 
+                               {{ ($remainingQuota ?? 3) <= 0 ? 'disabled' : '' }}>
+                        <button type="submit" id="btnSend" class="btn-send {{ ($remainingQuota ?? 3) <= 0 ? 'opacity-50 cursor-not-allowed' : '' }}" 
+                                title="Kirim Pesan" {{ ($remainingQuota ?? 3) <= 0 ? 'disabled' : '' }}>
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                             </svg>
@@ -428,12 +447,46 @@
                         `;
                         container.appendChild(bubble);
                         scrollToBottom();
+
+                        if (typeof data.remaining_quota !== 'undefined') {
+                            updateQuotaUI(data.remaining_quota);
+                        }
+                    } else if (data.message) {
+                        alert(data.message);
+                        if (typeof data.remaining_quota !== 'undefined') {
+                            updateQuotaUI(data.remaining_quota);
+                        }
                     }
                 })
                 .catch(err => {
                     form.submit();
                 });
             });
+
+            function updateQuotaUI(quota) {
+                const banner = document.getElementById('quotaBanner');
+                const text = document.getElementById('quotaText');
+                const icon = document.getElementById('quotaIcon');
+                const btn = document.getElementById('btnSend');
+
+                if (quota <= 0) {
+                    banner.className = 'px-4 py-2 text-xs font-semibold flex items-center justify-between border-t transition-all bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:text-rose-300';
+                    icon.textContent = '⚠️';
+                    text.innerHTML = 'Batas chat tercapai (3/3). Tunggu balasan dari Manager untuk mengirim pesan lagi.';
+                    input.disabled = true;
+                    input.placeholder = 'Tunggu balasan dari Manager sebelum mengirim lagi...';
+                    btn.disabled = true;
+                    btn.classList.add('opacity-50', 'cursor-not-allowed');
+                } else {
+                    banner.className = 'px-4 py-2 text-xs font-semibold flex items-center justify-between border-t transition-all bg-slate-50 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-300';
+                    icon.textContent = '💬';
+                    text.innerHTML = `Sisa kuota: <strong>${quota}/3</strong> pesan sebelum dibalas Manager.`;
+                    input.disabled = false;
+                    input.placeholder = 'Ketik pesan Anda untuk Manager armada...';
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                }
+            }
 
             // Polling auto-refresh setiap 4 detik
             setInterval(function () {
@@ -444,6 +497,9 @@
                 .then(data => {
                     if (data.success && data.messages) {
                         renderMessages(data.messages);
+                    }
+                    if (data.success && typeof data.remaining_quota !== 'undefined') {
+                        updateQuotaUI(data.remaining_quota);
                     }
                 })
                 .catch(() => {});

@@ -24,6 +24,7 @@ class Vehicle extends Model
         'color',
         'fuel',
         'price_per_day',
+        'price_per_week',
         'description',
         'image',
         'status',
@@ -31,14 +32,17 @@ class Vehicle extends Model
         'manager_id',
         'total_stock',
         'available_stock',
+        'damaged_stock',
     ];
 
     protected $casts = [
         'year' => 'integer',
         'capacity' => 'integer',
         'price_per_day' => 'decimal:2',
+        'price_per_week' => 'decimal:2',
         'total_stock' => 'integer',
         'available_stock' => 'integer',
+        'damaged_stock' => 'integer',
     ];
 
     public function manager()

@@ -27,6 +27,12 @@
             ->whereIn('status', ['paid', 'active'])
             ->count();
     }
+
+    // Badge Transaksi Butuh Tindakan (SuperAdmin)
+    $navSuperAdminPendingCount = 0;
+    if ($navUserRole === 'superadmin') {
+        $navSuperAdminPendingCount = \App\Models\Cart::whereIn('status', ['paid', 'pending_return', 'pending_payment'])->count();
+    }
 @endphp
 <nav x-data="{ open: false }" class="navbar">
     <!-- Primary Navigation Menu -->
@@ -34,8 +40,9 @@
         <div class="flex items-center justify-between h-16 relative">
             <!-- Logo (Kiri) -->
             <div class="shrink-0 flex items-center">
-                <a href="{{ route('user.home') }}" class="brand-link">
-                    <span class="brand-text"><span class="highlight">GoAnywhere</span></span>
+                <a href="{{ auth()->check() ? (auth()->user()->role === 'user' ? route('user.home') : (auth()->user()->role === 'manager' ? route('manager.dashboard') : route('superadmin.dashboard'))) : '/' }}" class="brand-link flex items-center gap-2.5">
+                    <img src="{{ asset('GoAnywhereLogo.png') }}" alt="GoAnywhere Logo" style="width: 36px; height: 36px; max-width: 36px; max-height: 36px; object-fit: contain;" class="w-9 h-9 object-contain rounded-lg shadow-sm shrink-0">
+                    <span class="brand-text font-extrabold text-lg tracking-tight"><span class="highlight">GoAnywhere</span></span>
                 </a>
             </div>
 
@@ -51,16 +58,19 @@
                                 Layanan
                             </x-nav-link>
                             <x-nav-link :href="route('user.armada')" :active="request()->routeIs('user.armada*')" class="nav-link">
-                        Armada
+                                Armada
                             </x-nav-link>
-                            <x-nav-link :href="route('user.rental')" :active="request()->routeIs('user.rental')" class="nav-link">
-                                <span>Sewa Saya</span>
+                            <x-nav-link :href="route('user.rental')" :active="request()->routeIs('user.rental*')" class="nav-link">
+                                <span>Transaksi Saya</span>
                                 @if($navActiveRentalCount > 0)
                                     <span class="nav-pill-badge nav-pill-badge--primary" title="{{ $navActiveRentalCount }} sewa aktif / menunggu">{{ $navActiveRentalCount }}</span>
                                 @endif
                             </x-nav-link>
+                            <x-nav-link :href="route('user.profile.user')" :active="request()->routeIs('user.profile.user*')" class="nav-link">
+                                Profil Saya
+                            </x-nav-link>
                             <x-nav-link :href="route('user.profile')" :active="request()->routeIs('user.profile')" class="nav-link">
-                                Profile
+                                Cabang Kami
                             </x-nav-link>
                             <x-nav-link :href="route('user.chat.index')" :active="request()->routeIs('user.chat.*')" class="nav-link">
                                 <span>Chat</span>
@@ -101,7 +111,10 @@
                         Armada
                             </x-nav-link>
                             <x-nav-link :href="route('superadmin.rentals')" :active="request()->routeIs('superadmin.rentals')" class="nav-link">
-                        Transaksi
+                                <span>Transaksi</span>
+                                @if($navSuperAdminPendingCount > 0)
+                                    <span class="nav-pill-badge nav-pill-badge--warning" title="{{ $navSuperAdminPendingCount }} transaksi butuh tindakan">{{ $navSuperAdminPendingCount }}</span>
+                                @endif
                             </x-nav-link>
                         @endif
                     @endauth
@@ -143,8 +156,11 @@
                             <x-dropdown-link :href="route('user.cart')" class="dropdown-link">
                                 Cart
                             </x-dropdown-link>
+                            <x-dropdown-link :href="route('user.rental')" class="dropdown-link">
+                                Riwayat Transaksi
+                            </x-dropdown-link>
                             <x-dropdown-link :href="route('user.profile.user')" class="dropdown-link">
-                                Profile User
+                                Profil User
                             </x-dropdown-link>
                             <div class="dropdown-divider"></div>
                         @endif
@@ -186,16 +202,19 @@
                     <x-responsive-nav-link :href="route('user.armada')" :active="request()->routeIs('user.armada*')" class="responsive-link">
                         Armada
                     </x-responsive-nav-link>
-                    <x-responsive-nav-link :href="route('user.rental')" :active="request()->routeIs('user.rental')" class="responsive-link">
+                    <x-responsive-nav-link :href="route('user.rental')" :active="request()->routeIs('user.rental*')" class="responsive-link">
                         <div class="flex items-center justify-between">
-                            <span>Sewa Saya</span>
+                            <span>Transaksi Saya</span>
                             @if($navActiveRentalCount > 0)
                                 <span class="nav-pill-badge nav-pill-badge--primary">{{ $navActiveRentalCount }}</span>
                             @endif
                         </div>
                     </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('user.profile.user')" :active="request()->routeIs('user.profile.user*')" class="responsive-link">
+                        Profil Saya
+                    </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('user.profile')" :active="request()->routeIs('user.profile')" class="responsive-link">
-                        Profile
+                        Cabang Kami
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('user.chat.index')" :active="request()->routeIs('user.chat.*')" class="responsive-link">
                         <div class="flex items-center justify-between">
@@ -242,7 +261,12 @@
                         Armada
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('superadmin.rentals')" :active="request()->routeIs('superadmin.rentals')" class="responsive-link">
-                        Transaksi
+                        <div class="flex items-center justify-between">
+                            <span>Transaksi</span>
+                            @if($navSuperAdminPendingCount > 0)
+                                <span class="nav-pill-badge nav-pill-badge--warning">{{ $navSuperAdminPendingCount }}</span>
+                            @endif
+                        </div>
                     </x-responsive-nav-link>
                 @endif
             @endauth
@@ -260,8 +284,11 @@
                     <x-responsive-nav-link :href="route('user.cart')" class="responsive-link">
                         Cart
                     </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('user.rental')" class="responsive-link">
+                        Riwayat Transaksi
+                    </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('user.profile.user')" class="responsive-link">
-                        Profile User
+                        Profil User
                     </x-responsive-nav-link>
                 @endif
 
@@ -294,6 +321,20 @@
     /* ===== BRAND ===== */
     .brand-link {
         text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .brand-link img,
+    .navbar img {
+        width: 36px !important;
+        height: 36px !important;
+        max-width: 36px !important;
+        max-height: 36px !important;
+        object-fit: contain !important;
+        flex-shrink: 0 !important;
+        display: inline-block !important;
     }
 
     .brand-text {

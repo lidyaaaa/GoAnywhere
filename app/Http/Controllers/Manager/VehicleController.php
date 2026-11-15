@@ -48,6 +48,7 @@ class VehicleController extends Controller
             'color' => 'required|string|max:50',
             'fuel' => 'required|string|max:50',
             'price_per_day' => 'required|numeric|min:0',
+            'price_per_week' => 'required|numeric|min:0',
             'description' => 'nullable|string',
             'total_stock' => 'required|integer|min:1',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -72,9 +73,11 @@ class VehicleController extends Controller
             'color' => $request->color,
             'fuel' => $request->fuel,
             'price_per_day' => $request->price_per_day,
+            'price_per_week' => $request->price_per_week,
             'description' => $request->description,
             'total_stock' => $request->total_stock,
             'available_stock' => $request->total_stock,
+            'damaged_stock' => 0,
             'location' => auth()->user()->location,
             'image' => $imagePath,
             'status' => 'available',
@@ -105,6 +108,7 @@ class VehicleController extends Controller
             'color' => 'required|string|max:50',
             'fuel' => 'required|string|max:50',
             'price_per_day' => 'required|numeric|min:0',
+            'price_per_week' => 'required|numeric|min:0',
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
@@ -128,10 +132,26 @@ class VehicleController extends Controller
             'color' => $request->color,
             'fuel' => $request->fuel,
             'price_per_day' => $request->price_per_day,
+            'price_per_week' => $request->price_per_week,
             'description' => $request->description,
         ]);
 
         return redirect()->route('manager.vehicles')->with('success', 'Kendaraan berhasil diupdate!');
+    }
+
+    public function repair($id)
+    {
+        $vehicle = Vehicle::where('location', auth()->user()->location)->findOrFail($id);
+
+        if ($vehicle->damaged_stock < 1) {
+            return back()->with('error', 'Tidak ada unit rusak untuk kendaraan ini.');
+        }
+
+        $vehicle->damaged_stock = max(0, $vehicle->damaged_stock - 1);
+        $vehicle->available_stock += 1;
+        $vehicle->save();
+
+        return back()->with('success', '1 unit ' . $vehicle->name . ' telah selesai direparasi dan kembali ke stok tersedia!');
     }
 
     public function addStock(Request $request, $id)

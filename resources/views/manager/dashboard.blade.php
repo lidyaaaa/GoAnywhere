@@ -340,6 +340,102 @@
                         <div class="label">Stok Tersedia</div>
                     </div>
                 </div>
+
+                <!-- Unit Rusak/Servis -->
+                <div class="stat-card">
+                    <div class="icon">🛠️</div>
+                    <div class="info">
+                        <div class="number orange">{{ $totalDamagedStock ?? 0 }}</div>
+                        <div class="label">Unit Rusak/Servis</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== DAFTAR KENDARAAN RUSAK / PERBAIKAN ===== -->
+            <div class="section-card {{ ($totalDamagedStock ?? 0) > 0 ? 'border-amber-300' : 'border-emerald-200' }}">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="section-title {{ ($totalDamagedStock ?? 0) > 0 ? 'text-amber-800' : 'text-slate-800' }} flex items-center gap-2">
+                        <span class="text-xl">🛠️</span> <span>Daftar Kendaraan Rusak / Dalam Perbaikan</span>
+                    </h3>
+                    @if(($totalDamagedStock ?? 0) > 0)
+                        <span class="text-xs font-bold px-3 py-1 bg-rose-100 text-rose-800 border border-rose-200 rounded-full flex items-center gap-1 shadow-sm">
+                            <span class="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
+                            Total Rusak: {{ $totalDamagedStock }} Unit
+                        </span>
+                    @else
+                        <span class="text-xs font-bold px-3 py-1 bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-full flex items-center gap-1 shadow-sm">
+                            <span>✅</span> Total Rusak: 0 Unit
+                        </span>
+                    @endif
+                </div>
+
+                @if(isset($damagedVehicles) && count($damagedVehicles) > 0)
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Kendaraan</th>
+                                    <th>Jenis / Tipe</th>
+                                    <th>Unit Rusak</th>
+                                    <th>Stok Tersedia Saat Ini</th>
+                                    <th>Aksi Perbaikan</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($damagedVehicles as $item)
+                                    <tr>
+                                        <td>
+                                            <div class="flex items-center gap-3">
+                                                @if($item->image)
+                                                    <img src="{{ asset('storage/' . $item->image) }}" class="w-12 h-10 object-cover rounded-lg border">
+                                                @else
+                                                    <div class="w-12 h-10 bg-slate-200 rounded-lg flex items-center justify-center text-sm">🚗</div>
+                                                @endif
+                                                <div>
+                                                    <div class="font-bold text-slate-800">{{ $item->name }}</div>
+                                                    <div class="text-xs text-slate-500">{{ $item->brand }} • {{ $item->year }}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="px-2 py-0.5 rounded text-xs font-medium {{ $item->vehicle_type === 'car' ? 'bg-blue-100 text-blue-800' : 'bg-emerald-100 text-emerald-800' }}">
+                                                {{ $item->vehicle_type === 'car' ? 'Mobil' : 'Motor' }} ({{ $item->type }})
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="font-bold text-rose-600 text-sm">
+                                                ⚠️ {{ $item->damaged_stock }} unit
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="font-semibold text-slate-700">
+                                                {{ $item->available_stock }} / {{ $item->total_stock }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <form action="{{ route('manager.vehicles.repair', $item->id) }}" method="POST">
+                                                @csrf
+                                                <button type="submit" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-sm" onclick="return confirm('Konfirmasi: 1 unit {{ $item->name }} telah selesai diservis di bengkel dan siap disewakan kembali?')">
+                                                    <span>🔧</span> Selesai Servis / Siap Sewa
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <div class="p-6 text-center rounded-2xl bg-gradient-to-r from-emerald-50/70 via-teal-50/50 to-emerald-50/70 border border-emerald-200/80 shadow-inner">
+                        <div class="w-12 h-12 mx-auto mb-2 rounded-full bg-emerald-100 flex items-center justify-center text-2xl text-emerald-700 shadow-sm">
+                            ✨
+                        </div>
+                        <h4 class="text-base font-bold text-slate-800 mb-1">Armada Cabang {{ Auth::user()->location }} Siap Beroperasi!</h4>
+                        <p class="text-slate-600 text-xs max-w-lg mx-auto">
+                            Semua unit kendaraan dalam kondisi prima dan siap disewa oleh customer. Tidak ada unit yang sedang mengalami kerusakan atau perbaikan.
+                        </p>
+                    </div>
+                @endif
             </div>
 
             <!-- ===== SEWA AKTIF ===== -->

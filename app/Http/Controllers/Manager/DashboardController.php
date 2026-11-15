@@ -60,10 +60,17 @@ class DashboardController extends Controller
             ->limit(10)
             ->get();
         
+        // Kendaraan rusak yang butuh perbaikan
+        $damagedVehicles = Vehicle::where('location', $location)
+            ->where('damaged_stock', '>', 0)
+            ->get();
+        $totalDamagedStock = Vehicle::where('location', $location)->sum('damaged_stock');
+        
         return view('manager.dashboard', compact(
             'totalVehicles', 'totalCars', 'totalMotorcycles',
             'totalStock', 'availableStock', 'activeRentals', 'recentHistory',
-            'totalIncome', 'totalActiveRentals', 'totalHistory' // 🔥 BARU
+            'totalIncome', 'totalActiveRentals', 'totalHistory',
+            'damagedVehicles', 'totalDamagedStock'
         ));
     }
 }

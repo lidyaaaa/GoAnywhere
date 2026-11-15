@@ -336,7 +336,7 @@
     <div class="login-container">
         <!-- Header -->
         <div class="login-header">
-            <span class="icon"></span>
+            <img src="{{ asset('GoAnywhereLogo.png') }}" alt="GoAnywhere" class="w-16 h-16 mx-auto mb-3 object-contain drop-shadow-md">
             <h2 class="title">Welcome to <span class="highlight">GoAnywhere</span></h2>
             <p class="subtitle">Masuk untuk mulai menyewa kendaraan</p>
         </div>

@@ -1,298 +1,299 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            Transaksi - {{ Auth::user()->location }}
-        </h2>
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="font-bold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+                    Kelola Transaksi & Pengantaran - Cabang {{ Auth::user()->location }}
+                </h2>
+                <p class="text-xs text-gray-500 mt-1">Pantau pesanan baru, serah terima unit, cek fisik kendaraan, dan pembayaran denda.</p>
+            </div>
+            <span class="px-3 py-1 bg-[#004B87]/10 text-[#004B87] dark:text-blue-300 font-bold text-xs rounded-full">
+                📍 Cabang {{ Auth::user()->location }}
+            </span>
+        </div>
     </x-slot>
 
     <style>
-        * {
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
         .transaksi-section {
-            padding: 40px 0 60px;
-            background: #eef1f4;
-            position: relative;
+            padding: 30px 0 60px;
+            background: #F0F4F8;
             min-height: 100vh;
         }
-
+        .dark .transaksi-section {
+            background: #001F3F;
+        }
         .section-card {
             background: #ffffff;
-            border-radius: 16px;
+            border-radius: 20px;
             padding: 24px 28px;
             margin-bottom: 24px;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15), 0 4px 20px rgba(0, 0, 0, 0.08);
-            border: 1px solid #e8e4de;
-            transition: all 0.4s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(15, 23, 42, 0.08);
+            transition: all 0.3s ease;
         }
-
-        .section-card:hover {
-            box-shadow: 0 20px 55px rgba(0, 0, 0, 0.22), 0 12px 35px rgba(0, 0, 0, 0.12);
-            border-color: #43637E;
+        .dark .section-card {
+            background: #0f172a;
+            border-color: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
         }
-
-        .section-card .section-title {
-            font-size: 18px;
+        .section-title {
+            font-size: 17px;
             font-weight: 700;
-            color: #2c3e50;
-            font-family: 'Georgia', serif;
+            color: #002D55;
+            display: flex;
+            align-items: center;
+            gap: 8px;
             margin-bottom: 16px;
         }
-
-        .section-card .section-title .icon {
-            margin-right: 8px;
+        .dark .section-title {
+            color: #f8fafc;
         }
-
         .table-wrap {
             overflow-x: auto;
         }
-
         .table-wrap table {
             width: 100%;
             border-collapse: collapse;
         }
-
-        .table-wrap thead {
-            background: #eef1f4;
-            border-radius: 10px;
-        }
-
         .table-wrap thead th {
             padding: 12px 16px;
             text-align: left;
             font-size: 11px;
             font-weight: 700;
-            color: #43637E;
+            color: #004B87;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            background: #F8FAFC;
         }
-
+        .dark .table-wrap thead th {
+            background: #1e293b;
+            color: #93c5fd;
+        }
         .table-wrap tbody td {
-            padding: 12px 16px;
-            font-size: 14px;
-            color: #5a6a7a;
-            border-top: 1px solid #f0ede8;
-        }
-
-        .table-wrap tbody tr:hover {
-            background: rgba(67, 99, 126, 0.02);
-        }
-
-        .table-wrap tbody .vehicle-name {
-            font-weight: 600;
-            color: #2c3e50;
-        }
-
-        .table-wrap tbody .booking-code {
-            font-weight: 600;
-            color: #43637E;
-            font-family: monospace;
+            padding: 14px 16px;
             font-size: 13px;
+            color: #334155;
+            border-top: 1px solid #f1f5f9;
         }
-
-        .table-wrap tbody .status-badge {
-            display: inline-block;
-            padding: 4px 14px;
-            border-radius: 20px;
+        .dark .table-wrap tbody td {
+            color: #cbd5e1;
+            border-top-color: #1e293b;
+        }
+        .table-wrap tbody tr:hover {
+            background: rgba(106, 155, 209, 0.05);
+        }
+        .btn-action-primary {
+            padding: 7px 14px;
+            border-radius: 10px;
             font-size: 12px;
-            font-weight: 600;
-        }
-
-        .table-wrap tbody .status-badge.active {
-            background: #e8f4ec;
-            color: #4a7a5a;
-        }
-
-        .table-wrap tbody .status-badge.warning {
-            background: #fdf6e8;
-            color: #b08a3a;
-        }
-
-        .table-wrap tbody .status-badge.danger {
-            background: #fce8e8;
-            color: #b04a4a;
-        }
-
-        .table-wrap tbody .status-badge.completed {
-            background: #e8f4ec;
-            color: #4a7a5a;
-        }
-
-        .approve-btn {
-            border: 0;
-            border-radius: 8px;
-            padding: 8px 14px;
-            background: #43637E;
+            font-weight: 700;
             color: #ffffff;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .approve-btn:hover {
-            background: #36546b;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 32px 20px;
-            color: #7a8a9a;
-        }
-
-        .empty-state .icon {
-            font-size: 40px;
-            display: block;
-            margin-bottom: 8px;
-        }
-
-        /* ===== PAGINATION ===== */
-        .pagination-wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-            margin-top: 16px;
-        }
-
-        .pagination-wrapper .info-text {
-            font-size: 14px;
-            color: #7a8a9a;
-            font-weight: 300;
-        }
-
-        .pagination-wrapper .info-text strong {
-            color: #43637E;
-            font-weight: 600;
-        }
-
-        .pagination-wrapper nav {
-            display: flex;
-            gap: 6px;
-            align-items: center;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .pagination-wrapper nav .page-link {
+            background: #004B87;
             display: inline-flex;
             align-items: center;
-            justify-content: center;
-            min-width: 40px;
-            height: 40px;
-            padding: 0 14px;
+            gap: 6px;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-action-primary:hover {
+            background: #002D55;
+            transform: translateY(-1px);
+        }
+        .btn-action-danger {
+            padding: 7px 12px;
             border-radius: 10px;
-            background: #ffffff;
-            color: #2c3e50;
+            font-size: 12px;
+            font-weight: 700;
+            color: #e11d48;
+            background: #ffe4e6;
+            border: 1px solid #fecdd3;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-action-danger:hover {
+            background: #f43f5e;
+            color: #ffffff;
+        }
+        .btn-chat-link {
+            padding: 7px 12px;
+            border-radius: 10px;
+            font-size: 12px;
             font-weight: 600;
-            font-size: 14px;
+            background: #f1f5f9;
+            color: #334155;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
             text-decoration: none;
-            border: 1.5px solid #e8e4de;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            transition: all 0.2s;
         }
-
-        .pagination-wrapper nav .page-link:hover {
-            background: #43637E;
-            color: #ffffff;
-            border-color: #43637E;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(67, 99, 126, 0.25);
+        .btn-chat-link:hover {
+            background: #e2e8f0;
+            color: #0f172a;
         }
-
-        .pagination-wrapper nav .page-link.active {
-            background: #43637E;
-            color: #ffffff;
-            border-color: #43637E;
-            box-shadow: 0 8px 25px rgba(67, 99, 126, 0.35);
+        .dark .btn-chat-link {
+            background: #1e293b;
+            color: #94a3b8;
         }
-
-        .pagination-wrapper nav .page-link.disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            pointer-events: none;
+        .dark .btn-chat-link:hover {
+            background: #334155;
+            color: #f8fafc;
         }
-
-        /* ===== DARK MODE ===== */
-        .dark .transaksi-section { background: #1a2632; }
-        .dark .section-card { background: #1a2632; border-color: #2c3e50; box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
-        .dark .section-card:hover { border-color: #43637E; }
-        .dark .section-card .section-title { color: #f0ede8; }
-        .dark .table-wrap thead { background: #0f1a24; }
-        .dark .table-wrap thead th { color: #f0e6d0; }
-        .dark .table-wrap tbody td { color: #b0bec5; border-top-color: #2c3e50; }
-        .dark .table-wrap tbody tr:hover { background: rgba(67,99,126,0.05); }
-        .dark .table-wrap tbody .vehicle-name { color: #f0ede8; }
-        .dark .table-wrap tbody .booking-code { color: #f0e6d0; }
-        .dark .empty-state { color: #b0bec5; }
-        .dark .pagination-wrapper .info-text { color: #b0bec5; }
-        .dark .pagination-wrapper .info-text strong { color: #f0e6d0; }
-        .dark .pagination-wrapper nav .page-link { background: #1a2632; color: #f0ede8; border-color: #2c3e50; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
-        .dark .pagination-wrapper nav .page-link:hover { background: #43637E; color: #ffffff; border-color: #43637E; }
-        .dark .pagination-wrapper nav .page-link.active { background: #43637E; color: #ffffff; border-color: #43637E; }
-
-        @media (max-width: 768px) {
-            .section-card { padding: 18px 16px; }
-            .table-wrap thead th, .table-wrap tbody td { padding: 10px 12px; font-size: 12px; }
-            .pagination-wrapper nav .page-link { min-width: 36px; height: 36px; font-size: 13px; padding: 0 10px; }
+        .empty-box {
+            padding: 32px;
+            text-align: center;
+            color: #94a3b8;
+            font-size: 13px;
         }
-
-        @media (max-width: 480px) {
-            .transaksi-section { padding: 24px 0 40px; }
-            .section-card { padding: 14px 12px; }
-            .table-wrap thead th, .table-wrap tbody td { padding: 8px 8px; font-size: 11px; }
-            .table-wrap tbody .status-badge { font-size: 10px; padding: 2px 10px; }
-            .pagination-wrapper nav .page-link { min-width: 32px; height: 32px; font-size: 12px; padding: 0 8px; border-radius: 8px; }
-            .pagination-wrapper .info-text { font-size: 12px; }
-        }
-
-        ::-webkit-scrollbar { width: 10px; }
-        ::-webkit-scrollbar-track { background: #f0ede8; }
-        ::-webkit-scrollbar-thumb { background: #43637E; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #36546b; }
-        .dark ::-webkit-scrollbar-track { background: #1a2632; }
-        .dark ::-webkit-scrollbar-thumb { background: #43637E; }
     </style>
 
     <div class="transaksi-section">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-            <!-- ===== MENUNGGU PERSETUJUAN ===== -->
-            <div class="section-card">
-                <h3 class="section-title"><span class="icon"></span> Menunggu Persetujuan</h3>
+            {{-- Flash Alerts --}}
+            @if(session('success'))
+                <div class="p-4 mb-5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-semibold flex items-center gap-2">
+                    <span>✅</span> {{ session('success') }}
+                </div>
+            @endif
+            @if(session('warning'))
+                <div class="p-4 mb-5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 text-sm font-semibold flex items-center gap-2">
+                    <span>⚠️</span> {{ session('warning') }}
+                </div>
+            @endif
+            @if(session('error'))
+                <div class="p-4 mb-5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-sm font-semibold flex items-center gap-2">
+                    <span>❌</span> {{ session('error') }}
+                </div>
+            @endif
+
+            {{-- SEARCH & FILTER BY STATUS BAR --}}
+            <div class="bg-white dark:bg-slate-900 rounded-2xl p-5 mb-6 border border-slate-200 dark:border-slate-800 shadow-sm">
+                <form action="{{ route('manager.rentals') }}" method="GET" class="flex flex-col lg:flex-row gap-3 items-stretch lg:items-center justify-between">
+                    {{-- Search Input --}}
+                    <div class="relative flex-1">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
+                            🔍
+                        </span>
+                        <input type="text" name="search" value="{{ $search }}" placeholder="Cari Kode Booking, Nama Customer, No. HP, atau Armada..." class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm focus:ring-2 focus:ring-[#004B87] focus:outline-none">
+                    </div>
+
+                    {{-- Dropdown Status Filter & Button --}}
+                    <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+                        <select name="status" onchange="this.form.submit()" class="py-2.5 px-3.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-[#004B87] focus:outline-none">
+                            <option value="all" {{ $statusFilter === 'all' ? 'selected' : '' }}>📌 Semua Status ({{ $counts['all'] }})</option>
+                            <option value="paid" {{ $statusFilter === 'paid' ? 'selected' : '' }}>⏳ Menunggu Persetujuan ({{ $counts['paid'] }})</option>
+                            <option value="approved" {{ $statusFilter === 'approved' ? 'selected' : '' }}>🚚 Armada OTW / Serah Terima ({{ $counts['approved'] }})</option>
+                            <option value="active" {{ $statusFilter === 'active' ? 'selected' : '' }}>🚗 Sewa Aktif ({{ $counts['active'] }})</option>
+                            <option value="pending_return" {{ $statusFilter === 'pending_return' ? 'selected' : '' }}>🔍 Cek Fisik Unit ({{ $counts['pending_return'] }})</option>
+                            <option value="pending_payment" {{ $statusFilter === 'pending_payment' ? 'selected' : '' }}>💳 Menunggu Denda ({{ $counts['pending_payment'] }})</option>
+                            <option value="completed" {{ $statusFilter === 'completed' ? 'selected' : '' }}>✅ Selesai ({{ $counts['completed'] }})</option>
+                            <option value="cancelled" {{ $statusFilter === 'cancelled' ? 'selected' : '' }}>❌ Dibatalkan ({{ $counts['cancelled'] }})</option>
+                            <option value="rejected" {{ $statusFilter === 'rejected' ? 'selected' : '' }}>🚫 Ditolak ({{ $counts['rejected'] }})</option>
+                        </select>
+                        <button type="submit" class="px-5 py-2.5 bg-[#004B87] hover:bg-[#002D55] text-white rounded-xl text-sm font-bold shadow-sm transition">
+                            Cari
+                        </button>
+                        @if(!empty($search) || $statusFilter !== 'all')
+                            <a href="{{ route('manager.rentals') }}" class="px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl text-sm font-semibold transition" title="Reset filter">
+                                ↺ Reset
+                            </a>
+                        @endif
+                    </div>
+                </form>
+
+                {{-- Status Pills Tabs --}}
+                <div class="flex items-center gap-2 overflow-x-auto pt-3.5 mt-3 border-t border-slate-100 dark:border-slate-800 text-xs font-semibold no-scrollbar">
+                    @php
+                        $filterTabs = [
+                            'all' => ['label' => 'Semua', 'icon' => '📌', 'count' => $counts['all']],
+                            'paid' => ['label' => 'Menunggu Approve', 'icon' => '⏳', 'count' => $counts['paid']],
+                            'approved' => ['label' => 'Armada OTW', 'icon' => '🚚', 'count' => $counts['approved']],
+                            'active' => ['label' => 'Sewa Aktif', 'icon' => '🚗', 'count' => $counts['active']],
+                            'pending_return' => ['label' => 'Cek Fisik Unit', 'icon' => '🔍', 'count' => $counts['pending_return']],
+                            'pending_payment' => ['label' => 'Menunggu Denda', 'icon' => '💳', 'count' => $counts['pending_payment']],
+                            'completed' => ['label' => 'Selesai', 'icon' => '✅', 'count' => $counts['completed']],
+                            'cancelled' => ['label' => 'Dibatalkan', 'icon' => '❌', 'count' => $counts['cancelled']],
+                            'rejected' => ['label' => 'Ditolak', 'icon' => '🚫', 'count' => $counts['rejected']],
+                        ];
+                    @endphp
+                    @foreach($filterTabs as $tabKey => $tab)
+                        <a href="{{ route('manager.rentals', array_merge(request()->query(), ['status' => $tabKey])) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl whitespace-nowrap transition {{ $statusFilter === $tabKey ? 'bg-[#004B87] text-white shadow-sm' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200' }}">
+                            <span>{{ $tab['icon'] }}</span>
+                            <span>{{ $tab['label'] }}</span>
+                            <span class="px-1.5 py-0.5 rounded-full text-[10px] {{ $statusFilter === $tabKey ? 'bg-white/20 text-white' : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200' }} font-bold">{{ $tab['count'] }}</span>
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+
+            <!-- ======================================================== -->
+            <!-- 1. MENUNGGU PERSETUJUAN (STATUS: PAID)                   -->
+            <!-- ======================================================== -->
+            @if($statusFilter === 'all' || $statusFilter === 'paid')
+            <div class="section-card border-l-4 border-l-amber-500">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="section-title text-amber-700 dark:text-amber-400">
+                        <span>⏳</span> Menunggu Persetujuan Booking (Paid)
+                    </h3>
+                    <span class="text-xs font-bold px-2.5 py-1 bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 rounded-full">
+                        {{ count($pendingApprovals) }} Booking Baru
+                    </span>
+                </div>
+                <p class="text-xs text-slate-500 mb-4">Pelanggan telah melakukan pembayaran. Stok unit baru berkurang setelah Anda klik "Setujui Booking".</p>
 
                 @if(count($pendingApprovals) > 0)
                     <div class="table-wrap">
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Kode</th>
-                                    <th>Kendaraan</th>
-                                    <th>Penyewa</th>
-                                    <th>Total</th>
-                                    <th>Aksi</th>
+                                    <th>Kode Booking</th>
+                                    <th>Armada Kendaraan</th>
+                                    <th>Pelanggan & Titik Antar</th>
+                                    <th>Durasi Sewa</th>
+                                    <th>Total Bayar (+Ongkir)</th>
+                                    <th>Aksi Manager</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach($pendingApprovals as $item)
                                     <tr>
-                                        <td><span class="booking-code">{{ $item->booking_code ?? 'N/A' }}</span></td>
-                                        <td class="vehicle-name">{{ $item->vehicle->name ?? 'N/A' }}</td>
-                                        <td>{{ $item->user->name ?? 'N/A' }}</td>
-                                        <td>Rp {{ number_format($item->subtotal ?? 0, 0, ',', '.') }}</td>
+                                        <td><span class="font-mono font-bold text-[#004B87] dark:text-blue-300">{{ $item->booking_code }}</span></td>
                                         <td>
-                                            <div style="display:flex; align-items:center; gap:8px;">
-                                                <form action="{{ route('manager.rentals.approve', $item->booking_code) }}" method="POST" style="margin:0;">
+                                            <div class="font-bold text-slate-900 dark:text-white">{{ $item->vehicle->name }}</div>
+                                            <div class="text-xs text-slate-500">{{ $item->vehicle->brand }} • Stok Tersedia: {{ $item->vehicle->available_stock }} unit</div>
+                                        </td>
+                                        <td>
+                                            <div class="font-semibold text-slate-800 dark:text-slate-200">{{ $item->user->name }} ({{ $item->user->phone }})</div>
+                                            <div class="text-xs text-slate-500 truncate max-w-xs" title="{{ $item->pickup_location }}">
+                                                📍 {{ $item->pickup_location }}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="px-2 py-0.5 rounded text-xs font-semibold {{ $item->period === 'weekly' ? 'bg-purple-100 text-purple-800' : 'bg-slate-100 text-slate-800' }}">
+                                                {{ $item->period === 'weekly' ? '🎁 Paket 7 Hari' : $item->quantity_days . ' Hari' }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="font-bold text-slate-900 dark:text-white">
+                                                Rp {{ number_format($item->total_payment > 0 ? $item->total_payment : $item->subtotal, 0, ',', '.') }}
+                                            </div>
+                                            <div class="text-[11px] text-emerald-600 font-medium">Termasuk Ongkir Antar</div>
+                                        </td>
+                                        <td>
+                                            <div class="flex items-center gap-2">
+                                                <form action="{{ route('manager.rentals.approve', $item->booking_code) }}" method="POST" onsubmit="return confirm('Setujui booking ini? Stok kendaraan akan otomatis dipotong 1 unit dan status berubah menjadi armada OTW diantar.')">
                                                     @csrf
-                                                    <button type="submit" class="approve-btn" onclick="return confirm('Setujui booking ini?')">Setujui Booking</button>
+                                                    <button type="submit" class="btn-action-primary">
+                                                        <span>✅</span> Setujui Booking
+                                                    </button>
                                                 </form>
-                                                <a href="{{ route('manager.chat.start', ['user_id' => $item->user_id, 'vehicle_id' => $item->vehicle_id]) }}" 
-                                                   style="display:inline-flex; align-items:center; gap:6px; padding:7px 12px; background:#43637E; color:#ffffff; border-radius:8px; font-size:12px; font-weight:600; text-decoration:none; transition:all 0.2s ease; border:1px solid #43637E;"
-                                                   title="Chat dengan {{ $item->user->name ?? 'Penyewa' }}">
-                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                                                    </svg>
-                                                    <span>Chat</span>
+                                                <button type="button" onclick="openRejectModal('{{ $item->booking_code }}', '{{ $item->vehicle->name }}', '{{ $item->user->name }}')" class="btn-action-danger">
+                                                    Tolak
+                                                </button>
+                                                <a href="{{ route('manager.chat.start', ['user_id' => $item->user_id, 'vehicle_id' => $item->vehicle_id]) }}" class="btn-chat-link">
+                                                    💬 Chat
                                                 </a>
                                             </div>
                                         </td>
@@ -302,46 +303,307 @@
                         </table>
                     </div>
                 @else
-                    <div class="empty-state">
-                        <span class="icon"></span>
-                        <p>Tidak ada transaksi yang menunggu persetujuan</p>
-                    </div>
+                    <div class="empty-box">Tidak ada booking baru yang menunggu persetujuan.</div>
                 @endif
             </div>
+            @endif
 
-            <!-- ===== SEWA AKTIF ===== -->
-            @include('manager.partials.active-rentals')
+            <!-- ======================================================== -->
+            <!-- 2. ARMADA DISETUJUI / OTW (STATUS: APPROVED)             -->
+            <!-- ======================================================== -->
+            @if($statusFilter === 'all' || $statusFilter === 'approved')
+            <div class="section-card border-l-4 border-l-blue-600">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="section-title text-blue-800 dark:text-blue-300">
+                        <span>🚚</span> Armada OTW & Serah Terima KTP (Approved)
+                    </h3>
+                    <span class="text-xs font-bold px-2.5 py-1 bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-200 rounded-full">
+                        {{ count($approvedRentals) }} Unit Sedang OTW
+                    </span>
+                </div>
+                <p class="text-xs text-slate-500 mb-4">Armada sedang diantar ke alamat pelanggan. Saat bertemu pelanggan, wajib unggah foto jaminan (KTP) dan konfirmasi serah terima agar masa sewa resmi dimulai.</p>
 
-            <!-- ===== RIWAYAT TRANSAKSI ===== -->
+                @if(count($approvedRentals) > 0)
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Kode Booking</th>
+                                    <th>Kendaraan</th>
+                                    <th>Pelanggan</th>
+                                    <th>Alamat Pengantaran</th>
+                                    <th>Aksi Serah Terima Unit</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($approvedRentals as $item)
+                                    <tr>
+                                        <td><span class="font-mono font-bold text-blue-700 dark:text-blue-300">{{ $item->booking_code }}</span></td>
+                                        <td class="font-bold text-slate-900 dark:text-white">{{ $item->vehicle->name }}</td>
+                                        <td>
+                                            <div class="font-semibold">{{ $item->user->name }}</div>
+                                            <div class="text-xs text-slate-500">{{ $item->user->phone }}</div>
+                                        </td>
+                                        <td>
+                                            <span class="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                                                📍 {{ $item->pickup_location }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="flex items-center gap-2">
+                                                <button type="button" onclick="openHandoverModal('{{ $item->id }}', '{{ $item->booking_code }}', '{{ $item->vehicle->name }}', '{{ $item->user->name }}')" class="btn-action-primary bg-emerald-600 hover:bg-emerald-700">
+                                                    <span>📸</span> Serah Terima & Upload KTP
+                                                </button>
+                                                <a href="{{ route('manager.chat.start', ['user_id' => $item->user_id, 'vehicle_id' => $item->vehicle_id]) }}" class="btn-chat-link">
+                                                    💬 Hubungi User
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <div class="empty-box">Tidak ada armada yang sedang dalam perjalanan serah terima.</div>
+                @endif
+            </div>
+            @endif
+
+            <!-- ======================================================== -->
+            <!-- 3. MENUNGGU CEK FISIK UNIT (STATUS: PENDING_RETURN)      -->
+            <!-- ======================================================== -->
+            @if($statusFilter === 'all' || $statusFilter === 'pending_return')
+            <div class="section-card border-l-4 border-l-purple-600">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="section-title text-purple-800 dark:text-purple-300">
+                        <span>🔍</span> Menunggu Pengecekan Fisik Unit (Pending Return)
+                    </h3>
+                    <span class="text-xs font-bold px-2.5 py-1 bg-purple-100 dark:bg-purple-950 text-purple-800 dark:text-purple-200 rounded-full">
+                        {{ count($pendingReturns) }} Menunggu Inspeksi
+                    </span>
+                </div>
+                <p class="text-xs text-slate-500 mb-4">Pelanggan telah menyerahkan kunci/unit di gerai. Lakukan inspeksi fisik (Aman / Rusak) untuk menyelesaikan transaksi atau menerbitkan tagihan denda/reparasi.</p>
+
+                @if(count($pendingReturns) > 0)
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Kode Booking</th>
+                                    <th>Kendaraan</th>
+                                    <th>Penyewa</th>
+                                    <th>Status Jatuh Tempo</th>
+                                    <th>Aksi Pengecekan Fisik</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($pendingReturns as $item)
+                                    @php
+                                        $late = $item->late ?? \App\Services\LateFeeCalculator::calculate($item);
+                                    @endphp
+                                    <tr>
+                                        <td><span class="font-mono font-bold">{{ $item->booking_code }}</span></td>
+                                        <td class="font-bold">{{ $item->vehicle->name }}</td>
+                                        <td>{{ $item->user->name }} ({{ $item->user->phone }})</td>
+                                        <td>
+                                            @if($late['is_late'])
+                                                <span class="px-2.5 py-1 bg-rose-100 text-rose-800 text-xs font-bold rounded-lg inline-flex items-center gap-1">
+                                                    ⚠️ Terlambat {{ $late['duration_label'] }} (Denda: Rp {{ number_format($late['fine_amount'], 0, ',', '.') }})
+                                                </span>
+                                            @else
+                                                <span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-lg inline-flex items-center gap-1">
+                                                    ✅ Tepat Waktu
+                                                </span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <button type="button" onclick="openInspectModal('{{ $item->id }}', '{{ $item->booking_code }}', '{{ $item->vehicle->name }}', '{{ $late['is_late'] ? $late['fine_amount'] : 0 }}', '{{ $late['duration_label'] }}')" class="btn-action-primary bg-purple-600 hover:bg-purple-700">
+                                                <span>🔍</span> Periksa Fisik Kendaraan
+                                            </button>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <div class="empty-box">Tidak ada unit yang sedang menunggu pengecekan fisik saat ini.</div>
+                @endif
+            </div>
+            @endif
+
+            <!-- ======================================================== -->
+            <!-- 4. MENUNGGU PEMBAYARAN DENDA (STATUS: PENDING_PAYMENT)   -->
+            <!-- ======================================================== -->
+            @if($statusFilter === 'all' || $statusFilter === 'pending_payment')
+            @if(count($pendingPayments) > 0 || $statusFilter === 'pending_payment')
+                <div class="section-card border-l-4 border-l-rose-500">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="section-title text-rose-700 dark:text-rose-400">
+                            <span>💸</span> Menunggu Pelunasan Denda / Reparasi User
+                        </h3>
+                        <span class="text-xs font-bold px-2.5 py-1 bg-rose-100 text-rose-800 rounded-full">
+                            {{ count($pendingPayments) }} Tagihan Belum Lunas
+                        </span>
+                    </div>
+                    @if(count($pendingPayments) > 0)
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Kode Booking</th>
+                                    <th>Kendaraan</th>
+                                    <th>Penyewa</th>
+                                    <th>Rincian Tagihan</th>
+                                    <th>Total Denda</th>
+                                    <th>Status Pembayaran</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($pendingPayments as $item)
+                                    @php
+                                        $totalBill = ($item->fine->total_fine ?? 0) > 0 ? $item->fine->total_fine : ($item->fine_amount + $item->damage_fee);
+                                    @endphp
+                                    <tr>
+                                        <td><span class="font-mono font-bold">{{ $item->booking_code }}</span></td>
+                                        <td class="font-bold">{{ $item->vehicle->name }}</td>
+                                        <td>{{ $item->user->name }} ({{ $item->user->phone }})</td>
+                                        <td class="text-xs">
+                                            @if($item->damage_fee > 0)
+                                                <div class="text-rose-700 font-semibold">Reparasi: Rp {{ number_format($item->damage_fee, 0, ',', '.') }} ({{ $item->damage_note }})</div>
+                                            @endif
+                                            @if($item->fine_amount > 0)
+                                                <div class="text-amber-700 font-semibold">Denda Telat: Rp {{ number_format($item->fine_amount, 0, ',', '.') }}</div>
+                                            @endif
+                                        </td>
+                                        <td class="font-bold text-rose-600">
+                                            Rp {{ number_format($totalBill, 0, ',', '.') }}
+                                        </td>
+                                        <td>
+                                            <span class="px-2.5 py-1 bg-rose-100 text-rose-800 text-xs font-bold rounded-full">
+                                                Menunggu User Bayar
+                                            </span>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    @else
+                        <div class="empty-box">Tidak ada tagihan denda atau reparasi yang menunggu pembayaran.</div>
+                    @endif
+                </div>
+            @endif
+            @endif
+
+            <!-- ======================================================== -->
+            <!-- 5. SEWA SEDANG BERJALAN / AKTIF (STATUS: ACTIVE)         -->
+            <!-- ======================================================== -->
+            @if($statusFilter === 'all' || $statusFilter === 'active')
+            <div class="section-card border-l-4 border-l-emerald-600">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="section-title text-emerald-800 dark:text-emerald-300">
+                        <span>🚗</span> Sewa Aktif / Masa Sewa Berjalan
+                    </h3>
+                    <span class="text-xs font-bold px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-full">
+                        {{ count($activeRentals) }} Unit Digunakan
+                    </span>
+                </div>
+                @if(count($activeRentals) > 0)
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Kode Booking</th>
+                                    <th>Kendaraan</th>
+                                    <th>Penyewa</th>
+                                    <th>Mulai Sewa (Handover)</th>
+                                    <th>Wajib Kembali</th>
+                                    <th>Aksi Cepat</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($activeRentals as $item)
+                                    @php
+                                        $late = $item->late ?? \App\Services\LateFeeCalculator::calculate($item);
+                                    @endphp
+                                    <tr>
+                                        <td><span class="font-mono font-bold">{{ $item->booking_code }}</span></td>
+                                        <td class="font-bold">{{ $item->vehicle->name }}</td>
+                                        <td>{{ $item->user->name }} ({{ $item->user->phone }})</td>
+                                        <td class="text-xs">{{ \Carbon\Carbon::parse($item->rental_start_date)->format('d M Y H:i') }}</td>
+                                        <td class="text-xs font-semibold {{ $late['is_late'] ? 'text-rose-600' : 'text-slate-700' }}">
+                                            {{ \Carbon\Carbon::parse($item->rental_end_date)->format('d M Y H:i') }}
+                                            @if($late['is_late'])
+                                                <span class="block text-[11px] text-rose-600 font-bold">⚠️ Telat {{ $late['duration_label'] }}</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <div class="flex items-center gap-2">
+                                                <button type="button" onclick="openInspectModal('{{ $item->id }}', '{{ $item->booking_code }}', '{{ $item->vehicle->name }}', '{{ $late['is_late'] ? $late['fine_amount'] : 0 }}', '{{ $late['duration_label'] }}')" class="btn-action-primary bg-purple-600 hover:bg-purple-700">
+                                                    <span>🔍</span> Terima & Cek Fisik
+                                                </button>
+                                                @if($item->whatsapp_url)
+                                                    <a href="{{ $item->whatsapp_url }}" target="_blank" class="btn-chat-link bg-emerald-100 text-emerald-800 hover:bg-emerald-200">
+                                                        WhatsApp
+                                                    </a>
+                                                @endif
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <div class="empty-box">Tidak ada sewa yang sedang aktif saat ini.</div>
+                @endif
+            </div>
+            @endif
+
+            <!-- ======================================================== -->
+            <!-- 6. RIWAYAT TRANSAKSI (COMPLETED / CANCELLED / REJECTED)  -->
+            <!-- ======================================================== -->
+            @if($statusFilter === 'all' || in_array($statusFilter, ['completed', 'cancelled', 'rejected']))
             <div class="section-card">
-                    <h3 class="section-title"><span class="icon"></span> Riwayat Transaksi</h3>
-
+                <h3 class="section-title">
+                    <span>📜</span> Riwayat Transaksi Selesai & Dibatalkan
+                </h3>
                 @if(count($history) > 0)
                     <div class="table-wrap">
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Kode</th>
+                                    <th>Kode Booking</th>
                                     <th>Kendaraan</th>
                                     <th>Penyewa</th>
-                                    <th>Durasi</th>
-                                    <th>Total</th>
-                                    <th>Status</th>
+                                    <th>Total Bayar</th>
+                                    <th>Denda/Reparasi</th>
+                                    <th>Status Akhir</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach($history as $item)
                                     <tr>
-                                        <td><span class="booking-code">{{ $item->booking_code ?? 'N/A' }}</span></td>
-                                        <td class="vehicle-name">{{ $item->vehicle->name ?? 'N/A' }}</td>
-                                        <td>{{ $item->user->name ?? 'N/A' }}</td>
-                                        <td>{{ $item->quantity }} hari</td>
-                                        <td style="font-weight: 600; color: #43637E;">Rp {{ number_format($item->subtotal ?? 0, 0, ',', '.') }}</td>
+                                        <td><span class="font-mono text-xs font-bold">{{ $item->booking_code }}</span></td>
+                                        <td>{{ $item->vehicle->name }}</td>
+                                        <td>{{ $item->user->name }}</td>
+                                        <td>Rp {{ number_format($item->total_payment > 0 ? $item->total_payment : $item->subtotal, 0, ',', '.') }}</td>
                                         <td>
-                                            @if($item->status == 'completed')
-                                                <span class="status-badge completed">Selesai</span>
+                                            @if(($item->damage_fee + $item->fine_amount) > 0)
+                                                <span class="text-rose-600 font-bold text-xs">Rp {{ number_format($item->damage_fee + $item->fine_amount, 0, ',', '.') }}</span>
                                             @else
-                                                <span class="status-badge active">{{ ucfirst($item->status ?? 'N/A') }}</span>
+                                                <span class="text-slate-400 text-xs">-</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($item->status === 'completed')
+                                                <span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full">✅ Selesai</span>
+                                            @elseif($item->status === 'rejected')
+                                                <span class="px-2.5 py-1 bg-rose-100 text-rose-800 text-xs font-bold rounded-full" title="Alasan: {{ $item->reject_reason }}">❌ Ditolak</span>
+                                            @else
+                                                <span class="px-2.5 py-1 bg-slate-100 text-slate-700 text-xs font-bold rounded-full">Dibatalkan</span>
                                             @endif
                                         </td>
                                     </tr>
@@ -349,24 +611,230 @@
                             </tbody>
                         </table>
                     </div>
-
-                    <div class="pagination-wrapper">
-                        <div class="info-text">
-                            Menampilkan <strong>{{ $history->firstItem() ?? 0 }}</strong> - <strong>{{ $history->lastItem() ?? 0 }}</strong> dari <strong>{{ $history->total() }}</strong> transaksi
-                        </div>
-                        <div>
-                            {{ $history->links() }}
-                        </div>
+                    <div class="mt-4">
+                        {{ $history->links() }}
                     </div>
-
                 @else
-                    <div class="empty-state">
-                        <span class="icon"></span>
-                        <p>Belum ada transaksi</p>
-                    </div>
+                    <div class="empty-box">Belum ada riwayat transaksi selesai atau yang sesuai pencarian.</div>
                 @endif
             </div>
+            @endif
 
         </div>
     </div>
+
+    <!-- ======================================================== -->
+    <!-- MODAL 1: TOLAK BOOKING                                   -->
+    <!-- ======================================================== -->
+    <div id="modalReject" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800">
+            <h3 class="text-lg font-bold text-rose-700 mb-1 flex items-center gap-2">
+                <span>❌</span> Tolak Booking Kendaraan
+            </h3>
+            <p id="rejectSubtitle" class="text-xs text-slate-500 mb-4"></p>
+
+            <form id="formReject" method="POST" action="">
+                @csrf
+                <div class="mb-4">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">Alasan Penolakan (Wajib Diisi)</label>
+                    <textarea name="reject_reason" rows="3" required placeholder="Contoh: Unit sedang dalam perbaikan mendadak atau alamat pengantaran di luar jangkauan cabang." class="w-full rounded-xl border border-slate-300 dark:border-slate-700 p-3 text-xs bg-slate-50 dark:bg-slate-800"></textarea>
+                </div>
+                <div class="flex justify-end gap-2">
+                    <button type="button" onclick="closeRejectModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200">Batal</button>
+                    <button type="submit" class="px-4 py-2 rounded-xl text-xs font-bold text-white bg-rose-600 hover:bg-rose-700">Konfirmasi Tolak</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- MODAL 2: SERAH TERIMA UNIT & UPLOAD KTP                  -->
+    <!-- ======================================================== -->
+    <div id="modalHandover" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-2xl mb-3 shadow-inner">
+                📸
+            </div>
+            <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-1">
+                Serah Terima Unit & Upload Foto Jaminan (KTP)
+            </h3>
+            <p id="handoverSubtitle" class="text-xs text-slate-500 mb-4"></p>
+
+            <form id="formHandover" method="POST" action="" enctype="multipart/form-data">
+                @csrf
+                <div class="mb-4">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
+                        Upload Foto KTP Pelanggan (Wajib Jaminan)
+                    </label>
+                    <input type="file" name="ktp_image" accept="image/*" required class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 border rounded-xl p-2 bg-slate-50 dark:bg-slate-800">
+                    <span class="text-[11px] text-slate-400 mt-1 block">Format JPG/PNG, maksimal 5MB. Foto KTP disimpan secara aman sebagai jaminan sewa.</span>
+                </div>
+
+                <div class="p-3 mb-4 rounded-xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 text-xs text-blue-800 dark:text-blue-300 leading-relaxed">
+                    ⏱️ <strong>Masa Aktif Mulai:</strong> Detik Anda mengklik tombol di bawah, status sewa berubah menjadi <strong>ACTIVE</strong> dan timer masa sewa pelanggan resmi dimulai dari saat ini.
+                </div>
+
+                <div class="flex justify-end gap-2">
+                    <button type="button" onclick="closeHandoverModal()" class="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200">Tutup</button>
+                    <button type="submit" class="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-lg shadow-emerald-600/30">
+                        🤝 Kendaraan Telah Diserahkan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- MODAL 3: PENGECEKAN FISIK KENDARAAN (AMAN vs RUSAK)      -->
+    <!-- ======================================================== -->
+    <div id="modalInspect" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800">
+            <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-1 flex items-center gap-2">
+                <span>🔍</span> Pengecekan Fisik & Pengembalian Unit
+            </h3>
+            <p id="inspectSubtitle" class="text-xs text-slate-500 mb-4"></p>
+
+            <form id="formInspect" method="POST" action="">
+                @csrf
+
+                <!-- Pilihan Kondisi Fisik -->
+                <div class="mb-4">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2">
+                        Hasil Pengecekan Kondisi Fisik Unit:
+                    </label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <label class="cursor-pointer border-2 rounded-2xl p-3 text-center transition border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/20" id="optSafeLabel">
+                            <input type="radio" name="condition" value="safe" checked class="sr-only" onchange="toggleCondition('safe')">
+                            <div class="text-2xl mb-1">✨</div>
+                            <div class="text-xs font-bold text-emerald-700 dark:text-emerald-400">Opsi A: Unit Aman</div>
+                            <div class="text-[11px] text-slate-500">Mulus & Tanpa Kerusakan</div>
+                        </label>
+                        <label class="cursor-pointer border-2 rounded-2xl p-3 text-center transition border-slate-200 dark:border-slate-700 hover:border-rose-400" id="optDamagedLabel">
+                            <input type="radio" name="condition" value="damaged" class="sr-only" onchange="toggleCondition('damaged')">
+                            <div class="text-2xl mb-1">⚠️</div>
+                            <div class="text-xs font-bold text-rose-600">Opsi B: Unit Rusak</div>
+                            <div class="text-[11px] text-slate-500">Ada Baret / Lecet / Kerusakan</div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Input Kerusakan (Disabled jika Unit Aman) -->
+                <div id="damageFields" class="mb-4 p-3.5 rounded-2xl bg-rose-50/50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900 space-y-3 opacity-50 pointer-events-none transition-all">
+                    <div>
+                        <label class="block text-xs font-bold text-rose-800 dark:text-rose-300 mb-1">Biaya Reparasi / Perbaikan (Rp)</label>
+                        <input type="number" id="inputDamageFee" name="damage_fee" min="0" placeholder="Contoh: 250000" class="w-full rounded-xl border border-rose-300 p-2.5 text-xs bg-white dark:bg-slate-800" disabled>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-rose-800 dark:text-rose-300 mb-1">Keterangan Bagian yang Rusak</label>
+                        <textarea id="inputDamageNote" name="damage_note" rows="2" placeholder="Contoh: Spion kiri retak, baret pada pintu depan kanan." class="w-full rounded-xl border border-rose-300 p-2.5 text-xs bg-white dark:bg-slate-800" disabled></textarea>
+                    </div>
+                    <span class="text-[11px] text-rose-600 block leading-tight">
+                        *Unit yang dilaporkan rusak akan otomatis masuk ke daftar status RUSAK dan tidak dapat disewa sampai diperbaiki.
+                    </span>
+                </div>
+
+                <!-- Info Denda Keterlambatan -->
+                <div id="lateInfoBox" class="p-3 mb-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 text-xs space-y-1">
+                    <div class="flex justify-between items-center text-slate-600 dark:text-slate-400">
+                        <span>Denda Keterlambatan:</span>
+                        <strong id="displayLateFine" class="font-bold text-slate-900 dark:text-white">Rp 0</strong>
+                    </div>
+                    <div id="lateDurationText" class="text-[11px] text-slate-500">Tidak ada keterlambatan.</div>
+                </div>
+
+                <div class="flex justify-end gap-2">
+                    <button type="button" onclick="closeInspectModal()" class="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200">Batal</button>
+                    <button type="submit" class="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-purple-600 hover:bg-purple-700 shadow-lg shadow-purple-600/30">
+                        Selesaikan Pemeriksaan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- JAVASCRIPT MODAL CONTROLS                                -->
+    <!-- ======================================================== -->
+    <script>
+        function openRejectModal(code, vehicle, user) {
+            document.getElementById('rejectSubtitle').innerText = `Booking #${code} • ${vehicle} (${user})`;
+            document.getElementById('formReject').action = `/manager/rentals/${code}/reject`;
+            const m = document.getElementById('modalReject');
+            m.classList.remove('hidden');
+            m.classList.add('flex');
+        }
+        function closeRejectModal() {
+            const m = document.getElementById('modalReject');
+            m.classList.add('hidden');
+            m.classList.remove('flex');
+        }
+
+        function openHandoverModal(id, code, vehicle, user) {
+            document.getElementById('handoverSubtitle').innerText = `Booking #${code} • ${vehicle} (${user})`;
+            document.getElementById('formHandover').action = `/manager/rentals/${id}/handover`;
+            const m = document.getElementById('modalHandover');
+            m.classList.remove('hidden');
+            m.classList.add('flex');
+        }
+        function closeHandoverModal() {
+            const m = document.getElementById('modalHandover');
+            m.classList.add('hidden');
+            m.classList.remove('flex');
+        }
+
+        function openInspectModal(id, code, vehicle, lateFine, lateDuration) {
+            document.getElementById('inspectSubtitle').innerText = `Booking #${code} • ${vehicle}`;
+            document.getElementById('formInspect').action = `/manager/rentals/${id}/inspect`;
+
+            const fineAmount = parseFloat(lateFine) || 0;
+            document.getElementById('displayLateFine').innerText = 'Rp ' + fineAmount.toLocaleString('id-ID');
+            document.getElementById('lateDurationText').innerText = fineAmount > 0 
+                ? `Terlambat ${lateDuration} (dikenakan denda per jam).` 
+                : 'Unit dikembalikan tepat waktu.';
+
+            toggleCondition('safe');
+            const m = document.getElementById('modalInspect');
+            m.classList.remove('hidden');
+            m.classList.add('flex');
+        }
+        function closeInspectModal() {
+            const m = document.getElementById('modalInspect');
+            m.classList.add('hidden');
+            m.classList.remove('flex');
+        }
+
+        function toggleCondition(cond) {
+            const safeLabel = document.getElementById('optSafeLabel');
+            const damagedLabel = document.getElementById('optDamagedLabel');
+            const damageFields = document.getElementById('damageFields');
+            const feeInput = document.getElementById('inputDamageFee');
+            const noteInput = document.getElementById('inputDamageNote');
+
+            if (cond === 'damaged') {
+                damagedLabel.classList.add('border-rose-500', 'bg-rose-50/50', 'dark:bg-rose-950/20');
+                damagedLabel.classList.remove('border-slate-200');
+                safeLabel.classList.remove('border-emerald-500', 'bg-emerald-50/50', 'dark:bg-emerald-950/20');
+                safeLabel.classList.add('border-slate-200');
+
+                damageFields.classList.remove('opacity-50', 'pointer-events-none');
+                feeInput.disabled = false;
+                feeInput.required = true;
+                noteInput.disabled = false;
+                noteInput.required = true;
+            } else {
+                safeLabel.classList.add('border-emerald-500', 'bg-emerald-50/50', 'dark:bg-emerald-950/20');
+                safeLabel.classList.remove('border-slate-200');
+                damagedLabel.classList.remove('border-rose-500', 'bg-rose-50/50', 'dark:bg-rose-950/20');
+                damagedLabel.classList.add('border-slate-200');
+
+                damageFields.classList.add('opacity-50', 'pointer-events-none');
+                feeInput.disabled = true;
+                feeInput.required = false;
+                feeInput.value = '';
+                noteInput.disabled = true;
+                noteInput.required = false;
+                noteInput.value = '';
+            }
+        }
+    </script>
 </x-app-layout>

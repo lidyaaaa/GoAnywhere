@@ -690,8 +690,14 @@
                         <span class="value booking-code">{{ $bookingCode }}</span>
                     </div>
                     <div class="detail-row">
+                        <span class="label">📍 Alamat Pengantaran Unit</span>
+                        <span class="value text-xs font-semibold max-w-[200px] text-right truncate" title="{{ auth()->user()->address }}, {{ auth()->user()->location }}">
+                            {{ auth()->user()->address }}, {{ auth()->user()->location }}
+                        </span>
+                    </div>
+                    <div class="detail-row">
                         <span class="label">📦 Total Item</span>
-                        <span class="value">{{ count($carts) }}</span>
+                        <span class="value">{{ count($carts) }} Unit</span>
                     </div>
                     <div class="detail-row">
                         <span class="label">⏰ Batas Pembayaran</span>
@@ -700,9 +706,20 @@
 
                     <hr class="detail-divider">
 
+                    <div class="detail-row">
+                        <span class="label">Subtotal Sewa</span>
+                        <span class="value font-semibold">Rp {{ number_format($subtotal, 0, ',', '.') }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">🚚 Ongkos Kirim ({{ ($carPendingCount ?? 0) > 0 && ($motorcyclePendingCount ?? 0) > 0 ? 'Mobil + Motor' : (($carPendingCount ?? 0) > 0 ? 'Mobil' : 'Motor') }})</span>
+                        <span class="value font-semibold text-emerald-600 dark:text-emerald-400">+Rp {{ number_format($deliveryFee, 0, ',', '.') }}</span>
+                    </div>
+
+                    <hr class="detail-divider">
+
                     <div class="detail-total">
-                        <span>💰 Total</span>
-                        <span>Rp {{ number_format($total, 0, ',', '.') }}</span>
+                        <span>💰 Total Bayar</span>
+                        <span>Rp {{ number_format($grandTotal, 0, ',', '.') }}</span>
                     </div>
                 </div>
 
@@ -714,6 +731,7 @@
 
                 <form action="{{ route('user.cart.payment') }}" method="POST" id="paymentForm">
                     @csrf
+                    <input type="hidden" name="selected_carts" value="{{ implode(',', $carts->pluck('id')->toArray()) }}">
 
                     <div class="payment-grid">
                         <div class="payment-option">

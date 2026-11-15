@@ -34,13 +34,21 @@ class RegisteredUserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'phone' => ['required', 'string', User::PHONE_REGEX],
+            'location' => ['required', 'in:Jakarta,Bogor,Depok,Tangerang,Bekasi'],
+            'address' => ['required', 'string', 'max:500'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-        ], User::PHONE_MESSAGES);
+        ], array_merge(User::PHONE_MESSAGES, [
+            'location.required' => 'Pilih kota wilayah Anda (Jabodetabek).',
+            'location.in' => 'Kota wilayah harus salah satu dari: Jakarta, Bogor, Depok, Tangerang, Bekasi.',
+            'address.required' => 'Detail alamat lengkap wajib diisi untuk pengantaran unit.',
+        ]));
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,
+            'location' => $request->location,
+            'address' => $request->address,
             'password' => Hash::make($request->password),
         ]);
 

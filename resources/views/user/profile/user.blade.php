@@ -310,10 +310,31 @@
                                     @enderror
                                 </div>
 
-                                <div class="form-group" style="margin-bottom: 0;">
-                                    <label>No. HP</label>
+                                <div class="form-group">
+                                    <label>No. HP / WhatsApp</label>
                                     <input type="text" name="phone" value="{{ old('phone', $user->phone) }}" placeholder="0812-3456-7890">
                                     @error('phone')
+                                        <div class="error-text">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="form-group">
+                                    <label>📍 Kota Wilayah (Jabodetabek)</label>
+                                    <select name="location" class="w-full px-4 py-3 rounded-xl border-[1.5px] border-[#e8e4de] text-[14px] bg-[#faf8f5] text-[#2c3e50] focus:border-[#43637E] focus:bg-white focus:outline-none transition">
+                                        @foreach(['Jakarta', 'Bogor', 'Depok', 'Tangerang', 'Bekasi'] as $city)
+                                            <option value="{{ $city }}" {{ old('location', $user->location) === $city ? 'selected' : '' }}>{{ $city }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('location')
+                                        <div class="error-text">{{ $message }}</div>
+                                    @enderror
+                                    <p class="text-xs text-gray-500 mt-1">Sistem hanya mengizinkan booking kendaraan di kota yang sama dengan domisili Anda.</p>
+                                </div>
+
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label>🏠 Detail Alamat Lengkap</label>
+                                    <textarea name="address" rows="2" placeholder="Nama jalan, RT/RW, No. rumah, Kelurahan/Kecamatan" class="w-full px-4 py-3 rounded-xl border-[1.5px] border-[#e8e4de] text-[14px] bg-[#faf8f5] text-[#2c3e50] focus:border-[#43637E] focus:bg-white focus:outline-none transition">{{ old('address', $user->address) }}</textarea>
+                                    @error('address')
                                         <div class="error-text">{{ $message }}</div>
                                     @enderror
                                 </div>

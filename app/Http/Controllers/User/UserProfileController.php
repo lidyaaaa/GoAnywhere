@@ -24,6 +24,8 @@ class UserProfileController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
             'phone' => ['required', 'string', \App\Models\User::PHONE_REGEX],
+            'location' => 'required|in:Jakarta,Bogor,Depok,Tangerang,Bekasi',
+            'address' => 'required|string|max:500',
             'current_password' => 'nullable|required_with:new_password|current_password',
             'new_password' => 'nullable|min:8|confirmed',
         ], array_merge(\App\Models\User::PHONE_MESSAGES, [
@@ -31,6 +33,9 @@ class UserProfileController extends Controller
             'email.required' => 'Email wajib diisi.',
             'email.email' => 'Format email tidak valid.',
             'email.unique' => 'Email sudah terdaftar.',
+            'location.required' => 'Pilih kota wilayah Anda (Jabodetabek).',
+            'location.in' => 'Kota wilayah harus salah satu dari: Jakarta, Bogor, Depok, Tangerang, Bekasi.',
+            'address.required' => 'Alamat lengkap wajib diisi untuk titik serah terima armada.',
             'current_password.required_with' => 'Password saat ini wajib diisi jika ingin mengubah password baru.',
             'current_password.current_password' => 'Password saat ini tidak sesuai.',
             'new_password.min' => 'Password baru minimal harus 8 karakter.',
@@ -40,6 +45,8 @@ class UserProfileController extends Controller
         $user->name = $request->name;
         $user->email = $request->email;
         $user->phone = $request->phone;
+        $user->location = $request->location;
+        $user->address = $request->address;
 
         if ($request->filled('new_password')) {
             $user->password = Hash::make($request->new_password);

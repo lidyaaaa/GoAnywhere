@@ -78,6 +78,7 @@ class ArmadaController extends Controller
 
         // Ambil status booking/sewa user yang sedang aktif atau menunggu persetujuan (per vehicle)
         // Serta cek kuota jenis kendaraan (1 mobil, 1 motor)
+        // Catatan: status 'pending' (di keranjang) tidak dihitung sebagai sewa aktif
         $userBookedVehicles = [];
         $hasActiveCar = false;
         $hasActiveMotorcycle = false;
@@ -85,13 +86,11 @@ class ArmadaController extends Controller
         if (auth()->check()) {
             $userCarts = Cart::with('vehicle')
                 ->where('user_id', auth()->id())
-                ->whereIn('status', ['pending', 'paid', 'active'])
+                ->whereIn('status', ['paid', 'approved', 'active', 'pending_return', 'pending_payment'])
                 ->get();
 
             foreach ($userCarts as $c) {
-                if (in_array($c->status, ['paid', 'active'])) {
-                    $userBookedVehicles[$c->vehicle_id] = $c->status;
-                }
+                $userBookedVehicles[$c->vehicle_id] = $c->status;
 
                 $type = $c->vehicle?->vehicle_type;
                 if ($type === 'car') {
@@ -128,11 +127,11 @@ class ArmadaController extends Controller
         if (auth()->check()) {
             $userCarts = Cart::with('vehicle')
                 ->where('user_id', auth()->id())
-                ->whereIn('status', ['pending', 'paid', 'active'])
+                ->whereIn('status', ['paid', 'approved', 'active', 'pending_return', 'pending_payment'])
                 ->get();
 
             foreach ($userCarts as $c) {
-                if ($c->vehicle_id == $id && in_array($c->status, ['paid', 'active'])) {
+                if ($c->vehicle_id == $id) {
                     $userActiveRental = $c;
                 }
 

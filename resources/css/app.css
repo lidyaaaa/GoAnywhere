@@ -121,6 +121,17 @@ h1, h2, h3, h4, h5, h6 {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
+.navbar img, 
+.brand-link img,
+.brand-logo {
+    width: 36px !important;
+    height: 36px !important;
+    max-width: 36px !important;
+    max-height: 36px !important;
+    object-fit: contain !important;
+    flex-shrink: 0 !important;
+}
+
 .dark .navbar {
     background: rgba(15, 23, 42, 0.6) !important;
     border: 1px solid rgba(255, 255, 255, 0.08) !important;

@@ -24,8 +24,14 @@ Route::get('/', function () {
     return view('welcome');
 })->middleware('guest');
 
-// DASHBOARD USER
+// DASHBOARD USER & ROLE ROUTER
 Route::get('/dashboard', function () {
+    $role = auth()->user()?->role;
+    if ($role === 'superadmin') {
+        return redirect()->route('superadmin.dashboard');
+    } elseif ($role === 'manager') {
+        return redirect()->route('manager.dashboard');
+    }
     return redirect()->route('user.home');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -33,6 +39,10 @@ Route::get('/dashboard', function () {
 // USER ROUTES
 // =============================================
 Route::middleware(['auth', 'verified', 'role:user'])->prefix('user')->name('user.')->group(function () {
+    Route::get('/', function() {
+        return redirect()->route('user.home');
+    });
+
     // HOME
     Route::get('/home', [HomeController::class, 'index'])->name('home');
     
@@ -87,10 +97,14 @@ Route::middleware(['auth', 'verified', 'role:manager'])->prefix('manager')->name
     Route::get('/vehicles/{id}/edit', [ManagerVehicleController::class, 'edit'])->name('vehicles.edit');
     Route::put('/vehicles/{id}', [ManagerVehicleController::class, 'update'])->name('vehicles.update');
     Route::post('/vehicles/{id}/add-stock', [ManagerVehicleController::class, 'addStock'])->name('vehicles.addStock');
+    Route::post('/vehicles/{id}/repair', [ManagerVehicleController::class, 'repair'])->name('vehicles.repair');
     Route::delete('/vehicles/{id}', [ManagerVehicleController::class, 'destroy'])->name('vehicles.destroy');
     
     Route::get('/rentals', [ManagerRentalController::class, 'index'])->name('rentals');
     Route::post('/rentals/{booking_code}/approve', [ManagerRentalController::class, 'approve'])->name('rentals.approve');
+    Route::post('/rentals/{booking_code}/reject', [ManagerRentalController::class, 'reject'])->name('rentals.reject');
+    Route::post('/rentals/{id}/handover', [ManagerRentalController::class, 'handover'])->name('rentals.handover');
+    Route::post('/rentals/{id}/inspect', [ManagerRentalController::class, 'inspectReturn'])->name('rentals.inspect');
     Route::post('/rentals/{id}/complete', [ManagerRentalController::class, 'complete'])->name('rentals.complete');
     Route::post('/rentals/{id}/flag', [ManagerRentalController::class, 'flag'])->name('rentals.flag');
 

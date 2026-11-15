@@ -149,14 +149,14 @@
                 @endif
 
             @else
-                <div class="chat-card text-center py-16 px-6">
-                    <div class="w-20 h-20 mx-auto rounded-full bg-slate-100 dark:bg-gray-800 flex items-center justify-center text-slate-400 mb-4">
-                        <svg class="w-10 h-10 text-[#43637E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="chat-card text-center py-16 px-6 bg-white border border-slate-200 rounded-2xl shadow-sm">
+                    <div class="mx-auto rounded-full bg-blue-50 flex items-center justify-center text-slate-400 mb-4" style="width: 72px; height: 72px; max-width: 72px; max-height: 72px;">
+                        <svg class="text-[#004B87]" style="width: 36px; height: 36px; max-width: 36px; max-height: 36px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                         </svg>
                     </div>
-                    <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-2 font-serif">Belum Ada Pesan Masuk</h3>
-                    <p class="text-gray-500 dark:text-gray-400 text-sm max-w-md mx-auto">
+                    <h3 class="text-lg font-bold text-slate-800 mb-2">Belum Ada Pesan Masuk</h3>
+                    <p class="text-slate-500 text-sm max-w-md mx-auto">
                         Ketika user/customer menghubungi Anda mengenai armada atau transaksi sewa, obrolan mereka akan muncul di sini secara otomatis.
                     </p>
                 </div>
