@@ -20,9 +20,25 @@ use App\Http\Controllers\SuperAdmin\VehicleController as SuperAdminVehicleContro
 use App\Http\Controllers\SuperAdmin\RentalController as SuperAdminRentalController;
 
 // HOME
-Route::get('/', function () {
-    return view('welcome');
-})->middleware('guest');
+Route::get('/', function (Illuminate\Http\Request $request) {
+    $typeFilter = $request->query('type', 'all');
+    $locationFilter = $request->query('location', 'all');
+
+    $query = \App\Models\Vehicle::query()->where('available_stock', '>', 0);
+
+    if ($typeFilter !== 'all' && !empty($typeFilter)) {
+        $query->where('vehicle_type', $typeFilter);
+    }
+
+    if ($locationFilter !== 'all' && !empty($locationFilter)) {
+        $query->where('location', $locationFilter);
+    }
+
+    $vehicles = $query->orderBy('created_at', 'desc')->get();
+    $locations = ['Jakarta', 'Bogor', 'Depok', 'Tangerang', 'Bekasi'];
+
+    return view('welcome', compact('vehicles', 'locations', 'typeFilter', 'locationFilter'));
+});
 
 // DASHBOARD USER & ROLE ROUTER
 Route::get('/dashboard', function () {
