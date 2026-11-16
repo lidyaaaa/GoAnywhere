@@ -508,13 +508,6 @@
                                         @endif
                                     </div>
 
-                                    <div class="item-subtotal">
-                                        Subtotal: Rp {{ number_format($cart->subtotal, 0, ',', '.') }}
-                                        <span class="text-xs font-normal text-slate-500">
-                                            ({{ $cart->period === 'weekly' ? 'Paket 7 Hari' : $cart->quantity_days . ' Hari' }})
-                                        </span>
-                                    </div>
-
                                     <div class="item-stock {{ $stockOk ? 'available' : 'unavailable' }}">
                                         @if($stockOk)
                                             ✓ Stok tersedia ({{ $cart->available_stock }} unit)
@@ -530,26 +523,8 @@
                                     @endif
                                 </div>
 
-                                <!-- Controls: Update & Delete -->
-                                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                                    <div class="cart-controls-box">
-                                        <div class="cart-ctrl-group">
-                                            <label>Periode</label>
-                                            <select name="period" form="update_form_{{ $cart->id }}" onchange="toggleDays(this)">
-                                                <option value="daily" {{ $cart->period == 'daily' ? 'selected' : '' }}>Per Hari</option>
-                                                <option value="weekly" {{ $cart->period == 'weekly' ? 'selected' : '' }}>Per Minggu</option>
-                                            </select>
-                                        </div>
-
-                                        <div class="cart-ctrl-group">
-                                            <label>Hari</label>
-                                            <input type="number" form="update_form_{{ $cart->id }}" name="quantity_days" id="quantity_days_{{ $cart->id }}" value="{{ $cart->quantity_days ?? 1 }}" min="1" max="7">
-                                        </div>
-
-                                        <button type="submit" form="update_form_{{ $cart->id }}" class="btn-cart-update">Update</button>
-                                    </div>
-
-                                    <!-- Hapus Button Form -->
+                                <!-- Action: Hapus Saja (Durasi diatur saat Checkout) -->
+                                <div style="display: flex; align-items: center; gap: 10px;">
                                     <button type="submit" form="delete_form_{{ $cart->id }}" class="btn-cart-delete" title="Hapus dari keranjang">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -565,41 +540,26 @@
                     <!-- SUMMARY CARD -->
                     <div class="summary-card">
                         <h3 class="summary-title flex items-center justify-between">
-                            <span>📋 Ringkasan Pembayaran</span>
+                            <span>📋 Ringkasan Pilihan</span>
                             <span id="selectedCountBadge" class="text-xs font-bold px-3 py-1 bg-[#004B87]/10 text-[#004B87] dark:text-sky-300 rounded-full">
                                 0 Unit Dipilih
                             </span>
                         </h3>
 
-                        <div class="summary-row">
-                            <span>Subtotal Sewa Armada:</span>
-                            <span id="subtotalDisplay" class="font-bold text-slate-800 dark:text-slate-100">Rp 0</span>
-                        </div>
-
-                        <div class="summary-row">
-                            <span>Ongkir Pengantaran:</span>
-                            <span id="deliveryDisplay" class="font-bold text-slate-800 dark:text-slate-100">Rp 0</span>
-                        </div>
-
-                        <div class="summary-total">
-                            <span>Total Pembayaran:</span>
-                            <span id="grandTotalDisplay" class="text-xl font-bold text-[#004B87] dark:text-sky-300">Rp 0</span>
-                        </div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mb-3 leading-relaxed">
+                            Pilih kendaraan yang ingin Anda sewa. Pengaturan durasi hari sewa, pemilihan paket harian/mingguan, dan metode pembayaran akan dilakukan di <strong>Halaman Checkout</strong>.
+                        </p>
 
                         <div id="selectionWarning" class="hidden mt-3 p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-medium"></div>
 
                         <button type="submit" id="checkoutBtn" class="btn-checkout">
-                            Lanjut ke Pembayaran →
+                            Lanjut ke Checkout →
                         </button>
                     </div>
                 </form>
 
-                {{-- Hidden forms for updates and deletes --}}
+                {{-- Hidden forms for deletes --}}
                 @foreach($carts as $cart)
-                    <form id="update_form_{{ $cart->id }}" action="{{ route('user.cart.update', $cart->id) }}" method="POST" style="display: none;">
-                        @csrf
-                        @method('PUT')
-                    </form>
                     <form id="delete_form_{{ $cart->id }}" action="{{ route('user.cart.remove', $cart->id) }}" method="POST" onsubmit="return confirm('Hapus item ini dari keranjang?')" style="display: none;">
                         @csrf
                         @method('DELETE')
@@ -621,31 +581,6 @@
     </div>
 
     <script>
-    function toggleDays(select) {
-        var form = select.closest('.cart-controls-box');
-        var daysInput = form.querySelector('input[name="quantity_days"]');
-        
-        if (select.value === 'weekly') {
-            daysInput.value = 7;
-            daysInput.max = 7;
-            daysInput.readOnly = true;
-            daysInput.style.background = '#f1f5f9';
-            daysInput.style.opacity = '0.7';
-        } else {
-            daysInput.max = 7;
-            daysInput.readOnly = false;
-            daysInput.style.background = '';
-            daysInput.style.opacity = '1';
-            if (parseInt(daysInput.value) < 1 || isNaN(parseInt(daysInput.value))) {
-                daysInput.value = 1;
-            }
-        }
-    }
-
-    function formatRupiah(number) {
-        return 'Rp ' + new Intl.NumberFormat('id-ID').format(number);
-    }
-
     function handleCartCheckboxChange(currentCheckbox) {
         const checkboxes = document.querySelectorAll('.cart-checkbox:checked');
         let carCount = 0;
@@ -675,35 +610,18 @@
     function recalculateCartSummary() {
         const checkboxes = document.querySelectorAll('.cart-checkbox:checked');
         let selectedCount = 0;
-        let subtotal = 0;
-        let hasCar = false;
-        let hasMotor = false;
 
         // Reset visual card selection
         document.querySelectorAll('.cart-card').forEach(card => card.classList.remove('selected'));
 
         checkboxes.forEach(cb => {
             selectedCount++;
-            subtotal += parseFloat(cb.dataset.subtotal) || 0;
-            if (cb.dataset.type === 'car') hasCar = true;
-            if (cb.dataset.type === 'motorcycle') hasMotor = true;
-
             const card = document.getElementById('cart_card_' + cb.dataset.id);
             if (card) card.classList.add('selected');
         });
 
-        // Hitung ongkir
-        let deliveryFee = 0;
-        if (hasMotor) deliveryFee += 25000;
-        if (hasCar) deliveryFee += 50000;
-
-        const grandTotal = subtotal + deliveryFee;
-
         // Update DOM
         document.getElementById('selectedCountBadge').textContent = selectedCount + ' Unit Dipilih';
-        document.getElementById('subtotalDisplay').textContent = formatRupiah(subtotal);
-        document.getElementById('deliveryDisplay').textContent = formatRupiah(deliveryFee) + (deliveryFee > 0 ? (hasCar && hasMotor ? ' (Mobil 50rb + Motor 25rb)' : (hasCar ? ' (Mobil)' : ' (Motor)')) : '');
-        document.getElementById('grandTotalDisplay').textContent = formatRupiah(grandTotal);
 
         const checkoutBtn = document.getElementById('checkoutBtn');
         const warning = document.getElementById('selectionWarning');
@@ -717,15 +635,12 @@
         } else {
             checkoutBtn.disabled = false;
             checkoutBtn.classList.remove('disabled');
-            checkoutBtn.textContent = 'Lanjut ke Pembayaran (' + selectedCount + ' Unit) →';
+            checkoutBtn.textContent = 'Lanjut ke Checkout (' + selectedCount + ' Unit) →';
             warning.classList.add('hidden');
         }
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('select[name="period"]').forEach(function(select) {
-            toggleDays(select);
-        });
         recalculateCartSummary();
     });
     </script>

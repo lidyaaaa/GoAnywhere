@@ -9,9 +9,6 @@
     <!-- STYLE ELEGAN - #43637E + SHADOW HITAM TEBEL -->
     <!-- ============================================ -->
     <style>
-        * {
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
 
         .checkout-section {
             padding: 40px 0 60px;
@@ -121,9 +118,9 @@
         .item-card {
             display: flex;
             gap: 16px;
-            padding: 14px 0;
+            padding: 16px 0;
             border-bottom: 1px solid #f0ede8;
-            align-items: center;
+            align-items: flex-start;
             transition: all 0.3s ease;
         }
 
@@ -134,7 +131,7 @@
         .item-card:hover {
             background: rgba(67, 99, 126, 0.03);
             margin: 0 -8px;
-            padding: 14px 8px;
+            padding: 16px 8px;
             border-radius: 12px;
         }
 
@@ -195,6 +192,161 @@
             flex-wrap: wrap;
         }
 
+        /* Duration Segmented Pills & Stepper */
+        .checkout-duration-box {
+            margin-top: 12px;
+            padding: 12px 14px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .dark .checkout-duration-box {
+            background: #0f1a24;
+            border-color: #2c3e50;
+        }
+
+        .checkout-ctrl-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .checkout-ctrl-group .ctrl-label {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #64748B;
+            letter-spacing: 0.5px;
+        }
+
+        /* Pill Radio Group for Package */
+        .package-pills {
+            display: inline-flex;
+            gap: 6px;
+            background: #e2e8f0;
+            padding: 4px;
+            border-radius: 10px;
+        }
+
+        .dark .package-pills {
+            background: #1e293b;
+        }
+
+        .package-pill-btn {
+            position: relative;
+        }
+
+        .package-pill-btn input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .package-pill-btn label {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 14px;
+            font-size: 12.5px;
+            font-weight: 600;
+            border-radius: 8px;
+            color: #475569;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s ease;
+        }
+
+        .dark .package-pill-btn label {
+            color: #94a3b8;
+        }
+
+        .package-pill-btn input[type="radio"]:checked + label {
+            background: #004B87;
+            color: #ffffff;
+            box-shadow: 0 2px 6px rgba(0, 75, 135, 0.25);
+        }
+
+        .package-pill-btn label:hover {
+            color: #002D55;
+        }
+
+        .dark .package-pill-btn label:hover {
+            color: #f8fafc;
+        }
+
+        /* Number Stepper (+ / -) */
+        .stepper-box {
+            display: inline-flex;
+            align-items: center;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 10px;
+            background: #ffffff;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        }
+
+        .dark .stepper-box {
+            background: #1e293b;
+            border-color: #334155;
+        }
+
+        .stepper-btn {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            background: #f1f5f9;
+            color: #002D55;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+
+        .dark .stepper-btn {
+            background: #0f172a;
+            color: #f8fafc;
+        }
+
+        .stepper-btn:hover {
+            background: #e2e8f0;
+            color: #004B87;
+        }
+
+        .dark .stepper-btn:hover {
+            background: #334155;
+        }
+
+        .stepper-input {
+            width: 44px;
+            height: 32px;
+            text-align: center;
+            border: none;
+            font-size: 13.5px;
+            font-weight: 700;
+            color: #002D55;
+            background: transparent;
+            outline: none;
+            -moz-appearance: textfield;
+        }
+
+        .stepper-input::-webkit-outer-spin-button,
+        .stepper-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .dark .stepper-input {
+            color: #f8fafc;
+        }
+
         .item-card .item-detail .meta .badge-weekly {
             background: rgba(67, 99, 126, 0.12);
             color: #43637E;
@@ -211,7 +363,7 @@
             color: #43637E;
             font-size: 16px;
             font-family: 'Georgia', serif;
-            margin-top: 4px;
+            margin-top: 8px;
         }
 
         /* ===== DETAIL ORDER ===== */
@@ -657,7 +809,16 @@
                      </h4>
 
                     @foreach($carts as $cart)
-                        <div class="item-card">
+                        @php
+                            $dailyPrice = (float) $cart->vehicle->price_per_day;
+                            $weeklyPrice = (float) ($cart->vehicle->price_per_week > 0 ? $cart->vehicle->price_per_week : ($dailyPrice * 7));
+                            $currentPeriod = $cart->period ?: 'daily';
+                            $currentDays = $cart->quantity_days ?: 1;
+                        @endphp
+                        <div class="item-card" id="item_card_{{ $cart->id }}"
+                             data-id="{{ $cart->id }}"
+                             data-price-day="{{ $dailyPrice }}"
+                             data-price-week="{{ $weeklyPrice }}">
                             <div class="item-image">
                                 @if($cart->vehicle->image)
                                     <img src="{{ asset('storage/' . $cart->vehicle->image) }}" alt="{{ $cart->vehicle->name }}">
@@ -668,12 +829,67 @@
                             <div class="item-detail">
                                 <div class="name">{{ $cart->vehicle->name }}</div>
                                 <div class="meta">
-                                    📅 {{ $cart->quantity }} hari
-                                    @if($cart->period == 'weekly')
-                                        <span class="badge-weekly">📆 Mingguan</span>
+                                    <span>📍 {{ $cart->vehicle->location }}</span>
+                                    <span>&bull;</span>
+                                    <span>Rp {{ number_format($dailyPrice, 0, ',', '.') }}/hari</span>
+                                    @if($cart->vehicle->price_per_week > 0)
+                                        <span class="text-xs text-emerald-600 font-semibold">(Paket 7 Hari: Rp {{ number_format($cart->vehicle->price_per_week, 0, ',', '.') }})</span>
                                     @endif
                                 </div>
-                                <div class="price">Rp {{ number_format($cart->subtotal, 0, ',', '.') }}</div>
+
+                                <!-- Input Pengaturan Durasi Sewa: Segmented Button & Stepper -->
+                                <div class="checkout-duration-box">
+                                    <div class="checkout-ctrl-group">
+                                        <span class="ctrl-label">Pilihan Paket</span>
+                                        <div class="package-pills">
+                                            <div class="package-pill-btn">
+                                                <input type="radio" 
+                                                       name="durations[{{ $cart->id }}][period]" 
+                                                       value="daily" 
+                                                       id="period_daily_{{ $cart->id }}"
+                                                       form="paymentForm"
+                                                       {{ $currentPeriod === 'daily' ? 'checked' : '' }}
+                                                       onchange="onPackageSelect('{{ $cart->id }}', 'daily')">
+                                                <label for="period_daily_{{ $cart->id }}">
+                                                    <span>☀️</span> Harian
+                                                </label>
+                                            </div>
+                                            <div class="package-pill-btn">
+                                                <input type="radio" 
+                                                       name="durations[{{ $cart->id }}][period]" 
+                                                       value="weekly" 
+                                                       id="period_weekly_{{ $cart->id }}"
+                                                       form="paymentForm"
+                                                       {{ $currentPeriod === 'weekly' ? 'checked' : '' }}
+                                                       onchange="onPackageSelect('{{ $cart->id }}', 'weekly')">
+                                                <label for="period_weekly_{{ $cart->id }}">
+                                                    <span>🎁</span> Mingguan (7 Hari)
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="checkout-ctrl-group" id="days_group_{{ $cart->id }}" style="{{ $currentPeriod === 'weekly' ? 'display:none;' : '' }}">
+                                        <span class="ctrl-label">Durasi Hari (1 - 5 Hari)</span>
+                                        <div class="stepper-box">
+                                            <button type="button" class="stepper-btn" onclick="stepDays('{{ $cart->id }}', -1)">−</button>
+                                            <input type="number" 
+                                                   name="durations[{{ $cart->id }}][days]" 
+                                                   form="paymentForm"
+                                                   id="days_{{ $cart->id }}"
+                                                   class="stepper-input"
+                                                   value="{{ min(5, max(1, $currentDays)) }}" 
+                                                   min="1" 
+                                                   max="5"
+                                                   readonly>
+                                            <button type="button" class="stepper-btn" onclick="stepDays('{{ $cart->id }}', 1)">+</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="price" id="subtotal_text_{{ $cart->id }}">
+                                    Subtotal: Rp {{ number_format($cart->subtotal, 0, ',', '.') }}
+                                </div>
                             </div>
                         </div>
                     @endforeach
@@ -708,7 +924,7 @@
 
                     <div class="detail-row">
                         <span class="label">Subtotal Sewa</span>
-                        <span class="value font-semibold">Rp {{ number_format($subtotal, 0, ',', '.') }}</span>
+                        <span class="value font-semibold" id="checkoutSubtotalDisplay">Rp {{ number_format($subtotal, 0, ',', '.') }}</span>
                     </div>
                     <div class="detail-row">
                         <span class="label">🚚 Ongkos Kirim ({{ ($carPendingCount ?? 0) > 0 && ($motorcyclePendingCount ?? 0) > 0 ? 'Mobil + Motor' : (($carPendingCount ?? 0) > 0 ? 'Mobil' : 'Motor') }})</span>
@@ -719,7 +935,7 @@
 
                     <div class="detail-total">
                         <span>💰 Total Bayar</span>
-                        <span>Rp {{ number_format($grandTotal, 0, ',', '.') }}</span>
+                        <span id="checkoutGrandTotalDisplay">Rp {{ number_format($grandTotal, 0, ',', '.') }}</span>
                     </div>
                 </div>
 
@@ -801,14 +1017,107 @@
     </div>
 
     <!-- ============================================ -->
-    <!-- VALIDASI JS                                  -->
+    <!-- VALIDASI & INTERAKSI JS                      -->
     <!-- ============================================ -->
     <script>
+        const fixedDeliveryFee = {{ (float) $deliveryFee }};
+
+        function formatRupiah(number) {
+            return 'Rp ' + new Intl.NumberFormat('id-ID').format(number);
+        }
+
+        function onPackageSelect(cartId, period) {
+            const daysGroup = document.getElementById('days_group_' + cartId);
+            const daysInput = document.getElementById('days_' + cartId);
+            const card = document.getElementById('item_card_' + cartId);
+            const subtotalText = document.getElementById('subtotal_text_' + cartId);
+
+            if (!card || !daysInput) return;
+
+            const dailyPrice = parseFloat(card.dataset.priceDay) || 0;
+            const weeklyPrice = parseFloat(card.dataset.priceWeek) || 0;
+
+            let itemSubtotal = 0;
+            if (period === 'weekly') {
+                if (daysGroup) daysGroup.style.display = 'none';
+                daysInput.value = 7;
+                itemSubtotal = weeklyPrice;
+            } else {
+                if (daysGroup) daysGroup.style.display = 'flex';
+                let days = parseInt(daysInput.value) || 1;
+                if (days < 1) days = 1;
+                if (days > 5) days = 5;
+                daysInput.value = days;
+                itemSubtotal = dailyPrice * days;
+            }
+
+            card.dataset.itemSubtotal = itemSubtotal;
+            if (subtotalText) {
+                subtotalText.textContent = 'Subtotal: ' + formatRupiah(itemSubtotal);
+            }
+
+            recalculateAllCheckoutTotals();
+        }
+
+        function stepDays(cartId, delta) {
+            const daysInput = document.getElementById('days_' + cartId);
+            const card = document.getElementById('item_card_' + cartId);
+            const subtotalText = document.getElementById('subtotal_text_' + cartId);
+
+            if (!daysInput || !card) return;
+
+            let current = parseInt(daysInput.value) || 1;
+            let next = current + delta;
+            if (next < 1) next = 1;
+            if (next > 5) next = 5;
+
+            daysInput.value = next;
+
+            const dailyPrice = parseFloat(card.dataset.priceDay) || 0;
+            const itemSubtotal = dailyPrice * next;
+
+            card.dataset.itemSubtotal = itemSubtotal;
+            if (subtotalText) {
+                subtotalText.textContent = 'Subtotal: ' + formatRupiah(itemSubtotal);
+            }
+
+            recalculateAllCheckoutTotals();
+        }
+
+        function recalculateAllCheckoutTotals() {
+            let totalSubtotal = 0;
+            document.querySelectorAll('.item-card').forEach(function(card) {
+                const subtotal = parseFloat(card.dataset.itemSubtotal);
+                if (!isNaN(subtotal)) {
+                    totalSubtotal += subtotal;
+                }
+            });
+
+            const grandTotal = totalSubtotal + fixedDeliveryFee;
+
+            const subtotalEl = document.getElementById('checkoutSubtotalDisplay');
+            const grandTotalEl = document.getElementById('checkoutGrandTotalDisplay');
+
+            if (subtotalEl) subtotalEl.textContent = formatRupiah(totalSubtotal);
+            if (grandTotalEl) grandTotalEl.textContent = formatRupiah(grandTotal);
+        }
+
+        // Initialize durations on load
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.item-card').forEach(function(card) {
+                const cartId = card.dataset.id;
+                if (cartId) {
+                    const checkedRadio = document.querySelector('input[name="durations[' + cartId + '][period]"]:checked');
+                    const period = checkedRadio ? checkedRadio.value : 'daily';
+                    onPackageSelect(cartId, period);
+                }
+            });
+        });
+
         // Enable pay button when payment method is selected
         document.querySelectorAll('input[name="payment_method"]').forEach(function(radio) {
             radio.addEventListener('change', function() {
                 document.getElementById('btnPay').disabled = false;
-                // Add a subtle animation to the button
                 const btn = document.getElementById('btnPay');
                 btn.style.transform = 'scale(1.02)';
                 setTimeout(() => { btn.style.transform = 'scale(1)'; }, 200);

@@ -41,7 +41,7 @@ class CartController extends Controller
         $request->validate([
             'vehicle_id' => 'required|exists:vehicles,id',
             'package_type' => 'nullable|in:daily,weekly',
-            'quantity_days' => 'nullable|integer|min:1|max:7',
+            'quantity_days' => 'nullable|integer|min:1|max:5',
         ]);
 
         $user = auth()->user();
@@ -116,7 +116,7 @@ class CartController extends Controller
 
         $request->validate([
             'period' => 'required|in:daily,weekly',
-            'quantity_days' => 'nullable|integer|min:1|max:7',
+            'quantity_days' => 'nullable|integer|min:1|max:5',
         ]);
 
         $vehicle = Vehicle::find($cart->vehicle_id);
@@ -131,7 +131,7 @@ class CartController extends Controller
             $totalDays = 7;
             $subtotal = $vehicle->price_per_week > 0 ? $vehicle->price_per_week : ($vehicle->price_per_day * 7);
         } else {
-            $quantityDays = min(7, max(1, (int) $request->quantity_days));
+            $quantityDays = min(5, max(1, (int) $request->quantity_days));
             $totalDays = $quantityDays;
             $subtotal = $vehicle->price_per_day * $totalDays;
         }
@@ -192,7 +192,7 @@ class CartController extends Controller
         session(['checkout_selected_carts' => $carts->pluck('id')->toArray()]);
 
         if ($carts->isEmpty()) {
-            return redirect()->route('user.cart')->with('error', 'Keranjang kosong!');
+            return redirect()->route('user.cart')->with('error', 'Keranjang kosong! Silakan pilih kendaraan terlebih dahulu.');
         }
 
         // Cek kelengkapan profil
@@ -267,6 +267,9 @@ class CartController extends Controller
         $request->validate([
             'payment_method' => 'required|in:qris,bank_transfer,gopay,dana,ovo',
             'selected_carts' => 'nullable|string',
+            'durations' => 'nullable|array',
+            'durations.*.period' => 'nullable|in:daily,weekly',
+            'durations.*.days' => 'nullable|integer|min:1|max:5',
         ]);
 
         $user = auth()->user();
@@ -293,9 +296,8 @@ class CartController extends Controller
             return redirect()->route('user.cart')->with('error', 'Keranjang kosong!');
         }
 
-        // Cek stok kendaraan
-        $carCount = 0;
-        $motorCount = 0;
+        // UPDATE DURASI & SUBTOTAL CART DARI INPUT HALAMAN CHECKOUT
+        $durations = $request->input('durations', []);
         foreach ($carts as $cart) {
             $vehicle = $cart->vehicle;
             if (!$vehicle || $vehicle->available_stock < 1) {
@@ -304,6 +306,33 @@ class CartController extends Controller
             if ($user->location !== $vehicle->location) {
                 return redirect()->route('user.cart')->with('error', "Anda berada di {$user->location}. Silakan ganti lokasi Anda ke {$vehicle->location} di menu profil terlebih dahulu.");
             }
+
+            // Jika ada durasi yang diset di halaman checkout, perbarui cart
+            if (isset($durations[$cart->id])) {
+                $itemPeriod = $durations[$cart->id]['period'] ?? 'daily';
+                if ($itemPeriod === 'weekly') {
+                    $itemDays = 7;
+                    $itemSubtotal = $vehicle->price_per_week > 0 ? $vehicle->price_per_week : ($vehicle->price_per_day * 7);
+                } else {
+                    $itemDays = min(5, max(1, (int) ($durations[$cart->id]['days'] ?? 1)));
+                    $itemSubtotal = $vehicle->price_per_day * $itemDays;
+                }
+
+                $cart->period = $itemPeriod;
+                $cart->package_type = $itemPeriod;
+                $cart->quantity_days = $itemDays;
+                $cart->quantity = $itemDays;
+                $cart->subtotal = $itemSubtotal;
+                $cart->rental_end_date = \Carbon\Carbon::parse($cart->rental_start_date)->addDays($itemDays);
+                $cart->save();
+            }
+        }
+
+        // Cek stok kendaraan & hitung ulang
+        $carCount = 0;
+        $motorCount = 0;
+        foreach ($carts as $cart) {
+            $vehicle = $cart->vehicle;
             if ($vehicle->vehicle_type === 'car') $carCount++;
             if ($vehicle->vehicle_type === 'motorcycle') $motorCount++;
         }
@@ -393,16 +422,26 @@ class CartController extends Controller
 
     public function success($booking_code)
     {
+        // Cari cart berdasarkan booking_code awal (atau prefix base booking_code jika multi-item)
+        $baseCode = explode('-', $booking_code)[0] . '-' . (explode('-', $booking_code)[1] ?? '');
+
         $carts = Cart::where('user_id', auth()->id())
-            ->where('booking_code', $booking_code)
+            ->where(function($q) use ($booking_code, $baseCode) {
+                $q->where('booking_code', $booking_code)
+                  ->orWhere('booking_code', 'like', $baseCode . '%');
+            })
             ->where('status', 'paid')
+            ->with(['vehicle', 'payment'])
             ->get();
 
         if ($carts->isEmpty()) {
             return redirect()->route('user.cart')->with('error', 'Transaksi tidak ditemukan!');
         }
 
-        $total = $carts->sum('subtotal');
+        $total = $carts->sum('total_payment');
+        if ($total == 0) {
+            $total = $carts->sum('subtotal') + $carts->sum('delivery_fee');
+        }
         $pickupLocation = $carts->first()->pickup_location ?? 'SMKN 21 Jakarta';
 
         return view('user.cart.success', compact('carts', 'total', 'booking_code', 'pickupLocation'));

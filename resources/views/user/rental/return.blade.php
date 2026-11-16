@@ -1,5 +1,5 @@
 @php
-    use App\Http\Controllers\User\RentalController as RC;
+    use App\Services\LateFeeCalculator as Fee;
     $isLate = $late['is_late'];
     $fmt = fn ($date) => $date->translatedFormat('d M Y, H:i');
     $buttonLabel = $isLate ? 'Selesaikan & Bayar Denda' : 'Konfirmasi Pengembalian';
@@ -70,8 +70,8 @@
                                 <div class="flex justify-between py-3">
                                     <dt class="text-slate-600 dark:text-slate-300">Tarif denda</dt>
                                     <dd class="text-right font-semibold text-slate-900 dark:text-white">
-                                        {{ RC::rupiah($late['fine_per_hour']) }}/jam
-                                        <span class="block text-xs font-normal text-slate-500">≈ {{ RC::rupiah($late['fine_per_day']) }}/hari</span>
+                                        {{ Fee::rupiah($late['fine_per_hour']) }}/jam
+                                        <span class="block text-xs font-normal text-slate-500">≈ {{ Fee::rupiah($late['fine_per_day']) }}/hari</span>
                                     </dd>
                                 </div>
                                 <div class="flex justify-between py-3">
@@ -80,7 +80,7 @@
                                 </div>
                                 <div class="flex justify-between items-center py-4">
                                     <dt class="font-semibold text-slate-800 dark:text-slate-100">Total denda</dt>
-                                    <dd class="text-xl sm:text-2xl font-bold text-red-600 dark:text-red-400">{{ RC::rupiah($late['fine_amount']) }}</dd>
+                                    <dd class="text-xl sm:text-2xl font-bold text-red-600 dark:text-red-400">{{ Fee::rupiah($late['fine_amount']) }}</dd>
                                 </div>
                             </dl>
 
@@ -122,7 +122,7 @@
                     @endif
                     <div class="flex justify-between border-t border-slate-200 dark:border-slate-700 pt-3 mt-3">
                         <dt class="font-semibold text-slate-800 dark:text-slate-100">Total denda</dt>
-                        <dd class="font-bold {{ $isLate ? 'text-red-600' : 'text-emerald-600' }}">{{ RC::rupiah($late['fine_amount']) }}</dd>
+                        <dd class="font-bold {{ $isLate ? 'text-red-600' : 'text-emerald-600' }}">{{ Fee::rupiah($late['fine_amount']) }}</dd>
                     </div>
                 </dl>
 

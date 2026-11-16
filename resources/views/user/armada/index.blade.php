@@ -3,9 +3,6 @@
     <!-- STYLE ELEGAN - #43637E + SHADOW HITAM TEBEL -->
     <!-- ============================================ -->
     <style>
-        * {
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
 
         .armada-section {
             padding: 40px 0 60px;

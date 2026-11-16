@@ -6,9 +6,6 @@
     </x-slot>
 
     <style>
-        * {
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
 
         .manager-section {
             padding: 40px 0 60px;
@@ -488,10 +485,163 @@
                 @endif
             </div>
 
-            <!-- ===== RIWAYAT TRANSAKSI ===== -->
+            <!-- ===== LAPORAN PEMASUKAN BULANAN CABANG MANAGER ===== -->
+            <div class="section-card border-l-4 border-l-[#004B87]">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
+                    <div>
+                        <h3 class="section-title mb-0">
+                            <span>📅</span> Laporan Pemasukan Bulanan — Cabang {{ Auth::user()->location }}
+                        </h3>
+                        <p class="text-xs text-slate-500 mt-0.5">Pilih bulan untuk melihat total pemasukan dan rincian kendaraan cabang Anda yang disewa.</p>
+                    </div>
+
+                    {{-- Form Pilih Bulan --}}
+                    <form action="{{ route('manager.dashboard') }}" method="GET" class="flex items-center gap-2">
+                        <label for="selectMonthManager" class="text-xs font-bold text-slate-600 uppercase tracking-wider">Pilih Bulan:</label>
+                        <select name="month" id="selectMonthManager" onchange="this.form.submit()" class="py-2 px-3.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-bold text-[#004B87] dark:text-blue-300 focus:ring-2 focus:ring-[#004B87] focus:outline-none shadow-sm">
+                            @forelse($availableMonths as $monthOpt)
+                                <option value="{{ $monthOpt->month_key }}" {{ $selectedMonth === $monthOpt->month_key ? 'selected' : '' }}>
+                                    🗓️ {{ $monthOpt->month_name }}
+                                </option>
+                            @empty
+                                <option value="{{ now()->format('Y-m') }}">🗓️ {{ now()->translatedFormat('F Y') }}</option>
+                            @endforelse
+                        </select>
+                    </form>
+                </div>
+
+                {{-- Banner Ringkasan Bulan Terpilih --}}
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-5">
+                    <div class="p-4 rounded-2xl bg-gradient-to-r from-blue-50 to-sky-50 dark:from-slate-800 dark:to-slate-850 border border-blue-200/80 dark:border-blue-900/50 flex items-center justify-between">
+                        <div>
+                            <div class="text-xs font-bold uppercase tracking-wider text-slate-500">Total Pemasukan Cabang ({{ $selectedMonthName }})</div>
+                            <div class="text-2xl font-black text-[#004B87] dark:text-blue-300 mt-1">
+                                Rp {{ number_format($monthlyTotalRevenue ?? 0, 0, ',', '.') }}
+                            </div>
+                            <div class="text-[11px] text-slate-500 mt-1">
+                                Sewa: Rp {{ number_format($monthlyRentalRevenue ?? 0, 0, ',', '.') }}
+                            </div>
+                        </div>
+                        <span class="text-3xl">💰</span>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-gradient-to-r from-rose-50 to-amber-50 dark:from-slate-800 dark:to-slate-850 border border-rose-200/80 dark:border-rose-900/50 flex items-center justify-between">
+                        <div>
+                            <div class="text-xs font-bold uppercase tracking-wider text-rose-700">Pemasukan Denda & Reparasi</div>
+                            <div class="text-2xl font-black text-rose-600 dark:text-rose-400 mt-1">
+                                Rp {{ number_format($monthlyFineRevenue ?? 0, 0, ',', '.') }}
+                            </div>
+                            <div class="text-[11px] text-slate-500 mt-1">
+                                Dari denda telat & perbaikan cabang
+                            </div>
+                        </div>
+                        <span class="text-3xl">🛠️</span>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-slate-800 dark:to-slate-850 border border-emerald-200/80 dark:border-emerald-900/50 flex items-center justify-between">
+                        <div>
+                            <div class="text-xs font-bold uppercase tracking-wider text-slate-500">Total Kendaraan Disewa ({{ $selectedMonthName }})</div>
+                            <div class="text-2xl font-black text-emerald-700 dark:text-emerald-300 mt-1">
+                                {{ $monthlyTransactionCount ?? 0 }} Unit
+                            </div>
+                            <div class="text-[11px] text-slate-500 mt-1">
+                                Cabang {{ Auth::user()->location }}
+                            </div>
+                        </div>
+                        <span class="text-3xl">🚗</span>
+                    </div>
+                </div>
+
+                {{-- Tabel Daftar Kendaraan yang Disewa di Bulan Terpilih --}}
+                <h4 class="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-2.5">
+                    Daftar Kendaraan Cabang {{ Auth::user()->location }} yang Disewa pada {{ $selectedMonthName }}:
+                </h4>
+
+                @if(isset($monthlyItems) && count($monthlyItems) > 0)
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Kode Booking</th>
+                                    <th>Tanggal Transaksi</th>
+                                    <th>Kendaraan Disewa</th>
+                                    <th>Penyewa</th>
+                                    <th>Durasi Sewa</th>
+                                    <th>Status</th>
+                                    <th>Biaya Sewa (+Ongkir)</th>
+                                    <th>Denda / Reparasi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($monthlyItems as $item)
+                                    @php
+                                        $itemFineTotal = max(0, (float)$item->fine_amount) + max(0, (float)$item->damage_fee);
+                                    @endphp
+                                    <tr>
+                                        <td><span class="font-mono font-bold text-[#004B87] dark:text-blue-300">{{ $item->booking_code }}</span></td>
+                                        <td class="text-xs text-slate-600 font-medium">
+                                            {{ \Carbon\Carbon::parse($item->created_at)->format('d M Y, H:i') }}
+                                        </td>
+                                        <td>
+                                            <div class="font-bold text-slate-800 dark:text-slate-200">{{ $item->vehicle->name ?? 'N/A' }}</div>
+                                            <div class="text-[11px] text-slate-400">{{ $item->vehicle->brand ?? '' }} ({{ $item->vehicle->vehicle_type == 'car' ? 'Mobil' : 'Motor' }})</div>
+                                        </td>
+                                        <td>
+                                            <div class="font-bold text-slate-800 dark:text-slate-200">{{ $item->user->name ?? 'N/A' }}</div>
+                                            <div class="text-[11px] text-slate-400">{{ $item->user->email ?? '-' }}</div>
+                                        </td>
+                                        <td class="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                                            {{ $item->period === 'weekly' ? '🎁 Paket 7 Hari' : ($item->quantity_days ?? 1) . ' Hari' }}
+                                        </td>
+                                        <td>
+                                            @if($item->status === 'completed')
+                                                <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold">✅ Selesai</span>
+                                            @elseif($item->status === 'active')
+                                                <span class="px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 text-[11px] font-bold">🚗 Aktif</span>
+                                            @elseif($item->status === 'approved')
+                                                <span class="px-2 py-0.5 rounded-full bg-sky-100 text-sky-800 text-[11px] font-bold">🚚 OTW</span>
+                                            @elseif($item->status === 'paid')
+                                                <span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[11px] font-bold">⏳ Dibayar</span>
+                                            @else
+                                                <span class="px-2 py-0.5 rounded-full bg-purple-100 text-purple-800 text-[11px] font-bold">🔍 Proses Kembali</span>
+                                            @endif
+                                        </td>
+                                        <td style="font-weight: 700; color: #004B87;">
+                                            Rp {{ number_format(($item->total_payment > 0 ? $item->total_payment : $item->subtotal) ?? 0, 0, ',', '.') }}
+                                        </td>
+                                        <td>
+                                            @if($itemFineTotal > 0)
+                                                <span class="text-rose-600 font-bold text-xs">
+                                                    +Rp {{ number_format($itemFineTotal, 0, ',', '.') }}
+                                                </span>
+                                                @if($item->damage_note)
+                                                    <div class="text-[10px] text-slate-500">{{ $item->damage_note }}</div>
+                                                @endif
+                                            @else
+                                                <span class="text-slate-400 text-xs">-</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    @if($monthlyItems->hasPages())
+                        <div class="mt-4">
+                            {{ $monthlyItems->links() }}
+                        </div>
+                    @endif
+                @else
+                    <div class="empty-state">
+                        <p>Tidak ada transaksi sewa kendaraan di cabang {{ Auth::user()->location }} pada bulan {{ $selectedMonthName }}.</p>
+                    </div>
+                @endif
+            </div>
+
+            <!-- ===== TRANSAKSI TERBARU CABANG ===== -->
             <div class="section-card">
                 <div class="flex justify-between items-center mb-4">
-                    <h3 class="section-title"><span class="icon">📂</span> Riwayat Transaksi Terakhir</h3>
+                    <h3 class="section-title"><span class="icon">📂</span> Transaksi Terbaru — Cabang {{ Auth::user()->location }}</h3>
                     <a href="{{ route('manager.rentals') }}" class="view-all">Lihat Semua →</a>
                 </div>
 
@@ -501,31 +651,50 @@
                             <thead>
                                 <tr>
                                     <th>Kode</th>
+                                    <th>Tanggal</th>
                                     <th>Kendaraan</th>
                                     <th>Penyewa</th>
-                                    <th>Total</th>
+                                    <th>Lokasi</th>
                                     <th>Status</th>
+                                    <th>Total</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach($recentHistory as $item)
                                     <tr>
-                                        <td>{{ $item->booking_code ?? 'N/A' }}</td>
-                                        <td>{{ $item->vehicle->name ?? 'N/A' }}</td>
+                                        <td><span class="font-mono font-bold text-[#004B87] dark:text-blue-300">{{ $item->booking_code ?? 'N/A' }}</span></td>
+                                        <td class="text-xs text-slate-600 font-medium">
+                                            {{ \Carbon\Carbon::parse($item->created_at)->format('d M Y, H:i') }}
+                                        </td>
+                                        <td class="font-bold text-slate-800 dark:text-slate-200">{{ $item->vehicle->name ?? 'N/A' }}</td>
                                         <td>{{ $item->user->name ?? 'N/A' }}</td>
-                                        <td class="font-semibold">Rp {{ number_format($item->subtotal ?? 0, 0, ',', '.') }}</td>
+                                        <td>{{ $item->vehicle->location ?? 'N/A' }}</td>
                                         <td>
-                                            @if($item->status == 'completed')
-                                                <span class="status-badge completed">Selesai</span>
+                                            @if($item->status === 'completed')
+                                                <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold">✅ Selesai</span>
+                                            @elseif($item->status === 'active')
+                                                <span class="px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 text-[11px] font-bold">🚗 Aktif</span>
+                                            @elseif($item->status === 'approved')
+                                                <span class="px-2 py-0.5 rounded-full bg-sky-100 text-sky-800 text-[11px] font-bold">🚚 OTW</span>
+                                            @elseif($item->status === 'paid')
+                                                <span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[11px] font-bold">⏳ Dibayar</span>
                                             @else
-                                                <span class="status-badge active">{{ ucfirst($item->status ?? 'N/A') }}</span>
+                                                <span class="px-2 py-0.5 rounded-full bg-purple-100 text-purple-800 text-[11px] font-bold">🔍 Proses Kembali</span>
                                             @endif
+                                        </td>
+                                        <td style="font-weight: 600; color: #43637E;">
+                                            Rp {{ number_format(($item->total_payment > 0 ? $item->total_payment : $item->subtotal) ?? 0, 0, ',', '.') }}
                                         </td>
                                     </tr>
                                 @endforeach
                             </tbody>
                         </table>
                     </div>
+                    @if($recentHistory->hasPages())
+                        <div class="mt-4">
+                            {{ $recentHistory->links() }}
+                        </div>
+                    @endif
                 @else
                     <div class="empty-state">
                         <span class="icon"></span>

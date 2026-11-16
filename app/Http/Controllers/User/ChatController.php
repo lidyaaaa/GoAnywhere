@@ -59,17 +59,22 @@ class ChatController extends Controller
             return back()->with('error', 'Saat ini belum ada manager armada yang tersedia untuk dihubungi.');
         }
 
-        // Cari atau buat percakapan
+        // Cari atau buat percakapan per akun User & Manager
         $conversation = Conversation::firstOrCreate(
             [
                 'user_id' => $userId,
                 'manager_id' => $managerId,
-                'vehicle_id' => $vehicle?->id,
             ],
             [
+                'vehicle_id' => $vehicle?->id,
                 'last_message_at' => now(),
             ]
         );
+
+        // Jika armada baru dikirim dan percakapan sudah ada, perbarui referensi vehicle_id terkini
+        if ($vehicle && $conversation->vehicle_id !== $vehicle->id) {
+            $conversation->update(['vehicle_id' => $vehicle->id]);
+        }
 
         return redirect()->route('user.chat.show', $conversation->id);
     }

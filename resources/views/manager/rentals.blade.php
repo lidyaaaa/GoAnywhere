@@ -170,33 +170,20 @@
 
             {{-- SEARCH & FILTER BY STATUS BAR --}}
             <div class="bg-white dark:bg-slate-900 rounded-2xl p-5 mb-6 border border-slate-200 dark:border-slate-800 shadow-sm">
-                <form action="{{ route('manager.rentals') }}" method="GET" class="flex flex-col lg:flex-row gap-3 items-stretch lg:items-center justify-between">
+                <form action="{{ route('manager.rentals') }}" method="GET" class="flex flex-col sm:flex-row gap-3 items-center justify-between">
                     {{-- Search Input --}}
-                    <div class="relative flex-1">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
-                            🔍
-                        </span>
-                        <input type="text" name="search" value="{{ $search }}" placeholder="Cari Kode Booking, Nama Customer, No. HP, atau Armada..." class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm focus:ring-2 focus:ring-[#004B87] focus:outline-none">
+                    <div class="relative w-full flex-1">
+                        <input type="text" name="search" value="{{ $search }}" placeholder="Cari Kode Booking, Nama Customer, No. HP, atau Armada..." class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm focus:ring-2 focus:ring-[#004B87] focus:outline-none">
+                        <input type="hidden" name="status" value="{{ $statusFilter }}">
                     </div>
 
-                    {{-- Dropdown Status Filter & Button --}}
-                    <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap">
-                        <select name="status" onchange="this.form.submit()" class="py-2.5 px-3.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-[#004B87] focus:outline-none">
-                            <option value="all" {{ $statusFilter === 'all' ? 'selected' : '' }}>📌 Semua Status ({{ $counts['all'] }})</option>
-                            <option value="paid" {{ $statusFilter === 'paid' ? 'selected' : '' }}>⏳ Menunggu Persetujuan ({{ $counts['paid'] }})</option>
-                            <option value="approved" {{ $statusFilter === 'approved' ? 'selected' : '' }}>🚚 Armada OTW / Serah Terima ({{ $counts['approved'] }})</option>
-                            <option value="active" {{ $statusFilter === 'active' ? 'selected' : '' }}>🚗 Sewa Aktif ({{ $counts['active'] }})</option>
-                            <option value="pending_return" {{ $statusFilter === 'pending_return' ? 'selected' : '' }}>🔍 Cek Fisik Unit ({{ $counts['pending_return'] }})</option>
-                            <option value="pending_payment" {{ $statusFilter === 'pending_payment' ? 'selected' : '' }}>💳 Menunggu Denda ({{ $counts['pending_payment'] }})</option>
-                            <option value="completed" {{ $statusFilter === 'completed' ? 'selected' : '' }}>✅ Selesai ({{ $counts['completed'] }})</option>
-                            <option value="cancelled" {{ $statusFilter === 'cancelled' ? 'selected' : '' }}>❌ Dibatalkan ({{ $counts['cancelled'] }})</option>
-                            <option value="rejected" {{ $statusFilter === 'rejected' ? 'selected' : '' }}>🚫 Ditolak ({{ $counts['rejected'] }})</option>
-                        </select>
-                        <button type="submit" class="px-5 py-2.5 bg-[#004B87] hover:bg-[#002D55] text-white rounded-xl text-sm font-bold shadow-sm transition">
+                    {{-- Action Buttons --}}
+                    <div class="flex items-center gap-2 w-full sm:w-auto shrink-0">
+                        <button type="submit" class="flex-1 sm:flex-initial px-6 py-2.5 bg-[#004B87] hover:bg-[#002D55] text-white rounded-xl text-sm font-bold shadow-sm transition">
                             Cari
                         </button>
                         @if(!empty($search) || $statusFilter !== 'all')
-                            <a href="{{ route('manager.rentals') }}" class="px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl text-sm font-semibold transition" title="Reset filter">
+                            <a href="{{ route('manager.rentals') }}" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl text-sm font-semibold transition" title="Reset filter">
                                 ↺ Reset
                             </a>
                         @endif
@@ -219,7 +206,7 @@
                         ];
                     @endphp
                     @foreach($filterTabs as $tabKey => $tab)
-                        <a href="{{ route('manager.rentals', array_merge(request()->query(), ['status' => $tabKey])) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl whitespace-nowrap transition {{ $statusFilter === $tabKey ? 'bg-[#004B87] text-white shadow-sm' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200' }}">
+                        <a href="{{ route('manager.rentals', ['search' => $search, 'status' => $tabKey]) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl whitespace-nowrap transition {{ $statusFilter === $tabKey ? 'bg-[#004B87] text-white shadow-sm' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200' }}">
                             <span>{{ $tab['icon'] }}</span>
                             <span>{{ $tab['label'] }}</span>
                             <span class="px-1.5 py-0.5 rounded-full text-[10px] {{ $statusFilter === $tabKey ? 'bg-white/20 text-white' : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200' }} font-bold">{{ $tab['count'] }}</span>
@@ -563,14 +550,21 @@
             @endif
 
             <!-- ======================================================== -->
-            <!-- 6. RIWAYAT TRANSAKSI (COMPLETED / CANCELLED / REJECTED)  -->
+            <!-- 6. RIWAYAT TRANSAKSI SELESAI (STATUS: COMPLETED)         -->
             <!-- ======================================================== -->
-            @if($statusFilter === 'all' || in_array($statusFilter, ['completed', 'cancelled', 'rejected']))
-            <div class="section-card">
-                <h3 class="section-title">
-                    <span>📜</span> Riwayat Transaksi Selesai & Dibatalkan
-                </h3>
-                @if(count($history) > 0)
+            @if($statusFilter === 'all' || $statusFilter === 'completed')
+            <div class="section-card border-l-4 border-l-emerald-500">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="section-title text-emerald-800 dark:text-emerald-300">
+                        <span>✅</span> Riwayat Transaksi Selesai
+                    </h3>
+                    <span class="text-xs font-bold px-2.5 py-1 bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-200 rounded-full">
+                        {{ $completedRentals->total() ?? count($completedRentals) }} Transaksi Tuntas
+                    </span>
+                </div>
+                <p class="text-xs text-slate-500 mb-4">Daftar transaksi sewa yang telah selesai, armada kembali ke cabang, dan seluruh pembayaran tuntas.</p>
+
+                @if(count($completedRentals) > 0)
                     <div class="table-wrap">
                         <table>
                             <thead>
@@ -584,7 +578,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($history as $item)
+                                @foreach($completedRentals as $item)
                                     <tr>
                                         <td><span class="font-mono text-xs font-bold">{{ $item->booking_code }}</span></td>
                                         <td>{{ $item->vehicle->name }}</td>
@@ -598,12 +592,69 @@
                                             @endif
                                         </td>
                                         <td>
-                                            @if($item->status === 'completed')
-                                                <span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full">✅ Selesai</span>
-                                            @elseif($item->status === 'rejected')
-                                                <span class="px-2.5 py-1 bg-rose-100 text-rose-800 text-xs font-bold rounded-full" title="Alasan: {{ $item->reject_reason }}">❌ Ditolak</span>
+                                            <span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full">✅ Selesai</span>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-4">
+                        {{ $completedRentals->links() }}
+                    </div>
+                @else
+                    <div class="empty-box">Belum ada riwayat transaksi yang berstatus selesai.</div>
+                @endif
+            </div>
+            @endif
+
+            <!-- ======================================================== -->
+            <!-- 7. RIWAYAT DIBATALKAN & DITOLAK                          -->
+            <!-- ======================================================== -->
+            @if($statusFilter === 'all' || in_array($statusFilter, ['cancelled', 'rejected']))
+            <div class="section-card border-l-4 border-l-rose-400">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="section-title text-slate-800 dark:text-slate-200">
+                        <span>❌</span> Riwayat Dibatalkan & Ditolak
+                    </h3>
+                    <span class="text-xs font-bold px-2.5 py-1 bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-200 rounded-full">
+                        {{ $cancelledRentals->total() ?? count($cancelledRentals) }} Transaksi
+                    </span>
+                </div>
+                <p class="text-xs text-slate-500 mb-4">Arsip transaksi yang dibatalkan oleh pengguna atau ditolak oleh pihak cabang.</p>
+
+                @if(count($cancelledRentals) > 0)
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Kode Booking</th>
+                                    <th>Kendaraan</th>
+                                    <th>Penyewa</th>
+                                    <th>Total Bayar</th>
+                                    <th>Keterangan / Alasan</th>
+                                    <th>Status Akhir</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($cancelledRentals as $item)
+                                    <tr>
+                                        <td><span class="font-mono text-xs font-bold">{{ $item->booking_code }}</span></td>
+                                        <td>{{ $item->vehicle->name }}</td>
+                                        <td>{{ $item->user->name }}</td>
+                                        <td>Rp {{ number_format($item->total_payment > 0 ? $item->total_payment : $item->subtotal, 0, ',', '.') }}</td>
+                                        <td class="text-xs text-slate-500 max-w-xs">
+                                            @if($item->status === 'rejected')
+                                                <span class="text-rose-600 font-medium">{{ $item->reject_reason ?? 'Ditolak Manager' }}</span>
                                             @else
-                                                <span class="px-2.5 py-1 bg-slate-100 text-slate-700 text-xs font-bold rounded-full">Dibatalkan</span>
+                                                <span class="text-slate-500">Dibatalkan oleh Pelanggan</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($item->status === 'rejected')
+                                                <span class="px-2.5 py-1 bg-rose-100 text-rose-800 text-xs font-bold rounded-full" title="Alasan: {{ $item->reject_reason }}">🚫 Ditolak</span>
+                                            @else
+                                                <span class="px-2.5 py-1 bg-slate-100 text-slate-700 text-xs font-bold rounded-full">❌ Dibatalkan</span>
                                             @endif
                                         </td>
                                     </tr>
@@ -612,10 +663,10 @@
                         </table>
                     </div>
                     <div class="mt-4">
-                        {{ $history->links() }}
+                        {{ $cancelledRentals->links() }}
                     </div>
                 @else
-                    <div class="empty-box">Belum ada riwayat transaksi selesai atau yang sesuai pencarian.</div>
+                    <div class="empty-box">Tidak ada transaksi yang dibatalkan atau ditolak.</div>
                 @endif
             </div>
             @endif

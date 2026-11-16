@@ -22,6 +22,8 @@ class User extends Authenticatable
         'location',
         'address',
         'phone',
+        'suspended_at',
+        'suspended_reason',
     ];
 
     /** Format nomor WA Indonesia: 08xx / 628xx / +628xx (spasi & strip diperbolehkan). */

@@ -10,27 +10,39 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::where('role', 'user')
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
+        $statusTab = $request->query('status', 'active'); // 'active', 'inactive' (disbanded), 'all'
+
+        $query = User::where('role', 'user')->orderBy('created_at', 'desc');
+
+        if ($statusTab === 'active') {
+            $query->whereNull('suspended_at');
+        } elseif ($statusTab === 'inactive') {
+            $query->whereNotNull('suspended_at');
+        }
+
+        $users = $query->paginate(10)->withQueryString();
+
+        $activeCount = User::where('role', 'user')->whereNull('suspended_at')->count();
+        $inactiveCount = User::where('role', 'user')->whereNotNull('suspended_at')->count();
+        $totalCount = $activeCount + $inactiveCount;
         
         foreach ($users as $user) {
-            // 🔥 Ambil SEMUA sewa aktif (bisa lebih dari 1)
+            // Ambil sewa aktif (status active)
             $activeRentals = \App\Models\Cart::where('user_id', $user->id)
                 ->whereIn('status', ['active', 'paid'])
                 ->with('vehicle')
                 ->get();
             
             $user->has_active_rental = $activeRentals->count() > 0;
-            $user->active_rentals = $activeRentals; // 🔥 Simpan semua sewa aktif
+            $user->active_rentals = $activeRentals;
             $user->total_rentals = \App\Models\Cart::where('user_id', $user->id)
-                ->whereIn('status', ['completed', 'paid'])
+                ->where('status', 'completed')
                 ->count();
         }
         
-        return view('superadmin.users', compact('users'));
+        return view('superadmin.users', compact('users', 'statusTab', 'activeCount', 'inactiveCount', 'totalCount'));
     }
 
     public function toggleBan(Request $request, $id)
@@ -38,20 +50,24 @@ class UserController extends Controller
         $user = User::where('role', 'user')->findOrFail($id);
 
         if ($user->suspended_at) {
-            $user->update([
-                'suspended_at' => null,
-                'suspended_reason' => null,
-            ]);
+            $user->suspended_at = null;
+            $user->suspended_reason = null;
+            $user->save();
 
             return back()->with('success', "Akun user {$user->name} berhasil diaktifkan kembali.");
         }
 
-        $reason = $request->input('reason') ?: 'Akun Anda telah disuspend / diban oleh Super Admin.';
-        $user->update([
-            'suspended_at' => now(),
-            'suspended_reason' => $reason,
+        $request->validate([
+            'reason' => 'required|string|max:255',
+        ], [
+            'reason.required' => 'Alasan disband akun wajib diisi.',
         ]);
 
-        return back()->with('success', "Akun user {$user->name} berhasil disuspend (banned).");
+        $reason = $request->input('reason');
+        $user->suspended_at = now();
+        $user->suspended_reason = $reason;
+        $user->save();
+
+        return back()->with('success', "Akun user {$user->name} berhasil dinonaktifkan (disband).");
     }
 }

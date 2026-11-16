@@ -41,17 +41,22 @@ class ChatController extends Controller
         $user = User::findOrFail($userId);
         $vehicle = $vehicleId ? Vehicle::find($vehicleId) : null;
 
-        // Cari atau buat percakapan antara manager ini dan user tersebut
+        // Cari atau buat percakapan per akun antara manager ini dan user tersebut
         $conversation = Conversation::firstOrCreate(
             [
                 'user_id' => $user->id,
                 'manager_id' => $managerId,
-                'vehicle_id' => $vehicle?->id,
             ],
             [
+                'vehicle_id' => $vehicle?->id,
                 'last_message_at' => now(),
             ]
         );
+
+        // Jika armada baru dikirim dan percakapan sudah ada, perbarui referensi vehicle_id terkini
+        if ($vehicle && $conversation->vehicle_id !== $vehicle->id) {
+            $conversation->update(['vehicle_id' => $vehicle->id]);
+        }
 
         return redirect()->route('manager.chat.show', $conversation->id);
     }

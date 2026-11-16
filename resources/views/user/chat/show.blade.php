@@ -20,12 +20,6 @@
                     </p>
                 </div>
             </div>
-
-            @if($conversation->vehicle)
-                <a href="{{ route('user.armada.detail', $conversation->vehicle->id) }}" class="text-xs bg-[#43637E]/10 hover:bg-[#43637E]/20 text-[#43637E] dark:text-[#8baac4] font-semibold px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
-                    <span>Lihat Unit {{ $conversation->vehicle->name }}</span> &rarr;
-                </a>
-            @endif
         </div>
     </x-slot>
 
@@ -33,8 +27,9 @@
         .chat-layout {
             display: grid;
             grid-template-columns: 320px 1fr;
-            height: calc(100vh - 160px);
-            min-height: 560px;
+            height: calc(100vh - 200px);
+            max-height: calc(100vh - 200px);
+            min-height: 460px;
             background: #ffffff;
             border-radius: 20px;
             border: 1px solid #e8e4de;
@@ -45,7 +40,9 @@
         @media (max-width: 900px) {
             .chat-layout {
                 grid-template-columns: 1fr;
-                height: calc(100vh - 140px);
+                height: calc(100vh - 170px);
+                max-height: calc(100vh - 170px);
+                min-height: 420px;
             }
             .chat-sidebar {
                 display: none;
@@ -58,6 +55,7 @@
             display: flex;
             flex-direction: column;
             overflow-y: auto;
+            min-height: 0;
         }
 
         /* Sidebar Item */
@@ -130,7 +128,9 @@
             flex-direction: column;
             background: #f6f7f9;
             height: 100%;
+            min-height: 0;
             position: relative;
+            overflow: hidden;
         }
 
         .vehicle-banner {
@@ -141,11 +141,15 @@
             align-items: center;
             justify-content: space-between;
             gap: 16px;
+            flex-shrink: 0;
         }
 
         .messages-container {
-            flex: 1;
+            flex: 1 1 0%;
+            min-height: 0;
             overflow-y: auto;
+            overscroll-behavior: contain;
+            -webkit-overflow-scrolling: touch;
             padding: 24px 20px;
             display: flex;
             flex-direction: column;
@@ -193,6 +197,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            flex-shrink: 0;
         }
 
         .chat-input-bar input {
@@ -283,7 +288,7 @@
         }
     </style>
 
-    <div class="py-6">
+    <div class="pt-2 pb-6">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="chat-layout">
 
@@ -307,11 +312,7 @@
                                     {{ $titleName }}
                                 </div>
                                 <div class="sidebar-item-sub truncate">
-                                    @if($item->vehicle)
-                                        🚗 {{ $item->vehicle->name }}
-                                    @else
-                                        {{ $item->manager->location ?? 'General' }}
-                                    @endif
+                                    {{ $item->manager->location ? 'Cabang ' . $item->manager->location : 'Manager Cabang' }}
                                 </div>
                             </div>
                         </a>
@@ -321,29 +322,23 @@
                 <!-- MAIN CHAT PANEL -->
                 <div class="chat-main">
 
-                    <!-- BANNER KENDARAAN (JIKA TERKAIT KENDARAAN) -->
-                    @if($conversation->vehicle)
-                        <div class="vehicle-banner">
-                            <div class="flex items-center gap-3">
-                                @if($conversation->vehicle->image)
-                                    <img src="{{ asset('storage/' . $conversation->vehicle->image) }}" class="w-12 h-10 object-cover rounded-lg border border-slate-200 dark:border-slate-700" alt="{{ $conversation->vehicle->name }}">
-                                @else
-                                    <div class="w-12 h-10 bg-slate-100 dark:bg-gray-800 rounded-lg flex items-center justify-center text-xs">🚗</div>
-                                @endif
-                                <div>
-                                    <h4 class="font-bold text-sm text-gray-900 dark:text-white">
-                                        {{ $conversation->vehicle->brand }} {{ $conversation->vehicle->name }}
-                                    </h4>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">
-                                        Rp {{ number_format($conversation->vehicle->price_per_day, 0, ',', '.') }}/hari &bull; Lokasi {{ $conversation->vehicle->location }}
-                                    </p>
-                                </div>
+                    <!-- CHAT HEADER: PROFIL MANAGER (MURNI ORANG KE ORANG) -->
+                    <div class="vehicle-banner">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-[#2c3e50] to-[#43637E] text-white flex items-center justify-center font-bold text-sm shadow-sm shrink-0">
+                                {{ strtoupper(substr($conversation->manager->name ?? 'M', 0, 2)) }}
                             </div>
-                            <a href="{{ route('user.armada.detail', $conversation->vehicle->id) }}" class="text-xs font-semibold text-[#43637E] dark:text-[#8baac4] hover:underline shrink-0">
-                                Detail & Sewa
-                            </a>
+                            <div>
+                                <h4 class="font-bold text-sm text-gray-900 dark:text-white flex items-center gap-2">
+                                    {{ $displayMgrName }}
+                                    <span class="inline-block w-2 h-2 rounded-full bg-emerald-500" title="Online"></span>
+                                </h4>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">
+                                    Manager Cabang {{ $conversation->manager->location ?? 'Armada' }}
+                                </p>
+                            </div>
                         </div>
-                    @endif
+                    </div>
 
                     <!-- MESSAGES LIST -->
                     <div id="messagesContainer" class="messages-container">

@@ -130,14 +130,6 @@
                                             </span>
                                         </div>
 
-                                        @if($item->vehicle)
-                                            <div class="mb-1.5">
-                                                <span class="badge-vehicle">
-                                                    🚗 {{ $item->vehicle->name }} ({{ $item->vehicle->location }})
-                                                </span>
-                                            </div>
-                                        @endif
-
                                         <div class="flex items-center justify-between">
                                             <p class="text-sm text-gray-500 dark:text-gray-400 truncate pr-2">
                                                 @if($latest)

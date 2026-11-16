@@ -47,8 +47,8 @@
             </div>
 
             <!-- Navigation Links (Tepat di Tengah) -->
-            <div class="hidden sm:flex items-center justify-center space-x-2 flex-1 mx-4">
-                <div class="flex items-center space-x-2">
+            <div class="hidden sm:flex items-center justify-center space-x-1 flex-1 mx-2 overflow-x-auto no-scrollbar">
+                <div class="flex items-center space-x-1 shrink-0">
                     @auth
                         @if(Auth::user()->role == 'user')
                             <x-nav-link :href="route('user.home')" :active="request()->routeIs('user.home')" class="nav-link">
@@ -122,7 +122,7 @@
             </div>
 
             <!-- Settings Dropdown (Kanan) -->
-            <div class="hidden sm:flex sm:items-center sm:ms-6">
+            <div class="hidden sm:flex sm:items-center sm:ms-4 shrink-0">
                 <!-- Cart Icon (User only) -->
                 @auth
                     @if(Auth::user()->role == 'user')
@@ -362,33 +362,41 @@
     }
 
     /* ===== NAV LINK ===== */
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
     .nav-link {
-        color: #374151;
-        font-weight: 600;
-        font-size: 14px;
-        padding: 6px 14px;
-        border-radius: 9999px;
-        border-bottom: 3px solid transparent;
-        transition: all 0.3s ease;
+        color: #64748B;
+        font-weight: 500;
+        font-size: 13.5px;
+        padding: 7px 12px;
+        border-radius: 8px;
+        border: none;
+        transition: background-color 0.2s ease, color 0.2s ease;
         text-decoration: none;
         display: inline-flex;
         align-items: center;
         white-space: nowrap;
-        letter-spacing: 0.3px;
+        letter-spacing: 0.2px;
         flex-shrink: 0;
     }
 
     .nav-link:hover {
-        color: #43637E;
-        background: #f3f4f6;
-        border-bottom-color: transparent;
+        color: #002D55;
+        background: rgba(106, 155, 209, 0.15);
     }
 
+    .nav-link.active,
     .nav-link[aria-current="page"] {
-        color: #ffffff;
-        background: #111827;
-        border-bottom-color: transparent;
-        font-weight: 700;
+        color: #004B87 !important;
+        background: rgba(0, 75, 135, 0.1) !important;
+        font-weight: 700 !important;
+        box-shadow: none !important;
     }
 
     /* ===== CART BUTTON ===== */

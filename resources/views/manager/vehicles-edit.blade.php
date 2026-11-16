@@ -6,9 +6,6 @@
     </x-slot>
 
     <style>
-        * {
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
 
         .form-section {
             padding: 40px 0 60px;
@@ -325,6 +322,12 @@
                             <div class="form-group">
                                 <label>Harga / Minggu (Paket Hemat 7 Hari)</label>
                                 <input type="number" name="price_per_week" value="{{ $vehicle->price_per_week }}" required min="0" placeholder="2800000">
+                            </div>
+
+                            <!-- Stok Total (Bisa diedit sampai 0 jika tidak ada yang disewa) -->
+                            <div class="form-group">
+                                <label>Total Stok Unit (Isi 0 jika ingin menghapus armada)</label>
+                                <input type="number" name="total_stock" value="{{ $vehicle->total_stock }}" required min="0" placeholder="0">
                             </div>
 
                             <!-- Deskripsi -->

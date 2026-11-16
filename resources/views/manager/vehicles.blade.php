@@ -6,9 +6,6 @@
     </x-slot>
 
     <style>
-        * {
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
 
         .armada-section {
             padding: 40px 0 60px;
@@ -97,7 +94,7 @@
         }
 
         .vehicle-card .image-wrap {
-            height: 180px;
+            height: 125px;
             background: linear-gradient(135deg, #e8e4de, #d5d0c8);
             display: flex;
             align-items: center;
@@ -114,58 +111,59 @@
         }
 
         .vehicle-card .image-wrap .placeholder {
-            font-size: 56px;
-            opacity: 0.6;
+            font-size: 28px;
+            font-weight: 700;
+            color: #475569;
+            opacity: 0.7;
         }
 
         .vehicle-card .image-wrap .stock-badge {
             position: absolute;
-            top: 10px;
-            right: 10px;
-            padding: 4px 14px;
-            border-radius: 14px;
-            font-size: 11px;
+            top: 8px;
+            right: 8px;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 10px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.3px;
         }
 
         .vehicle-card .image-wrap .stock-badge.available {
-            background: rgba(74, 122, 90, 0.85);
+            background: rgba(74, 122, 90, 0.9);
             color: #ffffff;
         }
 
         .vehicle-card .image-wrap .stock-badge.empty {
-            background: rgba(176, 74, 74, 0.85);
+            background: rgba(176, 74, 74, 0.9);
             color: #ffffff;
         }
 
         .vehicle-card .body {
-            padding: 14px 16px 16px;
+            padding: 12px 14px 14px;
             flex: 1;
             display: flex;
             flex-direction: column;
         }
 
         .vehicle-card .body .name {
-            font-size: 17px;
+            font-size: 15px;
             font-weight: 700;
             color: #2c3e50;
-            font-family: 'Georgia', serif;
+            line-height: 1.3;
         }
 
         .vehicle-card .body .specs {
-            font-size: 13px;
+            font-size: 11.5px;
             color: #7a8a9a;
             margin-top: 2px;
         }
 
         .vehicle-card .body .price {
-            font-size: 19px;
+            font-size: 15px;
             font-weight: 700;
             color: #43637E;
             margin-top: 4px;
-            font-family: 'Georgia', serif;
         }
 
         .vehicle-card .body .price small {
@@ -485,161 +483,251 @@
                 <div class="alert-error"> {{ session('error') }}</div>
             @endif
 
-            <div class="header-actions">
-                <h3 class="title">Daftar Kendaraan</h3>
+            <div class="header-actions flex-wrap gap-3">
+                <div class="flex items-center gap-2 flex-wrap">
+                    <a href="{{ route('manager.vehicles', ['type' => 'all']) }}" 
+                       class="px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 {{ ($typeFilter ?? 'all') === 'all' ? 'bg-[#004B87] text-white shadow-sm' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200' }}">
+                        <span>📋</span> Semua Armada ({{ $totalCount ?? 0 }})
+                    </a>
+                    <a href="{{ route('manager.vehicles', ['type' => 'car']) }}" 
+                       class="px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 {{ ($typeFilter ?? 'all') === 'car' ? 'bg-[#004B87] text-white shadow-sm' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200' }}">
+                        <span>🚗</span> Mobil ({{ $carCount ?? 0 }})
+                    </a>
+                    <a href="{{ route('manager.vehicles', ['type' => 'motorcycle']) }}" 
+                       class="px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 {{ ($typeFilter ?? 'all') === 'motorcycle' ? 'bg-[#004B87] text-white shadow-sm' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200' }}">
+                        <span>🏍️</span> Sepeda Motor ({{ $motorCount ?? 0 }})
+                    </a>
+                </div>
                 <a href="{{ route('manager.vehicles.create') }}" class="btn-add">
-                     Tambah Kendaraan
+                    + Tambah Kendaraan
                 </a>
             </div>
 
-            @if($vehicles->count() > 0)
-                {{-- GRID 2 KOLOM --}}
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                    @foreach($vehicles as $vehicle)
-                        <div class="vehicle-card">
-                            <div class="image-wrap">
-                                @if($vehicle->image)
-                                    <img src="{{ asset('storage/' . $vehicle->image) }}" alt="{{ $vehicle->name }}">
-                                @else
-                                    <span class="placeholder">                                 {{ $vehicle->vehicle_type == 'car' ? 'Car' : 'Motorcycle' }}</span>
-                                @endif
-                                <span class="stock-badge {{ $vehicle->available_stock > 0 ? 'available' : 'empty' }}">
-                                     {{ $vehicle->available_stock > 0 ? 'Tersedia' : 'Habis' }}
-                                </span>
-                            </div>
+            @if(($totalCount ?? 0) > 0)
 
-                            <div class="body">
-                                <h4 class="name">{{ $vehicle->name }}</h4>
-                                <div class="specs">{{ $vehicle->brand }} • {{ $vehicle->year }}</div>
-                                <div class="price">
-                                    <div class="text-base font-bold text-[#002D55] dark:text-blue-300">
-                                        Rp {{ number_format($vehicle->price_per_day, 0, ',', '.') }}
-                                        <small class="text-xs text-gray-500">/ hari</small>
-                                    </div>
-                                    @if($vehicle->price_per_week > 0)
-                                        <div class="text-xs text-emerald-600 dark:text-emerald-400 font-semibold mt-0.5">
-                                            🎁 Paket 7 Hari: Rp {{ number_format($vehicle->price_per_week, 0, ',', '.') }}
-                                        </div>
-                                    @endif
-                                </div>
-
-                                @php
-                                    $rentedCount = max(0, $vehicle->total_stock - $vehicle->available_stock - $vehicle->damaged_stock);
-                                @endphp
-                                <div class="grid grid-cols-2 gap-2 my-2.5 text-xs">
-                                    <div style="background: #f1f5f9; color: #1e293b; border: 1px solid #cbd5e1;" class="flex items-center justify-between p-2 rounded-xl shadow-sm">
-                                        <span class="flex items-center gap-1 font-semibold">📦 Total</span>
-                                        <strong class="font-extrabold text-sm">{{ $vehicle->total_stock }}</strong>
-                                    </div>
-                                    <div style="background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0;" class="flex items-center justify-between p-2 rounded-xl shadow-sm">
-                                        <span class="flex items-center gap-1 font-semibold">✅ Siap</span>
-                                        <strong class="font-extrabold text-sm">{{ $vehicle->available_stock }} unit</strong>
-                                    </div>
-                                    <div style="background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe;" class="flex items-center justify-between p-2 rounded-xl shadow-sm">
-                                        <span class="flex items-center gap-1 font-semibold">🚗 Disewa</span>
-                                        <strong class="font-extrabold text-sm">{{ $rentedCount }} unit</strong>
-                                    </div>
-                                    <div style="{{ $vehicle->damaged_stock > 0 ? 'background: #fff1f2; color: #9f1239; border: 1px solid #fecdd3;' : 'background: #f8fafc; color: #94a3b8; border: 1px solid #e2e8f0;' }}" class="flex items-center justify-between p-2 rounded-xl shadow-sm">
-                                        <span class="flex items-center gap-1 font-semibold">🛠️ Rusak</span>
-                                        <strong class="font-extrabold text-sm">{{ $vehicle->damaged_stock }} unit</strong>
-                                    </div>
-                                </div>
-
-                                @if($vehicle->damaged_stock > 0)
-                                    <form action="{{ route('manager.vehicles.repair', $vehicle->id) }}" method="POST" class="mb-2">
-                                        @csrf
-                                        <button type="submit" class="w-full py-1.5 px-3 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-sm" onclick="return confirm('Konfirmasi: 1 unit {{ $vehicle->name }} telah selesai direparasi dan siap kembali disewakan?')">
-                                            <span>🛠️</span> Betulkan 1 Unit Rusak (Stok Rusak: {{ $vehicle->damaged_stock }})
-                                        </button>
-                                    </form>
-                                @endif
-
-                                <div class="actions">
-                                    <a href="{{ route('manager.vehicles.edit', $vehicle->id) }}" class="btn-edit">
-                                         Edit
-                                    </a>
-                                    @php
-                                        $cannotDelete = ($vehicle->available_stock > 0 || $vehicle->total_stock > 0) || in_array($vehicle->id, $inCartOrBooked ?? []);
-                                        $deleteReason = ($vehicle->available_stock > 0 || $vehicle->total_stock > 0) 
-                                            ? 'Stok belum 0' 
-                                            : 'Sedang di keranjang / dibooking user';
-                                    @endphp
-                                    @if($cannotDelete)
-                                        <button type="button" class="btn-delete" disabled style="opacity:0.45; cursor:not-allowed; background:#cbd5e1; color:#64748b; border-color:#cbd5e1;" title="Tidak dapat dihapus: {{ $deleteReason }}">
-                                             Hapus
-                                        </button>
-                                    @else
-                                        <form action="{{ route('manager.vehicles.destroy', $vehicle->id) }}" method="POST" style="margin:0; width:100%;">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn-delete" onclick="return confirm('Hapus kendaraan {{ $vehicle->name }}?')">
-                                                 Hapus
-                                            </button>
-                                        </form>
-                                    @endif
-                                </div>
-
-                                <form action="{{ route('manager.vehicles.addStock', $vehicle->id) }}" method="POST" class="add-stock-form">
-                                    @csrf
-                                    <input type="number" name="stock" min="1" placeholder="Tambah" required>
-                                    <button type="submit" class="btn-stock">                            Stok</button>
-                                </form>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-
-                {{-- PAGINATION 2x5 (10 per halaman) --}}
-                <div class="pagination-wrapper">
-                    <div class="info-text">
-                        Menampilkan <strong>{{ $vehicles->firstItem() ?? 0 }}</strong> - <strong>{{ $vehicles->lastItem() ?? 0 }}</strong> dari <strong>{{ $vehicles->total() }}</strong> kendaraan
+                {{-- ================= SEKSI 1: ARMADA MOBIL ================= --}}
+                @if(($typeFilter ?? 'all') === 'all' || ($typeFilter ?? 'all') === 'car')
+                <div class="mb-8">
+                    <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-200 dark:border-slate-700">
+                        <h4 class="text-base font-extrabold text-[#002D55] dark:text-slate-100 flex items-center gap-2">
+                            <span>🚗</span> Armada Mobil
+                        </h4>
+                        <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-[#004B87]">
+                            {{ $cars->count() }} Tipe Mobil
+                        </span>
                     </div>
-                    <nav>
-                        {{-- Previous --}}
-                        @if ($vehicles->onFirstPage())
-                            <span class="page-link disabled">‹</span>
-                        @else
-                            <a href="{{ $vehicles->previousPageUrl() }}" class="page-link">‹</a>
-                        @endif
 
-                        {{-- Halaman --}}
-                        @php
-                            $currentPage = $vehicles->currentPage();
-                            $lastPage = $vehicles->lastPage();
-                            $start = max(1, $currentPage - 2);
-                            $end = min($lastPage, $currentPage + 2);
-                            
-                            if ($start > 1) {
-                                echo '<a href="' . $vehicles->url(1) . '" class="page-link">1</a>';
-                                if ($start > 2) {
-                                    echo '<span class="page-link disabled">…</span>';
-                                }
-                            }
-                            
-                            for ($i = $start; $i <= $end; $i++) {
-                                if ($i == $currentPage) {
-                                    echo '<span class="page-link active">' . $i . '</span>';
-                                } else {
-                                    echo '<a href="' . $vehicles->url($i) . '" class="page-link">' . $i . '</a>';
-                                }
-                            }
-                            
-                            if ($end < $lastPage) {
-                                if ($end < $lastPage - 1) {
-                                    echo '<span class="page-link disabled">…</span>';
-                                }
-                                echo '<a href="' . $vehicles->url($lastPage) . '" class="page-link">' . $lastPage . '</a>';
-                            }
-                        @endphp
+                    @if($cars->count() > 0)
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            @foreach($cars as $vehicle)
+                                <div class="vehicle-card">
+                                    <div class="image-wrap">
+                                        @if($vehicle->image)
+                                            <img src="{{ asset('storage/' . $vehicle->image) }}" alt="{{ $vehicle->name }}">
+                                        @else
+                                            <span class="placeholder">🚗 Mobil</span>
+                                        @endif
+                                        <span class="stock-badge {{ $vehicle->available_stock > 0 ? 'available' : 'empty' }}">
+                                            {{ $vehicle->available_stock > 0 ? 'Tersedia' : 'Habis' }}
+                                        </span>
+                                    </div>
 
-                        {{-- Next --}}
-                        @if ($vehicles->hasMorePages())
-                            <a href="{{ $vehicles->nextPageUrl() }}" class="page-link">›</a>
-                        @else
-                            <span class="page-link disabled">›</span>
-                        @endif
-                    </nav>
+                                    <div class="body">
+                                        <h4 class="name truncate" title="{{ $vehicle->name }}">{{ $vehicle->name }}</h4>
+                                        <div class="specs">{{ $vehicle->brand }} • {{ $vehicle->year }} • {{ ucfirst($vehicle->transmission ?? 'Auto') }}</div>
+                                        <div class="price">
+                                            <div class="text-sm font-bold text-[#002D55] dark:text-blue-300">
+                                                Rp {{ number_format($vehicle->price_per_day, 0, ',', '.') }}
+                                                <small class="text-[11px] text-gray-500">/ hari</small>
+                                            </div>
+                                            @if($vehicle->price_per_week > 0)
+                                                <div class="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold">
+                                                    🎁 Paket 7 Hari: Rp {{ number_format($vehicle->price_per_week, 0, ',', '.') }}
+                                                </div>
+                                            @endif
+                                        </div>
+
+                                        @php
+                                            $rentedCount = max(0, $vehicle->total_stock - $vehicle->available_stock - $vehicle->damaged_stock);
+                                        @endphp
+                                        <div class="grid grid-cols-2 gap-1.5 my-2 text-[11px]">
+                                            <div style="background: #f1f5f9; color: #1e293b; border: 1px solid #cbd5e1;" class="flex items-center justify-between px-2 py-1 rounded-lg">
+                                                <span class="font-semibold">📦 Total</span>
+                                                <strong class="font-extrabold">{{ $vehicle->total_stock }}</strong>
+                                            </div>
+                                            <div style="background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0;" class="flex items-center justify-between px-2 py-1 rounded-lg">
+                                                <span class="font-semibold">✅ Siap</span>
+                                                <strong class="font-extrabold">{{ $vehicle->available_stock }}</strong>
+                                            </div>
+                                            <div style="background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe;" class="flex items-center justify-between px-2 py-1 rounded-lg">
+                                                <span class="font-semibold">🚗 Sewa</span>
+                                                <strong class="font-extrabold">{{ $rentedCount }}</strong>
+                                            </div>
+                                            <div style="{{ $vehicle->damaged_stock > 0 ? 'background: #fff1f2; color: #9f1239; border: 1px solid #fecdd3;' : 'background: #f8fafc; color: #94a3b8; border: 1px solid #e2e8f0;' }}" class="flex items-center justify-between px-2 py-1 rounded-lg">
+                                                <span class="font-semibold">🛠️ Rusak</span>
+                                                <strong class="font-extrabold">{{ $vehicle->damaged_stock }}</strong>
+                                            </div>
+                                        </div>
+
+                                        @if($vehicle->damaged_stock > 0)
+                                            <form action="{{ route('manager.vehicles.repair', $vehicle->id) }}" method="POST" class="mb-1.5">
+                                                @csrf
+                                                <button type="submit" class="w-full py-1 px-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-[11px] font-bold transition flex items-center justify-center gap-1 shadow-sm" onclick="return confirm('Konfirmasi: 1 unit {{ $vehicle->name }} telah selesai direparasi dan siap kembali disewakan?')">
+                                                    <span>🛠️</span> Betulkan 1 Unit ({{ $vehicle->damaged_stock }})
+                                                </button>
+                                            </form>
+                                        @endif
+
+                                        <div class="actions">
+                                            <a href="{{ route('manager.vehicles.edit', $vehicle->id) }}" class="btn-edit">
+                                                Edit
+                                            </a>
+                                            @php
+                                                $cannotDelete = ($vehicle->available_stock > 0 || $vehicle->total_stock > 0) || in_array($vehicle->id, $inCartOrBooked ?? []);
+                                                $deleteReason = ($vehicle->available_stock > 0 || $vehicle->total_stock > 0) 
+                                                    ? 'Ubah stok menjadi 0 terlebih dahulu untuk menghapus' 
+                                                    : 'Sedang dibooking / disewa user';
+                                            @endphp
+                                            @if($cannotDelete)
+                                                <button type="button" class="btn-delete" disabled style="opacity:0.45; cursor:not-allowed; background:#cbd5e1 !important; color:#64748b !important; border-color:#cbd5e1 !important;" title="Tidak dapat dihapus: {{ $deleteReason }}">
+                                                    Hapus
+                                                </button>
+                                            @else
+                                                <button type="button" class="btn-delete" style="width:100%;" onclick="openDeleteVehicleModal('{{ $vehicle->id }}', '{{ addslashes($vehicle->name) }}')">
+                                                    Hapus
+                                                </button>
+                                            @endif
+                                        </div>
+
+                                        <form action="{{ route('manager.vehicles.addStock', $vehicle->id) }}" method="POST" class="add-stock-form">
+                                            @csrf
+                                            <span class="text-[11px] font-bold text-slate-600 dark:text-slate-300 whitespace-nowrap">Stok:</span>
+                                            <input type="number" name="stock" min="0" value="{{ $vehicle->total_stock }}" placeholder="0" required title="Isi 0 jika ingin mengosongkan stok agar armada bisa dihapus">
+                                            <button type="submit" class="btn-stock">Simpan</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="p-6 text-center bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 text-xs text-slate-500">
+                            Belum ada armada mobil di cabang {{ Auth::user()->location }}.
+                        </div>
+                    @endif
                 </div>
+                @endif
+
+                {{-- ================= SEKSI 2: ARMADA SEPEDA MOTOR ================= --}}
+                @if(($typeFilter ?? 'all') === 'all' || ($typeFilter ?? 'all') === 'motorcycle')
+                <div>
+                    <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-200 dark:border-slate-700">
+                        <h4 class="text-base font-extrabold text-[#002D55] dark:text-slate-100 flex items-center gap-2">
+                            <span>🏍️</span> Armada Sepeda Motor
+                        </h4>
+                        <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
+                            {{ $motorcycles->count() }} Tipe Motor
+                        </span>
+                    </div>
+
+                    @if($motorcycles->count() > 0)
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            @foreach($motorcycles as $vehicle)
+                                <div class="vehicle-card">
+                                    <div class="image-wrap">
+                                        @if($vehicle->image)
+                                            <img src="{{ asset('storage/' . $vehicle->image) }}" alt="{{ $vehicle->name }}">
+                                        @else
+                                            <span class="placeholder">🏍️ Motor</span>
+                                        @endif
+                                        <span class="stock-badge {{ $vehicle->available_stock > 0 ? 'available' : 'empty' }}">
+                                            {{ $vehicle->available_stock > 0 ? 'Tersedia' : 'Habis' }}
+                                        </span>
+                                    </div>
+
+                                    <div class="body">
+                                        <h4 class="name truncate" title="{{ $vehicle->name }}">{{ $vehicle->name }}</h4>
+                                        <div class="specs">{{ $vehicle->brand }} • {{ $vehicle->year }} • {{ ucfirst($vehicle->transmission_motor ?? $vehicle->transmission ?? 'Matic') }}</div>
+                                        <div class="price">
+                                            <div class="text-sm font-bold text-[#002D55] dark:text-blue-300">
+                                                Rp {{ number_format($vehicle->price_per_day, 0, ',', '.') }}
+                                                <small class="text-[11px] text-gray-500">/ hari</small>
+                                            </div>
+                                            @if($vehicle->price_per_week > 0)
+                                                <div class="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold">
+                                                    🎁 Paket 7 Hari: Rp {{ number_format($vehicle->price_per_week, 0, ',', '.') }}
+                                                </div>
+                                            @endif
+                                        </div>
+
+                                        @php
+                                            $rentedCount = max(0, $vehicle->total_stock - $vehicle->available_stock - $vehicle->damaged_stock);
+                                        @endphp
+                                        <div class="grid grid-cols-2 gap-1.5 my-2 text-[11px]">
+                                            <div style="background: #f1f5f9; color: #1e293b; border: 1px solid #cbd5e1;" class="flex items-center justify-between px-2 py-1 rounded-lg">
+                                                <span class="font-semibold">📦 Total</span>
+                                                <strong class="font-extrabold">{{ $vehicle->total_stock }}</strong>
+                                            </div>
+                                            <div style="background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0;" class="flex items-center justify-between px-2 py-1 rounded-lg">
+                                                <span class="font-semibold">✅ Siap</span>
+                                                <strong class="font-extrabold">{{ $vehicle->available_stock }}</strong>
+                                            </div>
+                                            <div style="background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe;" class="flex items-center justify-between px-2 py-1 rounded-lg">
+                                                <span class="font-semibold">🏍️ Sewa</span>
+                                                <strong class="font-extrabold">{{ $rentedCount }}</strong>
+                                            </div>
+                                            <div style="{{ $vehicle->damaged_stock > 0 ? 'background: #fff1f2; color: #9f1239; border: 1px solid #fecdd3;' : 'background: #f8fafc; color: #94a3b8; border: 1px solid #e2e8f0;' }}" class="flex items-center justify-between px-2 py-1 rounded-lg">
+                                                <span class="font-semibold">🛠️ Rusak</span>
+                                                <strong class="font-extrabold">{{ $vehicle->damaged_stock }}</strong>
+                                            </div>
+                                        </div>
+
+                                        @if($vehicle->damaged_stock > 0)
+                                            <form action="{{ route('manager.vehicles.repair', $vehicle->id) }}" method="POST" class="mb-1.5">
+                                                @csrf
+                                                <button type="submit" class="w-full py-1 px-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-[11px] font-bold transition flex items-center justify-center gap-1 shadow-sm" onclick="return confirm('Konfirmasi: 1 unit {{ $vehicle->name }} telah selesai direparasi dan siap kembali disewakan?')">
+                                                    <span>🛠️</span> Betulkan 1 Unit ({{ $vehicle->damaged_stock }})
+                                                </button>
+                                            </form>
+                                        @endif
+
+                                        <div class="actions">
+                                            <a href="{{ route('manager.vehicles.edit', $vehicle->id) }}" class="btn-edit">
+                                                Edit
+                                            </a>
+                                            @php
+                                                $cannotDelete = ($vehicle->available_stock > 0 || $vehicle->total_stock > 0) || in_array($vehicle->id, $inCartOrBooked ?? []);
+                                                $deleteReason = ($vehicle->available_stock > 0 || $vehicle->total_stock > 0) 
+                                                    ? 'Ubah stok menjadi 0 terlebih dahulu untuk menghapus' 
+                                                    : 'Sedang dibooking / disewa user';
+                                            @endphp
+                                            @if($cannotDelete)
+                                                <button type="button" class="btn-delete" disabled style="opacity:0.45; cursor:not-allowed; background:#cbd5e1 !important; color:#64748b !important; border-color:#cbd5e1 !important;" title="Tidak dapat dihapus: {{ $deleteReason }}">
+                                                    Hapus
+                                                </button>
+                                            @else
+                                                <button type="button" class="btn-delete" style="width:100%;" onclick="openDeleteVehicleModal('{{ $vehicle->id }}', '{{ addslashes($vehicle->name) }}')">
+                                                    Hapus
+                                                </button>
+                                            @endif
+                                        </div>
+
+                                        <form action="{{ route('manager.vehicles.addStock', $vehicle->id) }}" method="POST" class="add-stock-form">
+                                            @csrf
+                                            <span class="text-[11px] font-bold text-slate-600 dark:text-slate-300 whitespace-nowrap">Stok:</span>
+                                            <input type="number" name="stock" min="0" value="{{ $vehicle->total_stock }}" placeholder="0" required title="Isi 0 jika ingin mengosongkan stok agar armada bisa dihapus">
+                                            <button type="submit" class="btn-stock">Simpan</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="p-6 text-center bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 text-xs text-slate-500">
+                            Belum ada armada sepeda motor di cabang {{ Auth::user()->location }}.
+                        </div>
+                    @endif
+                </div>
+                @endif
 
             @else
                 <div class="empty-state">
@@ -654,4 +742,52 @@
 
         </div>
     </div>
+
+    <!-- ===== MODAL KONFIRMASI HAPUS ARMADA ===== -->
+    <div id="modalDeleteVehicle" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-6 text-center shadow-2xl border border-slate-200 dark:border-slate-800">
+            <div class="w-16 h-16 bg-rose-100 dark:bg-rose-950/60 text-rose-600 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 shadow-inner">
+                ⚠️
+            </div>
+            <h3 class="text-xl font-extrabold text-slate-900 dark:text-white mb-2">
+                Apakah yakin ingin menghapus armada ini?
+            </h3>
+            <p id="deleteVehicleDesc" class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-6">
+                Data kendaraan akan dihapus secara permanen dari cabang Anda dan tindakan ini tidak dapat dibatalkan.
+            </p>
+
+            <form id="formDeleteVehicle" method="POST" action="">
+                @csrf
+                @method('DELETE')
+                <div class="flex items-center gap-3">
+                    <button type="button" onclick="closeDeleteVehicleModal()" class="flex-1 py-3 px-4 rounded-xl text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition">
+                        Batal
+                    </button>
+                    <button type="submit" class="flex-1 py-3 px-4 rounded-xl text-sm font-bold text-white bg-rose-600 hover:bg-rose-700 shadow-lg shadow-rose-600/30 transition">
+                        Ya, Hapus Armada
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openDeleteVehicleModal(vehicleId, vehicleName) {
+            const modal = document.getElementById('modalDeleteVehicle');
+            const form = document.getElementById('formDeleteVehicle');
+            const desc = document.getElementById('deleteVehicleDesc');
+
+            form.action = "{{ url('manager/vehicles') }}/" + vehicleId;
+            desc.innerHTML = 'Anda akan menghapus armada <strong>"' + vehicleName + '"</strong> secara permanen. Tindakan ini tidak dapat dibatalkan.';
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeDeleteVehicleModal() {
+            const modal = document.getElementById('modalDeleteVehicle');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+    </script>
 </x-app-layout>

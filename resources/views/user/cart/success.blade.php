@@ -8,10 +8,7 @@
     <!-- ============================================ -->
     <!-- STYLE ELEGAN - #43637E + SHADOW HITAM TEBEL -->
     <!-- ============================================ -->
-    <style>
-        * {
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+    <style>
 
         .success-section {
             padding: 40px 0 60px;
@@ -310,7 +307,11 @@
                     <!-- ===== DETAIL ===== -->
                     <div style="margin-top: 20px; text-align: left;">
                         <div class="detail-row">
-                            <span class="label">Total Pembayaran</span>
+                            <span class="label">Kendaraan ({{ $carts->count() }} Unit)</span>
+                            <span class="value">{{ $carts->map(fn($c) => $c->vehicle->name)->implode(', ') }}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Total Pembayaran (+Ongkir)</span>
                             <span class="value">Rp {{ number_format($total, 0, ',', '.') }}</span>
                         </div>
                         <div class="detail-row">

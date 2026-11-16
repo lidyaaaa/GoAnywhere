@@ -103,22 +103,20 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ======================================================== */
-/* NAVBAR: Floating Pill / Capsule Design                   */
+/* NAVBAR: Full Width Clean Header                          */
 /* ======================================================== */
 .navbar {
-    max-width: 64rem !important;
-    margin: 20px auto !important;
-    border-radius: 9999px !important;
-    background: rgba(255, 255, 255, 0.8) !important;
-    backdrop-filter: blur(16px) !important;
-    -webkit-backdrop-filter: blur(16px) !important;
-    border: 1px solid rgba(15, 23, 42, 0.06) !important;
-    box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.02) !important;
-    padding: 0 24px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    background: #ffffff !important;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.08) !important;
+    box-shadow: 0 2px 12px rgba(15, 23, 42, 0.04) !important;
+    padding: 0 !important;
     position: sticky !important;
-    top: 20px !important;
+    top: 0 !important;
     z-index: 100 !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 .navbar img, 
@@ -133,9 +131,9 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .dark .navbar {
-    background: rgba(15, 23, 42, 0.6) !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
-    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3) !important;
+    background: #0f1a24 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
 }
 
 .brand-text .highlight, .navbar .brand .highlight, .hero-title .highlight {
@@ -153,24 +151,30 @@ h1, h2, h3, h4, h5, h6 {
 .nav-link {
     color: #64748B !important;
     font-weight: 500 !important;
-    font-size: 14px !important;
+    font-size: 13.5px !important;
     border: none !important;
-    border-radius: 12px !important;
-    padding: 10px 16px !important;
+    border-radius: 8px !important;
+    padding: 8px 12px !important;
     position: relative !important;
+    text-decoration: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    white-space: nowrap !important;
     transition: all 0.2s ease !important;
 }
 
 .nav-link:hover {
     color: #002D55 !important;
-    background: rgba(106, 155, 209, 0.12) !important;
-    transform: translateY(-1px);
+    background: rgba(106, 155, 209, 0.15) !important;
 }
 
+/* EFEK HOVER/ACTIVE YANG NGESTUCK DI HALAMAN AKTIF */
+.nav-link.active,
 .nav-link[aria-current="page"] {
-    color: #002D55 !important;
-    background: rgba(106, 155, 209, 0.18) !important;
-    box-shadow: inset 0 -2px 0 #004B87;
+    color: #004B87 !important;
+    background: rgba(0, 75, 135, 0.1) !important;
+    font-weight: 700 !important;
+    box-shadow: none !important;
 }
 
 .dark .nav-link {
@@ -180,10 +184,12 @@ h1, h2, h3, h4, h5, h6 {
     color: #F0F4F8 !important;
     background: rgba(106, 155, 209, 0.18) !important;
 }
+.dark .nav-link.active,
 .dark .nav-link[aria-current="page"] {
-    color: #F0F4F8 !important;
-    background: rgba(106, 155, 209, 0.24) !important;
-    box-shadow: inset 0 -2px 0 #6A9BD1;
+    color: #FFFFFF !important;
+    background: rgba(106, 155, 209, 0.25) !important;
+    font-weight: 700 !important;
+    box-shadow: none !important;
 }
 
 /* ======================================================== */

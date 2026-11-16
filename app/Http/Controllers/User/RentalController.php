@@ -88,26 +88,25 @@ class RentalController extends Controller
         $applySearch($pendingPaymentsQuery);
         $pendingPayments = ($statusFilter === 'all' || $statusFilter === 'pending_payment') ? $pendingPaymentsQuery->get() : collect();
 
-        // 6. Riwayat Selesai & Dibatalkan
-        $historyStatuses = ['completed', 'cancelled', 'rejected'];
-        if (in_array($statusFilter, $historyStatuses)) {
-            $targetStatuses = [$statusFilter];
-        } elseif ($statusFilter === 'all') {
-            $targetStatuses = $historyStatuses;
-        } else {
-            $targetStatuses = [];
-        }
+        // 6. Riwayat Selesai (Completed)
+        $completedRentalsQuery = Cart::where('user_id', $userId)
+            ->where('status', 'completed')
+            ->with('vehicle')
+            ->orderBy('created_at', 'desc');
+        $applySearch($completedRentalsQuery);
+        $completedRentals = ($statusFilter === 'all' || $statusFilter === 'completed')
+            ? $completedRentalsQuery->paginate(10, ['*'], 'completed_page')->appends($request->all())
+            : new \Illuminate\Pagination\LengthAwarePaginator([], 0, 10, null, ['pageName' => 'completed_page']);
 
-        if (!empty($targetStatuses)) {
-            $historyQuery = Cart::where('user_id', $userId)
-                ->whereIn('status', $targetStatuses)
-                ->with('vehicle')
-                ->orderBy('created_at', 'desc');
-            $applySearch($historyQuery);
-            $history = $historyQuery->paginate(15)->appends($request->all());
-        } else {
-            $history = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 15);
-        }
+        // 7. Riwayat Dibatalkan & Ditolak (Cancelled & Rejected)
+        $cancelledRentalsQuery = Cart::where('user_id', $userId)
+            ->whereIn('status', ['cancelled', 'rejected'])
+            ->with('vehicle')
+            ->orderBy('created_at', 'desc');
+        $applySearch($cancelledRentalsQuery);
+        $cancelledRentals = ($statusFilter === 'all' || in_array($statusFilter, ['cancelled', 'rejected']))
+            ? $cancelledRentalsQuery->paginate(10, ['*'], 'cancelled_page')->appends($request->all())
+            : new \Illuminate\Pagination\LengthAwarePaginator([], 0, 10, null, ['pageName' => 'cancelled_page']);
 
         // Kalkulasi keterlambatan untuk sewa aktif
         $activeRentals->each(function (Cart $rental) {
@@ -131,7 +130,8 @@ class RentalController extends Controller
             'activeRentals',
             'pendingReturns',
             'pendingPayments',
-            'history',
+            'completedRentals',
+            'cancelledRentals',
             'statusFilter',
             'search',
             'counts',

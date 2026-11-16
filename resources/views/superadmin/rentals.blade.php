@@ -79,24 +79,29 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
                         <!-- Search Box -->
-                        <div class="md:col-span-5 relative">
+                        <div class="md:col-span-4 relative">
                             <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Pencarian</label>
-                            <div class="relative">
-                                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                                    🔍
-                                </span>
-                                <input type="text" 
-                                       name="search" 
-                                       value="{{ $search }}" 
-                                       placeholder="Cari Kode Booking, Customer, atau Armada..." 
-                                       class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm text-slate-800 placeholder-slate-400 focus:bg-white focus:border-[#004B87] focus:ring-2 focus:ring-[#004B87]/20 transition">
-                            </div>
+                            <input type="text" 
+                                   name="search" 
+                                   value="{{ $search }}" 
+                                   placeholder="Cari Kode Booking, Customer, atau Armada..." 
+                                   class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm text-slate-800 placeholder-slate-400 focus:bg-white focus:border-[#004B87] focus:ring-2 focus:ring-[#004B87]/20 transition">
+                        </div>
+
+                        <!-- Filter Tanggal -->
+                        <div class="md:col-span-3">
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Filter Tanggal</label>
+                            <input type="date" 
+                                   name="date" 
+                                   value="{{ $dateFilter ?? '' }}" 
+                                   onchange="this.form.submit()"
+                                   class="w-full py-2.5 px-3 bg-slate-50 border border-slate-300 rounded-xl text-sm text-slate-800 focus:bg-white focus:border-[#004B87] focus:ring-2 focus:ring-[#004B87]/20 transition">
                         </div>
 
                         <!-- Filter Manager / Cabang -->
-                        <div class="md:col-span-4">
+                        <div class="md:col-span-3">
                             <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Filter Manager / Cabang</label>
-                            <select name="manager_id" class="w-full py-2.5 px-3 bg-slate-50 border border-slate-300 rounded-xl text-sm text-slate-800 focus:bg-white focus:border-[#004B87] focus:ring-2 focus:ring-[#004B87]/20 transition">
+                            <select name="manager_id" onchange="this.form.submit()" class="w-full py-2.5 px-3 bg-slate-50 border border-slate-300 rounded-xl text-sm text-slate-800 focus:bg-white focus:border-[#004B87] focus:ring-2 focus:ring-[#004B87]/20 transition">
                                 <option value="all" {{ $managerFilter === 'all' ? 'selected' : '' }}>🏢 Semua Cabang & Manager</option>
                                 @foreach($managers as $m)
                                     <option value="{{ $m->id }}" {{ $managerFilter == $m->id ? 'selected' : '' }}>
@@ -107,13 +112,13 @@
                         </div>
 
                         <!-- Tombol Aksi -->
-                        <div class="md:col-span-3 flex items-end gap-2">
+                        <div class="md:col-span-2 flex items-end gap-2">
                             <button type="submit" class="flex-1 py-2.5 px-4 bg-[#004B87] hover:bg-[#002D55] text-white font-bold text-sm rounded-xl transition shadow-sm flex items-center justify-center gap-1.5">
                                 <span>Filter</span>
                             </button>
-                            @if(!empty($search) || $managerFilter !== 'all' || $statusFilter !== 'all')
+                            @if(!empty($search) || $managerFilter !== 'all' || $statusFilter !== 'all' || !empty($dateFilter))
                                 <a href="{{ route('superadmin.rentals') }}" class="py-2.5 px-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm rounded-xl transition border border-slate-300" title="Reset Semua Filter">
-                                    ↺ Reset
+                                    ↺
                                 </a>
                             @endif
                         </div>
@@ -183,18 +188,30 @@
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-100 text-sm text-slate-700">
+                                @php $lastDateGroup = null; @endphp
                                 @foreach($rentals as $rental)
                                     @php
+                                        $currentDateGroup = $rental->created_at->translatedFormat('l, d F Y');
                                         $managerUser = $managers->firstWhere('location', $rental->vehicle->location ?? '');
                                     @endphp
+
+                                    @if($lastDateGroup !== $currentDateGroup)
+                                        <tr class="bg-slate-100/80 border-y border-slate-200/80">
+                                            <td colspan="7" class="py-2 px-4 text-xs font-extrabold text-[#004B87] uppercase tracking-wider">
+                                                📅 {{ $currentDateGroup }}
+                                            </td>
+                                        </tr>
+                                        @php $lastDateGroup = $currentDateGroup; @endphp
+                                    @endif
+
                                     <tr class="hover:bg-slate-50/60 transition">
                                         <!-- Booking Info -->
                                         <td class="py-4 px-4 align-top">
-                                            <div class="font-mono font-bold text-slate-800">{{ $rental->booking_code }}</div>
-                                            <div class="text-[11px] text-slate-500 mt-0.5">
-                                                {{ $rental->created_at->format('d M Y, H:i') }}
+                                            <div class="font-mono font-bold text-slate-800 whitespace-nowrap">{{ $rental->booking_code }}</div>
+                                            <div class="text-[11px] text-slate-500 mt-0.5 whitespace-nowrap">
+                                                🕒 {{ $rental->created_at->format('H:i') }} WIB
                                             </div>
-                                            <span class="inline-block mt-1 px-2 py-0.5 text-[10px] font-bold rounded bg-blue-100 text-blue-800">
+                                            <span class="inline-block mt-1 px-2 py-0.5 text-[10px] font-bold rounded bg-blue-100 text-blue-800 whitespace-nowrap">
                                                 💳 {{ strtoupper($rental->payment->payment_type ?? 'ONLINE') }}
                                             </span>
                                         </td>

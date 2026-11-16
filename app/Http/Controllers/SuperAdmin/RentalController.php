@@ -15,6 +15,7 @@ class RentalController extends Controller
         $statusFilter = $request->query('status', 'all');
         $managerFilter = $request->query('manager_id', 'all');
         $locationFilter = $request->query('location', 'all');
+        $dateFilter = $request->query('date', '');
         $search = trim($request->query('search', ''));
 
         // Ambil semua manager beserta lokasinya
@@ -23,8 +24,15 @@ class RentalController extends Controller
         // Ambil list lokasi cabang unik
         $locations = Vehicle::select('location')->distinct()->pluck('location')->filter()->values();
 
-        // Query dasar
-        $baseQuery = Cart::query()->with(['vehicle', 'user']);
+        // Query dasar (hanya transaksi sewa sesungguhnya, bukan item keranjang 'pending' yang belum dicheckout)
+        $baseQuery = Cart::query()
+            ->where('status', '!=', 'pending')
+            ->with(['vehicle', 'user']);
+
+        // Filter Tanggal
+        if (!empty($dateFilter)) {
+            $baseQuery->whereDate('created_at', $dateFilter);
+        }
 
         // Filter Manager / Lokasi
         if ($managerFilter !== 'all' && !empty($managerFilter)) {
@@ -85,8 +93,8 @@ class RentalController extends Controller
             $baseQuery->where('status', $statusFilter);
         }
 
-        // Urutkan berdasarkan yang terbaru
-        $rentals = $baseQuery->orderBy('created_at', 'desc')->paginate(15)->withQueryString();
+        // Urutkan berdasarkan aktivitas / tanggal terbaru
+        $rentals = $baseQuery->orderBy('created_at', 'desc')->orderBy('updated_at', 'desc')->paginate(15)->withQueryString();
 
         return view('superadmin.rentals', compact(
             'rentals',
@@ -97,6 +105,7 @@ class RentalController extends Controller
             'statusFilter',
             'managerFilter',
             'locationFilter',
+            'dateFilter',
             'search'
         ));
     }
