@@ -65,10 +65,27 @@
             margin-bottom: 20px;
             padding-bottom: 12px;
             border-bottom: 2px solid #f0ede8;
+            display: flex;
+            align-items: center;
         }
 
-        .profile-grid .col-title .icon {
-            margin-right: 8px;
+        .title-badge-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: rgba(67, 99, 126, 0.12);
+            color: #43637E;
+            font-size: 18px;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .dark .title-badge-icon {
+            background: rgba(67, 99, 126, 0.3);
+            color: #f0e6d0;
         }
 
         /* ===== FORM ===== */
@@ -377,7 +394,7 @@
                             <!-- ===== KOLOM KIRI: Profil ===== -->
                             <div>
                                 <div class="col-title">
-                                     <span class="section-badge"></span> Informasi Profil
+                                     <span class="title-badge-icon">👤</span> Informasi Profil
                                 </div>
 
                                 <div class="form-group">
@@ -408,7 +425,7 @@
                             <!-- ===== KOLOM KANAN: Ganti Password ===== -->
                             <div>
                                 <div class="col-title">
-                                     <span class="section-badge"></span> Ganti Password
+                                     <span class="title-badge-icon">🔒</span> Ganti Password
                                 </div>
 
                                 <div class="form-group">

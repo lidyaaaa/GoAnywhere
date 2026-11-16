@@ -61,6 +61,8 @@ class CartController extends Controller
             return back()->with('error', 'Stok tidak mencukupi! Tersisa ' . $vehicle->available_stock . ' unit.');
         }
 
+        $isDirectCheckout = $request->boolean('direct_checkout') || $request->input('direct_checkout') == '1';
+
         // 2. Cek apakah kendaraan yang sama persis sudah ada di keranjang pending
         $hasSameVehicleInCart = Cart::where('user_id', $user->id)
             ->where('status', 'pending')
@@ -68,6 +70,9 @@ class CartController extends Controller
             ->first();
 
         if ($hasSameVehicleInCart) {
+            if ($isDirectCheckout) {
+                return redirect()->route('user.cart.checkout', ['selected_carts' => [$hasSameVehicleInCart->id]]);
+            }
             return redirect()->route('user.cart')->with('info', "Kendaraan {$vehicle->name} sudah ada di keranjang Anda! Anda dapat mengatur durasi dan mencentangnya menggunakan checkbox saat checkout.");
         }
 
@@ -86,7 +91,7 @@ class CartController extends Controller
             $tempBookingCode = 'TEMP-' . strtoupper(Str::random(8));
         } while (Cart::where('booking_code', $tempBookingCode)->exists());
 
-        Cart::create([
+        $newCart = Cart::create([
             'id' => Str::uuid(),
             'user_id' => $user->id,
             'vehicle_id' => $vehicle->id,
@@ -103,6 +108,10 @@ class CartController extends Controller
             'pickup_location' => $user->address . ', ' . $user->location,
             'payment_deadline' => now()->addMinutes(30),
         ]);
+
+        if ($isDirectCheckout) {
+            return redirect()->route('user.cart.checkout', ['selected_carts' => [$newCart->id]]);
+        }
 
         return redirect()->route('user.cart')->with('success', 'Kendaraan berhasil ditambahkan ke keranjang!');
     }

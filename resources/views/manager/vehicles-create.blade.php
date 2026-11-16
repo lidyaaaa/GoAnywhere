@@ -232,7 +232,7 @@
                             <!-- Tahun -->
                             <div class="form-group">
                                 <label>Tahun</label>
-                                <input type="number" name="year" required min="2000" max="{{ date('Y') }}" placeholder="2024">
+                                <input type="number" name="year" required min="1900" max="{{ date('Y') + 1 }}" placeholder="2024">
                             </div>
 
                             <!-- Transmisi Mobil -->

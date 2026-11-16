@@ -295,22 +295,16 @@ h1, h2, h3, h4, h5, h6 {
     position: relative;
     flex-shrink: 0;
 }
-.icon::before,
-.hero-icon::before,
-.stat-icon::before,
-.city-icon::before,
-.search-icon::before,
-.status-icon::before,
-.feature-icon::before,
-.section-badge::before,
-.contact-icon::before {
-    content: '';
-    position: absolute;
-    width: 14px;
-    height: 14px;
-    border-radius: 999px;
-    background: #004B87;
-    opacity: 0.18;
+.icon:empty::before,
+.hero-icon:empty::before,
+.stat-icon:empty::before,
+.city-icon:empty::before,
+.search-icon:empty::before,
+.status-icon:empty::before,
+.feature-icon:empty::before,
+.section-badge:empty::before,
+.contact-icon:empty::before {
+    display: none;
 }
 .hero-icon {
     width: 120px;

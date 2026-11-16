@@ -60,7 +60,7 @@ class VehicleController extends Controller
             'vehicle_type' => 'required|in:car,motorcycle',
             'brand' => 'required|string|max:100',
             'type' => 'required|string|max:100',
-            'year' => 'required|integer|min:2000|max:' . date('Y'),
+            'year' => 'required|integer|min:1900|max:' . (date('Y') + 1),
             'transmission' => 'nullable|in:manual,automatic',
             'transmission_motor' => 'nullable|in:matic,manual',
             'capacity' => 'required|integer|min:1',
@@ -78,6 +78,14 @@ class VehicleController extends Controller
             $imagePath = $request->file('image')->store('vehicles', 'public');
         }
 
+        if ($request->vehicle_type === 'car') {
+            $transmission = $request->transmission ?? 'automatic';
+            $transmissionMotor = null;
+        } else {
+            $transmissionMotor = $request->transmission_motor ?? 'matic';
+            $transmission = $transmissionMotor === 'matic' ? 'automatic' : 'manual';
+        }
+
         Vehicle::create([
             'id' => Str::uuid(),
             'manager_id' => auth()->id(),
@@ -86,8 +94,8 @@ class VehicleController extends Controller
             'brand' => $request->brand,
             'type' => $request->type,
             'year' => $request->year,
-            'transmission' => $request->transmission ?? $request->transmission_motor,
-            'transmission_motor' => $request->transmission_motor,
+            'transmission' => $transmission,
+            'transmission_motor' => $transmissionMotor,
             'capacity' => $request->capacity,
             'color' => $request->color,
             'fuel' => $request->fuel,
@@ -120,7 +128,7 @@ class VehicleController extends Controller
             'vehicle_type' => 'required|in:car,motorcycle',
             'brand' => 'required|string|max:100',
             'type' => 'required|string|max:100',
-            'year' => 'required|integer|min:2000|max:' . date('Y'),
+            'year' => 'required|integer|min:1900|max:' . (date('Y') + 1),
             'transmission' => 'nullable|in:manual,automatic',
             'transmission_motor' => 'nullable|in:matic,manual',
             'capacity' => 'required|integer|min:1',
@@ -154,14 +162,22 @@ class VehicleController extends Controller
             $vehicle->image = $request->file('image')->store('vehicles', 'public');
         }
 
+        if ($request->vehicle_type === 'car') {
+            $transmission = $request->transmission ?? 'automatic';
+            $transmissionMotor = null;
+        } else {
+            $transmissionMotor = $request->transmission_motor ?? 'matic';
+            $transmission = $transmissionMotor === 'matic' ? 'automatic' : 'manual';
+        }
+
         $vehicle->update([
             'name' => $request->name,
             'vehicle_type' => $request->vehicle_type,
             'brand' => $request->brand,
             'type' => $request->type,
             'year' => $request->year,
-            'transmission' => $request->transmission ?? $request->transmission_motor,
-            'transmission_motor' => $request->transmission_motor,
+            'transmission' => $transmission,
+            'transmission_motor' => $transmissionMotor,
             'capacity' => $request->capacity,
             'color' => $request->color,
             'fuel' => $request->fuel,

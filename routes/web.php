@@ -71,6 +71,7 @@ Route::middleware(['auth', 'verified', 'role:user'])->prefix('user')->name('user
     
     // PROFILE PERUSAHAAN (5 lokasi + kontak)
     Route::get('/profile', [UserProfileController::class, 'company'])->name('profile');
+    Route::get('/cabang-kami', [UserProfileController::class, 'company'])->name('profile.company');
     
     // SEWA SAYA (di menu navigasi)
     Route::get('/rental', [RentalController::class, 'index'])->name('rental');

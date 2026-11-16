@@ -353,7 +353,14 @@
                             <div class="payment-option">
                                 <input type="radio" name="payment_method" value="qris" id="method_qris" required>
                                 <label for="method_qris" class="payment-option-label">
-                                    <span class="icon">📱</span>
+                                    <span class="icon">
+                                        <svg class="w-6 h-6 mx-auto text-slate-800 dark:text-slate-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <rect x="3" y="3" width="7" height="7" rx="1" />
+                                            <rect x="14" y="3" width="7" height="7" rx="1" />
+                                            <rect x="3" y="14" width="7" height="7" rx="1" />
+                                            <path d="M14 14h3v3h-3zM17 17h4v4h-4z" />
+                                        </svg>
+                                    </span>
                                     <span>QRIS</span>
                                 </label>
                             </div>
@@ -361,7 +368,11 @@
                             <div class="payment-option">
                                 <input type="radio" name="payment_method" value="bank_transfer" id="method_transfer" required>
                                 <label for="method_transfer" class="payment-option-label">
-                                    <span class="icon">🏦</span>
+                                    <span class="icon">
+                                        <svg class="w-6 h-6 mx-auto text-[#004B87] dark:text-sky-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 21h18M3 10h18M5 10v8m4-8v8m6-8v8m4-8v8M3 10l9-6 9 6" />
+                                        </svg>
+                                    </span>
                                     <span>Transfer</span>
                                 </label>
                             </div>
@@ -369,7 +380,12 @@
                             <div class="payment-option">
                                 <input type="radio" name="payment_method" value="gopay" id="method_gopay" required>
                                 <label for="method_gopay" class="payment-option-label">
-                                    <span class="icon">💚</span>
+                                    <span class="icon">
+                                        <svg class="w-6 h-6 mx-auto" viewBox="0 0 24 24" fill="none">
+                                            <circle cx="12" cy="12" r="10" fill="#00AA13"/>
+                                            <circle cx="12" cy="12" r="4.5" fill="#ffffff"/>
+                                        </svg>
+                                    </span>
                                     <span>GoPay</span>
                                 </label>
                             </div>
@@ -377,7 +393,12 @@
                             <div class="payment-option">
                                 <input type="radio" name="payment_method" value="dana" id="method_dana" required>
                                 <label for="method_dana" class="payment-option-label">
-                                    <span class="icon">💙</span>
+                                    <span class="icon">
+                                        <svg class="w-6 h-6 mx-auto" viewBox="0 0 24 24" fill="none">
+                                            <rect x="2" y="3" width="20" height="18" rx="4" fill="#118EEA"/>
+                                            <path d="M7 8h10M7 12h10M7 16h6" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+                                        </svg>
+                                    </span>
                                     <span>DANA</span>
                                 </label>
                             </div>
@@ -385,7 +406,13 @@
                             <div class="payment-option">
                                 <input type="radio" name="payment_method" value="ovo" id="method_ovo" required>
                                 <label for="method_ovo" class="payment-option-label">
-                                    <span class="icon">💜</span>
+                                    <span class="icon">
+                                        <svg class="w-6 h-6 mx-auto" viewBox="0 0 24 24" fill="none">
+                                            <circle cx="12" cy="12" r="10" fill="#4C3494"/>
+                                            <circle cx="12" cy="12" r="6" fill="#ffffff"/>
+                                            <circle cx="12" cy="12" r="3.2" fill="#4C3494"/>
+                                        </svg>
+                                    </span>
                                     <span>OVO</span>
                                 </label>
                             </div>

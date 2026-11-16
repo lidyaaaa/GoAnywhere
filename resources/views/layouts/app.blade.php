@@ -35,6 +35,10 @@
             <main>
                 {{ $slot }}
             </main>
+
+            @if(!auth()->check() || auth()->user()->role === 'user')
+                @include('layouts.footer')
+            @endif
         </div>
     </body>
 </html>

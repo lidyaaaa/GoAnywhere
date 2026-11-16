@@ -1113,46 +1113,5 @@
                 </div>
             </div>
         </div>
-
-        <!-- ============================================ -->
-        <!-- FOOTER                                      -->
-        <!-- ============================================ -->
-        <footer class="footer">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-10">
-                    <div>
-                        <h3 class="footer-title">🚗 GoAnywhere</h3>
-                        <p class="footer-text">Solusi rental kendaraan terpercaya</p>
-                    </div>
-                    <div>
-                        <h4 class="footer-heading">📍 Lokasi</h4>
-                        <ul class="footer-list">
-                            <li>📍 Jakarta</li>
-                            <li>📍 Bogor</li>
-                            <li>📍 Depok</li>
-                            <li>📍 Tangerang</li>
-                            <li>📍 Bekasi</li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h4 class="footer-heading">📞 Kontak</h4>
-                        <ul class="footer-list">
-                            <li>📱 0812-3456-7890</li>
-                            <li>✉️ info@goanywhere.com</li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h4 class="footer-heading">🕐 Jam Operasional</h4>
-                        <ul class="footer-list">
-                            <li>📅 Senin - Minggu</li>
-                            <li>⏰ 08:00 - 22:00</li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="footer-divider">
-                    © {{ date('Y') }} GoAnywhere. All rights reserved. Made with ❤️
-                </div>
-            </div>
-        </footer>
     </div>
 </x-app-layout>

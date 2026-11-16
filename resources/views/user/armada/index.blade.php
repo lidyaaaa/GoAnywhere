@@ -931,14 +931,31 @@
                                         Habis
                                     </button>
                                 @else
-                                    <form action="{{ route('user.cart.add') }}" method="POST" style="margin:0; width:100%;">
-                                        @csrf
-                                        <input type="hidden" name="vehicle_id" value="{{ $vehicle->id }}">
-                                        <input type="hidden" name="quantity" value="1">
-                                        <button type="submit" class="btn-booking" style="width:100%;">
+                                    @php
+                                        $userLocation = auth()->check() ? auth()->user()->location : null;
+                                        $isSameLocation = ($userLocation && $userLocation === $vehicle->location);
+                                    @endphp
+
+                                    @if($isSameLocation)
+                                        {{-- SAMA LOKASI: Langsung ke Halaman Checkout / Payment --}}
+                                        <form action="{{ route('user.cart.add') }}" method="POST" style="margin:0; width:100%;">
+                                            @csrf
+                                            <input type="hidden" name="vehicle_id" value="{{ $vehicle->id }}">
+                                            <input type="hidden" name="direct_checkout" value="1">
+                                            <button type="submit" class="btn-booking" style="width:100%;" title="Sewa unit ini dan langsung ke pembayaran">
+                                                Booking
+                                            </button>
+                                        </form>
+                                    @else
+                                        {{-- BEDA LOKASI: Tampilkan peringatan tidak bisa pesan di luar daerah --}}
+                                        <button type="button" 
+                                                class="btn-booking" 
+                                                style="width:100%; background:#f1f5f9; color:#475569; border: 1.5px solid #cbd5e1;" 
+                                                title="Kendaraan ini berada di cabang {{ $vehicle->location }}. Klik untuk info selengkapnya."
+                                                onclick="openLocationMismatchModal('{{ addslashes($vehicle->name) }}', '{{ $vehicle->location }}', '{{ $userLocation ?? 'Belum Diatur' }}')">
                                             Booking
                                         </button>
-                                    </form>
+                                    @endif
                                 @endif
                             </div>
                         </div>
@@ -963,4 +980,55 @@
             </div>
         </div>
     </div>
+
+    <!-- ===== MODAL PERINGATAN BEDA WILAYAH ===== -->
+    <div id="modalLocationMismatch" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 animate-fadeInUp text-center">
+            <div class="w-16 h-16 rounded-2xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 flex items-center justify-center text-3xl mx-auto mb-4 shadow-sm">
+                📍
+            </div>
+            
+            <h3 class="text-lg font-bold text-slate-900 dark:text-white">
+                Tidak Dapat Memesan di Luar Daerah
+            </h3>
+            
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
+                Kendaraan <strong id="modalVehName" class="text-slate-800 dark:text-slate-200"></strong> berada di <strong class="text-blue-600 dark:text-blue-400">Cabang <span id="modalVehLoc"></span></strong>, sedangkan lokasi domisili Anda terdaftar di <strong class="text-rose-600 dark:text-rose-400"><span id="modalUserLoc"></span></strong>.
+            </p>
+
+            <div class="p-3 my-4 rounded-xl bg-amber-50/80 dark:bg-slate-800/80 border border-amber-200/80 dark:border-amber-900/50 text-left text-xs text-amber-800 dark:text-amber-300">
+                💡 <b>Kebijakan Rental:</b> Pengantaran unit hanya melayani domisili yang sama dengan cabang kendaraan. Silakan ganti lokasi di menu profil jika Anda berdomisili di kota tersebut.
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-center gap-2.5 mt-5">
+                <a href="{{ route('user.profile.user') }}" class="w-full py-2.5 px-4 bg-[#004B87] hover:bg-[#002D55] text-white rounded-xl text-xs font-bold shadow-md transition flex items-center justify-center gap-2">
+                    <span>⚙️</span> Ganti Lokasi di Profil
+                </a>
+                <button type="button" onclick="closeLocationMismatchModal()" class="w-full sm:w-auto py-2.5 px-4 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl text-xs font-bold transition">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openLocationMismatchModal(vehName, vehLoc, userLoc) {
+            document.getElementById('modalVehName').textContent = vehName;
+            document.getElementById('modalVehLoc').textContent = vehLoc;
+            document.getElementById('modalUserLoc').textContent = userLoc;
+            const modal = document.getElementById('modalLocationMismatch');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeLocationMismatchModal() {
+            const modal = document.getElementById('modalLocationMismatch');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        document.getElementById('modalLocationMismatch')?.addEventListener('click', function(e) {
+            if (e.target === this) closeLocationMismatchModal();
+        });
+    </script>
 </x-app-layout>

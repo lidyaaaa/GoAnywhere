@@ -101,17 +101,27 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 2px;
+            margin-right: 4px;
         }
 
         .cart-checkbox {
-            width: 22px;
-            height: 22px;
+            width: 24px;
+            height: 24px;
             border-radius: 6px;
             border: 2px solid #94a3b8;
             cursor: pointer;
             accent-color: #004B87;
             transition: all 0.2s;
+        }
+
+        .cart-checkbox:checked {
+            background-color: #004B87 !important;
+            border-color: #004B87 !important;
+        }
+
+        .cart-card {
+            cursor: pointer;
+            user-select: none;
         }
 
         .cart-checkbox:disabled {
@@ -456,16 +466,16 @@
                             $canSelect = $locMatch && $stockOk;
                         @endphp
 
-                        <div class="cart-card" id="cart_card_{{ $cart->id }}">
+                        <div class="cart-card {{ $canSelect && $index === 0 ? 'selected' : '' }}" id="cart_card_{{ $cart->id }}" onclick="handleCardClick('{{ $cart->id }}', event)">
                             <div class="cart-item-row">
 
                                 <!-- Checkbox Selector -->
-                                <div class="cart-select-wrap">
+                                <div class="cart-select-wrap" onclick="event.stopPropagation()">
                                     <input type="checkbox" 
                                            name="selected_carts[]" 
                                            value="{{ $cart->id }}" 
                                            id="cb_{{ $cart->id }}"
-                                           class="cart-checkbox"
+                                           class="cart-checkbox w-6 h-6 rounded-md text-[#004B87] focus:ring-[#004B87]"
                                            data-id="{{ $cart->id }}"
                                            data-type="{{ $cart->vehicle->vehicle_type }}"
                                            data-subtotal="{{ $cart->subtotal }}"
@@ -581,47 +591,52 @@
     </div>
 
     <script>
+    function handleCardClick(cartId, event) {
+        // Jangan toggle jika user mengklik tombol delete atau link
+        if (event.target.closest('button') || event.target.closest('a') || event.target.closest('form')) {
+            return;
+        }
+        const cb = document.getElementById('cb_' + cartId);
+        if (cb && !cb.disabled) {
+            cb.checked = !cb.checked;
+            handleCartCheckboxChange(cb);
+        }
+    }
+
     function handleCartCheckboxChange(currentCheckbox) {
-        const checkboxes = document.querySelectorAll('.cart-checkbox:checked');
-        let carCount = 0;
-        let motorCount = 0;
-
-        checkboxes.forEach(cb => {
-            const type = cb.dataset.type;
-            if (type === 'car') carCount++;
-            if (type === 'motorcycle') motorCount++;
-        });
-
-        // Enforce max 1 car & max 1 motorcycle
         if (currentCheckbox.checked) {
             const currentType = currentCheckbox.dataset.type;
-            if (currentType === 'car' && carCount > 1) {
-                currentCheckbox.checked = false;
-                alert('Kebijakan Rental: Anda hanya dapat memilih maksimal 1 Mobil dalam satu transaksi. Batalkan centang mobil sebelumnya jika ingin mengganti.');
-            } else if (currentType === 'motorcycle' && motorCount > 1) {
-                currentCheckbox.checked = false;
-                alert('Kebijakan Rental: Anda hanya dapat memilih maksimal 1 Sepeda Motor dalam satu transaksi. Batalkan centang motor sebelumnya jika ingin mengganti.');
-            }
+            
+            // Auto replace: jika sudah ada kendaraan sejenis yang dicentang, uncheck yang lama dan ganti dengan yang baru
+            document.querySelectorAll('.cart-checkbox:checked').forEach(cb => {
+                if (cb !== currentCheckbox && cb.dataset.type === currentType) {
+                    cb.checked = false;
+                    const oldCard = document.getElementById('cart_card_' + cb.dataset.id);
+                    if (oldCard) oldCard.classList.remove('selected');
+                }
+            });
         }
 
         recalculateCartSummary();
     }
 
     function recalculateCartSummary() {
-        const checkboxes = document.querySelectorAll('.cart-checkbox:checked');
+        const checkboxes = document.querySelectorAll('.cart-checkbox');
         let selectedCount = 0;
 
-        // Reset visual card selection
-        document.querySelectorAll('.cart-card').forEach(card => card.classList.remove('selected'));
-
         checkboxes.forEach(cb => {
-            selectedCount++;
             const card = document.getElementById('cart_card_' + cb.dataset.id);
-            if (card) card.classList.add('selected');
+            if (cb.checked) {
+                selectedCount++;
+                if (card) card.classList.add('selected');
+            } else {
+                if (card) card.classList.remove('selected');
+            }
         });
 
         // Update DOM
-        document.getElementById('selectedCountBadge').textContent = selectedCount + ' Unit Dipilih';
+        const badge = document.getElementById('selectedCountBadge');
+        if (badge) badge.textContent = selectedCount + ' Unit Dipilih';
 
         const checkoutBtn = document.getElementById('checkoutBtn');
         const warning = document.getElementById('selectionWarning');

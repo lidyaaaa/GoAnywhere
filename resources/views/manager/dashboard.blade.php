@@ -14,89 +14,109 @@
             min-height: 100vh;
         }
 
-        /* ===== STATISTIK 2x3 ===== */
+        /* ===== HERO INCOME CARD ===== */
+        .income-hero-card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 20px 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e8e4de;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .income-hero-card:hover {
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            border-color: #43637E;
+        }
+
+        /* ===== STATISTIK GRID (4 Kolom Ramping & Proporsional) ===== */
         .stat-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-            margin-bottom: 32px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin-bottom: 24px;
         }
 
         .stat-card {
             background: #ffffff;
-            border-radius: 16px;
-            padding: 24px 20px;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15), 0 4px 20px rgba(0, 0, 0, 0.08);
+            border-radius: 14px;
+            padding: 14px 16px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
             border: 1px solid #e8e4de;
-            transition: all 0.4s ease;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 12px;
         }
 
         .stat-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 55px rgba(0, 0, 0, 0.22), 0 12px 35px rgba(0, 0, 0, 0.12);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
             border-color: #43637E;
         }
 
         .stat-card .icon {
-            font-size: 36px;
+            font-size: 22px;
             flex-shrink: 0;
-            width: 56px;
-            height: 56px;
+            width: 44px;
+            height: 44px;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(67, 99, 126, 0.08);
-            border-radius: 12px;
+            background: rgba(67, 99, 126, 0.06);
+            border-radius: 10px;
         }
 
         .stat-card .info {
             flex: 1;
+            min-width: 0;
         }
 
         .stat-card .info .number {
-            font-size: 28px;
+            font-size: 20px;
             font-weight: 700;
-            font-family: 'Georgia', serif;
+            font-family: inherit;
             color: #2c3e50;
             line-height: 1.2;
         }
 
         .stat-card .info .number.income {
-            color: #4a7a5a;
+            color: #2e7d32;
         }
 
         .stat-card .info .number.blue {
-            color: #43637E;
+            color: #004B87;
         }
 
         .stat-card .info .number.green {
-            color: #4a7a5a;
+            color: #2e7d32;
         }
 
         .stat-card .info .number.orange {
-            color: #b08a3a;
+            color: #d97706;
         }
 
         .stat-card .info .number.purple {
-            color: #7a5a8a;
+            color: #7c3aed;
         }
 
         .stat-card .info .number.teal {
-            color: #3a7a7a;
+            color: #0d9488;
         }
 
         .stat-card .info .number.red {
-            color: #b04a4a;
+            color: #dc2626;
         }
 
         .stat-card .info .label {
-            font-size: 13px;
-            color: #7a8a9a;
-            font-weight: 500;
+            font-size: 11.5px;
+            color: #64748b;
+            font-weight: 600;
             margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         /* ===== SECTION CARD ===== */
@@ -217,7 +237,9 @@
 
         /* ===== DARK MODE ===== */
         .dark .manager-section { background: #1a2632; }
-        .dark .stat-card { background: #1a2632; border-color: #2c3e50; box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
+        .dark .income-hero-card { background: #1a2632; border-color: #2c3e50; box-shadow: 0 8px 30px rgba(0,0,0,0.4); }
+        .dark .income-hero-card:hover { border-color: #43637E; }
+        .dark .stat-card { background: #1a2632; border-color: #2c3e50; box-shadow: 0 8px 30px rgba(0,0,0,0.4); }
         .dark .stat-card:hover { border-color: #43637E; }
         .dark .stat-card .info .number { color: #f0ede8; }
         .dark .stat-card .info .label { color: #b0bec5; }
@@ -233,24 +255,17 @@
         .dark .section-card .view-all:hover { color: #ffffff; }
         .dark .empty-state { color: #b0bec5; }
 
-        @media (max-width: 768px) {
-            .stat-grid { gap: 12px; }
-            .stat-card { padding: 16px 14px; }
-            .stat-card .icon { font-size: 28px; width: 44px; height: 44px; }
-            .stat-card .info .number { font-size: 22px; }
-            .stat-card .info .label { font-size: 12px; }
-            .section-card { padding: 18px 16px; }
+        @media (max-width: 1024px) {
+            .stat-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
         }
 
-        @media (max-width: 480px) {
-            .manager-section { padding: 24px 0 40px; }
-            .stat-grid { gap: 10px; }
+        @media (max-width: 640px) {
+            .stat-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
             .stat-card { padding: 12px 10px; }
-            .stat-card .icon { font-size: 22px; width: 36px; height: 36px; }
-            .stat-card .info .number { font-size: 18px; }
+            .stat-card .icon { font-size: 18px; width: 36px; height: 36px; }
+            .stat-card .info .number { font-size: 17px; }
             .stat-card .info .label { font-size: 11px; }
-            .section-card { padding: 14px 12px; }
-            .section-card thead th, .section-card tbody td { padding: 8px 10px; font-size: 12px; }
+            .section-card { padding: 16px 14px; }
         }
 
         ::-webkit-scrollbar { width: 10px; }
@@ -264,23 +279,94 @@
     <div class="manager-section">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-            <!-- ===== STATISTIK 2x3 ===== -->
-            <div class="stat-grid">
-                    <!-- Total Income -->
-                <div class="stat-card">
-                    <div class="icon">💰</div>
-                    <div class="info">
-                        <div class="number income">Rp {{ number_format($totalIncome ?? 0, 0, ',', '.') }}</div>
-                        <div class="label">Total Income</div>
+            <!-- ===== HERO INCOME CARD WITH CLEAR BREAKDOWN ===== -->
+            <div class="income-hero-card">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+                    <!-- Left: Total Income Header -->
+                    <div class="flex items-center gap-4">
+                        <div class="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200/80 dark:border-emerald-800/50 flex items-center justify-center text-3xl shadow-sm flex-shrink-0">
+                            💰
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Total Income Cabang</span>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-emerald-100 text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-300">
+                                    {{ Auth::user()->location }}
+                                </span>
+                            </div>
+                            <div class="text-2xl sm:text-3xl font-extrabold text-emerald-600 dark:text-emerald-400 tracking-tight mt-0.5">
+                                Rp {{ number_format($totalIncome ?? 0, 0, ',', '.') }}
+                            </div>
+                            <div class="text-[11px] text-slate-400 dark:text-slate-500">
+                                Akumulasi realtime dari seluruh sewa, denda telat, dan reparasi unit
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Breakdown Items (Sewa, Denda, Reparasi) -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-4 lg:pt-0 border-t lg:border-t-0 lg:border-l border-slate-200/70 dark:border-slate-700/60 lg:pl-6">
+                        <!-- Dari Sewa -->
+                        <div class="px-3.5 py-2.5 rounded-xl bg-blue-50/80 dark:bg-slate-800/80 border border-blue-200/70 dark:border-blue-900/40 flex items-center gap-3">
+                            <span class="text-xl flex-shrink-0">🚗</span>
+                            <div class="min-w-0">
+                                <div class="text-[10.5px] font-bold uppercase tracking-wider text-blue-700 dark:text-blue-400 truncate">Dari Sewa Armada</div>
+                                <div class="text-sm font-extrabold text-slate-800 dark:text-slate-100 mt-0.5">
+                                    Rp {{ number_format($totalRentalIncome ?? 0, 0, ',', '.') }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Dari Denda Telat -->
+                        <div class="px-3.5 py-2.5 rounded-xl bg-amber-50/80 dark:bg-slate-800/80 border border-amber-200/70 dark:border-amber-900/40 flex items-center gap-3">
+                            <span class="text-xl flex-shrink-0">⏳</span>
+                            <div class="min-w-0">
+                                <div class="text-[10.5px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400 truncate">Dari Denda Telat</div>
+                                <div class="text-sm font-extrabold text-slate-800 dark:text-slate-100 mt-0.5">
+                                    Rp {{ number_format($totalLateFineIncome ?? 0, 0, ',', '.') }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Dari Biaya Reparasi -->
+                        <div class="px-3.5 py-2.5 rounded-xl bg-rose-50/80 dark:bg-slate-800/80 border border-rose-200/70 dark:border-rose-900/40 flex items-center gap-3">
+                            <span class="text-xl flex-shrink-0">🛠️</span>
+                            <div class="min-w-0">
+                                <div class="text-[10.5px] font-bold uppercase tracking-wider text-rose-700 dark:text-rose-400 truncate">Dari Biaya Reparasi</div>
+                                <div class="text-sm font-extrabold text-slate-800 dark:text-slate-100 mt-0.5">
+                                    Rp {{ number_format($totalDamageFeeIncome ?? 0, 0, ',', '.') }}
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+            </div>
 
+            <!-- ===== STATISTIK OPERASIONAL & STOK (4 Kolom Ramping & Simetris) ===== -->
+            <div class="stat-grid">
                 <!-- Total Armada -->
                 <div class="stat-card">
                     <div class="icon">🚗</div>
                     <div class="info">
                         <div class="number blue">{{ $totalVehicles ?? 0 }}</div>
                         <div class="label">Total Armada</div>
+                    </div>
+                </div>
+
+                <!-- Unit Mobil -->
+                <div class="stat-card">
+                    <div class="icon">🚘</div>
+                    <div class="info">
+                        <div class="number orange">{{ $totalCars ?? 0 }}</div>
+                        <div class="label">Unit Mobil</div>
+                    </div>
+                </div>
+
+                <!-- Unit Motor -->
+                <div class="stat-card">
+                    <div class="icon">🏍️</div>
+                    <div class="info">
+                        <div class="number teal">{{ $totalMotorcycles ?? 0 }}</div>
+                        <div class="label">Unit Motor</div>
                     </div>
                 </div>
 
@@ -302,30 +388,12 @@
                     </div>
                 </div>
 
-                <!-- Mobil -->
-                <div class="stat-card">
-                    <div class="icon">🚘</div>
-                    <div class="info">
-                        <div class="number orange">{{ $totalCars ?? 0 }}</div>
-                        <div class="label">Mobil</div>
-                    </div>
-                </div>
-
-                <!-- Motor -->
-                <div class="stat-card">
-                    <div class="icon">🏍️</div>
-                    <div class="info">
-                        <div class="number teal">{{ $totalMotorcycles ?? 0 }}</div>
-                        <div class="label">Motor</div>
-                    </div>
-                </div>
-
-                <!-- Total Stok -->
+                <!-- Total Stok Unit -->
                 <div class="stat-card">
                     <div class="icon">📊</div>
                     <div class="info">
                         <div class="number blue">{{ $totalStock ?? 0 }}</div>
-                        <div class="label">Total Stok</div>
+                        <div class="label">Total Stok Unit</div>
                     </div>
                 </div>
 
@@ -342,8 +410,8 @@
                 <div class="stat-card">
                     <div class="icon">🛠️</div>
                     <div class="info">
-                        <div class="number orange">{{ $totalDamagedStock ?? 0 }}</div>
-                        <div class="label">Unit Rusak/Servis</div>
+                        <div class="number {{ ($totalDamagedStock ?? 0) > 0 ? 'red' : 'orange' }}">{{ $totalDamagedStock ?? 0 }}</div>
+                        <div class="label">Unit Rusak / Servis</div>
                     </div>
                 </div>
             </div>
@@ -527,12 +595,14 @@
 
                     <div class="p-4 rounded-2xl bg-gradient-to-r from-rose-50 to-amber-50 dark:from-slate-800 dark:to-slate-850 border border-rose-200/80 dark:border-rose-900/50 flex items-center justify-between">
                         <div>
-                            <div class="text-xs font-bold uppercase tracking-wider text-rose-700">Pemasukan Denda & Reparasi</div>
+                            <div class="text-xs font-bold uppercase tracking-wider text-rose-700 dark:text-rose-400">Pemasukan Denda & Reparasi</div>
                             <div class="text-2xl font-black text-rose-600 dark:text-rose-400 mt-1">
                                 Rp {{ number_format($monthlyFineRevenue ?? 0, 0, ',', '.') }}
                             </div>
-                            <div class="text-[11px] text-slate-500 mt-1">
-                                Dari denda telat & perbaikan cabang
+                            <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 flex flex-wrap gap-x-2">
+                                <span>⏳ Denda: <b>Rp {{ number_format($monthlyLateFineRevenue ?? 0, 0, ',', '.') }}</b></span>
+                                <span>•</span>
+                                <span>🛠️ Reparasi: <b>Rp {{ number_format($monthlyDamageFeeRevenue ?? 0, 0, ',', '.') }}</b></span>
                             </div>
                         </div>
                         <span class="text-3xl">🛠️</span>

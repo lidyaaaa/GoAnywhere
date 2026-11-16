@@ -111,12 +111,34 @@
             opacity: 1;
         }
 
-        .layanan-card .icon {
-            font-size: 72px;
-            margin-bottom: 16px;
-            display: block;
+        .layanan-card .icon-box {
+            width: 72px;
+            height: 72px;
+            margin: 0 auto 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 20px;
+            background: linear-gradient(135deg, rgba(67, 99, 126, 0.12), rgba(67, 99, 126, 0.05));
+            border: 1px solid rgba(67, 99, 126, 0.2);
+            font-size: 34px;
+            box-shadow: 0 8px 20px rgba(67, 99, 126, 0.1);
             position: relative;
             z-index: 1;
+        }
+
+        .info-box .icon-box {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 14px;
+            background: linear-gradient(135deg, rgba(67, 99, 126, 0.12), rgba(67, 99, 126, 0.05));
+            border: 1px solid rgba(67, 99, 126, 0.2);
+            font-size: 24px;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(67, 99, 126, 0.08);
         }
 
         .layanan-card h3 {
@@ -503,15 +525,15 @@
             <div class="layanan-grid">
                 <!-- Sewa Harian -->
                 <div class="layanan-card">
-                    <span class="icon"></span>
+                    <div class="icon-box">🚗</div>
                     <h3>Sewa Harian</h3>
                     <div class="price">Rp 120.000 <small>/ hari</small></div>
                     <p class="desc">Fleksibel untuk kebutuhan harian Anda</p>
-                    <div class="badge">                     Maksimal 7 Hari</div>
+                    <div class="badge">Maksimal 7 Hari</div>
                     <ul class="feature-list">
                         <li>Bebas pilih kendaraan</li>
                         <li>Bebas pilih lokasi</li>
-                        <li>Harga transparan</li>
+                        <li>Harga transparan & jujur</li>
                     </ul>
                     <a href="{{ route('user.armada') }}" class="layanan-btn">
                         Lihat Armada →
@@ -520,13 +542,13 @@
 
                 <!-- Sewa Mingguan -->
                 <div class="layanan-card">
-                    <span class="icon"></span>
+                    <div class="icon-box">🎁</div>
                     <h3>Sewa Mingguan</h3>
                     <div class="price">Rp 700.000 <small>/ minggu</small></div>
-                    <p class="desc">Lebih hemat untuk sewa 7 hari</p>
-                    <div class="badge">                     Maksimal 1 Minggu</div>
+                    <p class="desc">Lebih hemat untuk sewa paket 7 hari penuh</p>
+                    <div class="badge">Paket Hemat 7 Hari</div>
                     <ul class="feature-list">
-                        <li>Diskon 10%</li>
+                        <li>Diskon hemat spesial</li>
                         <li>Bebas pilih kendaraan</li>
                         <li>Bebas pilih lokasi</li>
                     </ul>
@@ -540,14 +562,14 @@
             <div class="info-grid">
                 <!-- Lokasi -->
                 <div class="info-box">
-                    <div class="flex items-start gap-5">
-                         <span class="icon"></span>
+                    <div class="flex items-start gap-4">
+                        <div class="icon-box">📍</div>
                         <div style="flex: 1;">
                             <h4>Lokasi Pengambilan</h4>
                             <p class="mt-1">
-                                Anda bisa mengambil kendaraan di 5 lokasi kami:
+                                Anda bisa mengambil kendaraan di 5 gerai cabang resmi kami:
                             </p>
-                            <div class="flex flex-wrap gap-3 mt-4">
+                            <div class="flex flex-wrap gap-2.5 mt-4">
                                 <span class="location-tag">Jakarta</span>
                                 <span class="location-tag">Bogor</span>
                                 <span class="location-tag">Depok</span>
@@ -560,13 +582,13 @@
 
                 <!-- Aturan Sewa -->
                 <div class="info-box">
-                    <div class="flex items-start gap-5">
-                         <span class="icon"></span>
+                    <div class="flex items-start gap-4">
+                        <div class="icon-box">📋</div>
                         <div style="flex: 1;">
                             <h4>Aturan Sewa</h4>
                             <ul class="rule-list">
-                                <li>Maksimal sewa <strong>7 hari</strong> untuk harian</li>
-                                <li>Maksimal sewa <strong>1 minggu</strong> untuk mingguan</li>
+                                <li>Maksimal sewa <strong>7 hari</strong> untuk paket harian</li>
+                                <li>Maksimal sewa <strong>1 minggu</strong> untuk paket mingguan</li>
                                 <li>Pengembalian tepat waktu dengan toleransi 30 menit</li>
                                 <li>Denda keterlambatan <strong>Rp 50.000/jam</strong></li>
                             </ul>

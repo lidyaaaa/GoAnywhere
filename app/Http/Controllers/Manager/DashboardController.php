@@ -30,14 +30,23 @@ class DashboardController extends Controller
             ->selectRaw('SUM(CASE WHEN total_payment > 0 THEN total_payment ELSE subtotal END) as total')
             ->value('total') ?? 0;
 
-        $totalFineIncome = Cart::where('status', 'completed')
+        // Rincian denda keterlambatan
+        $totalLateFineIncome = Cart::where('status', 'completed')
             ->whereHas('vehicle', function($q) use ($location) {
                 $q->where('location', $location);
             })
-            ->selectRaw('SUM(GREATEST(0, COALESCE(fine_amount, 0)) + GREATEST(0, COALESCE(damage_fee, 0))) as total')
+            ->selectRaw('SUM(GREATEST(0, COALESCE(fine_amount, 0))) as total')
             ->value('total') ?? 0;
 
-        $totalIncome = $totalRentalIncome + $totalFineIncome;
+        // Rincian biaya reparasi / kerusakan fisik
+        $totalDamageFeeIncome = Cart::where('status', 'completed')
+            ->whereHas('vehicle', function($q) use ($location) {
+                $q->where('location', $location);
+            })
+            ->selectRaw('SUM(GREATEST(0, COALESCE(damage_fee, 0))) as total')
+            ->value('total') ?? 0;
+
+        $totalIncome = $totalRentalIncome + $totalLateFineIncome + $totalDamageFeeIncome;
         
         // TOTAL SEWA AKTIF
         $totalActiveRentals = Cart::where('status', 'active')
@@ -129,11 +138,17 @@ class DashboardController extends Controller
             ->selectRaw('SUM(CASE WHEN total_payment > 0 THEN total_payment ELSE subtotal END) as total')
             ->value('total') ?? 0;
 
-        $monthlyFineRevenue = (clone $monthlyBaseQuery)
+        $monthlyLateFineRevenue = (clone $monthlyBaseQuery)
             ->where('status', 'completed')
-            ->selectRaw('SUM(GREATEST(0, COALESCE(fine_amount, 0)) + GREATEST(0, COALESCE(damage_fee, 0))) as total')
+            ->selectRaw('SUM(GREATEST(0, COALESCE(fine_amount, 0))) as total')
             ->value('total') ?? 0;
 
+        $monthlyDamageFeeRevenue = (clone $monthlyBaseQuery)
+            ->where('status', 'completed')
+            ->selectRaw('SUM(GREATEST(0, COALESCE(damage_fee, 0))) as total')
+            ->value('total') ?? 0;
+
+        $monthlyFineRevenue = $monthlyLateFineRevenue + $monthlyDamageFeeRevenue;
         $monthlyTotalRevenue = $monthlyRentalRevenue + $monthlyFineRevenue;
 
         $monthlyTransactionCount = (clone $monthlyBaseQuery)->count();
@@ -146,10 +161,11 @@ class DashboardController extends Controller
         return view('manager.dashboard', compact(
             'totalVehicles', 'totalCars', 'totalMotorcycles',
             'totalStock', 'availableStock', 'activeRentals', 'recentHistory',
-            'totalIncome', 'totalActiveRentals', 'totalHistory',
+            'totalIncome', 'totalRentalIncome', 'totalLateFineIncome', 'totalDamageFeeIncome',
+            'totalActiveRentals', 'totalHistory',
             'damagedVehicles', 'totalDamagedStock',
             'availableMonths', 'selectedMonth', 'selectedMonthName',
-            'monthlyRentalRevenue', 'monthlyFineRevenue', 'monthlyTotalRevenue',
+            'monthlyRentalRevenue', 'monthlyLateFineRevenue', 'monthlyDamageFeeRevenue', 'monthlyFineRevenue', 'monthlyTotalRevenue',
             'monthlyTransactionCount', 'monthlyItems'
         ));
     }
