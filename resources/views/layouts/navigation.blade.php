@@ -37,12 +37,12 @@
 <nav x-data="{ open: false }" class="navbar">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between h-16 relative">
+        <div class="flex items-center justify-between h-20 relative">
             <!-- Logo (Kiri) -->
             <div class="shrink-0 flex items-center">
-                <a href="{{ auth()->check() ? (auth()->user()->role === 'user' ? route('user.home') : (auth()->user()->role === 'manager' ? route('manager.dashboard') : route('superadmin.dashboard'))) : '/' }}" class="brand-link flex items-center gap-2.5">
-                    <img src="{{ asset('GoAnywhereLogo.png') }}" alt="GoAnywhere Logo" style="width: 36px; height: 36px; max-width: 36px; max-height: 36px; object-fit: contain;" class="w-9 h-9 object-contain rounded-lg shadow-sm shrink-0">
-                    <span class="brand-text font-extrabold text-lg tracking-tight"><span class="highlight">GoAnywhere</span></span>
+<a href="{{ auth()->check() ? (auth()->user()->role === 'user' ? route('user.home') : (auth()->user()->role === 'manager' ? route('manager.dashboard') : route('superadmin.dashboard'))) : '/' }}" class="brand-link flex items-center gap-3">
+                     <img src="{{ asset('GoAnywhereLogo.png') }}" alt="GoAnywhere Logo" style="width: 44px; height: 44px; max-width: 44px; max-height: 44px; object-fit: contain;" class="w-11 h-11 object-contain rounded-lg shadow-sm shrink-0">
+                     <span class="brand-text font-extrabold text-2xl tracking-tight"><span class="highlight">GoAnywhere</span></span>
                 </a>
             </div>
 
@@ -316,6 +316,8 @@
         position: sticky;
         top: 0;
         z-index: 50;
+        padding-top: 8px;
+        padding-bottom: 8px;
     }
 
     /* ===== BRAND ===== */
@@ -323,22 +325,22 @@
         text-decoration: none;
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 12px;
     }
 
     .brand-link img,
     .navbar img {
-        width: 36px !important;
-        height: 36px !important;
-        max-width: 36px !important;
-        max-height: 36px !important;
+        width: 44px !important;
+        height: 44px !important;
+        max-width: 44px !important;
+        max-height: 44px !important;
         object-fit: contain !important;
         flex-shrink: 0 !important;
         display: inline-block !important;
     }
 
     .brand-text {
-        font-size: 24px;
+        font-size: 28px;
         font-weight: 700;
         color: #2c3e50;
         font-family: 'Georgia', serif;
@@ -353,10 +355,10 @@
     .brand-text .highlight::after {
         content: '';
         position: absolute;
-        bottom: -3px;
+        bottom: -4px;
         left: 0;
         right: 0;
-        height: 2.5px;
+        height: 3px;
         background: linear-gradient(90deg, #43637E, #f0e6d0);
         border-radius: 4px;
     }

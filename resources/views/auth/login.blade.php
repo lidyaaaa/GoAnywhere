@@ -93,6 +93,62 @@
             margin-top: 4px;
         }
 
+        /* ===== ALERT ERROR ===== */
+        .alert-error {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            border: 2px solid #ef4444;
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 20px;
+            animation: shake 0.5s ease;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2);
+        }
+
+        .alert-icon {
+            flex-shrink: 0;
+            width: 24px;
+            height: 24px;
+            color: #dc2626;
+        }
+
+        .alert-content {
+            flex: 1;
+        }
+
+        .alert-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #991b1b;
+            margin-bottom: 4px;
+        }
+
+        .alert-message {
+            font-size: 13px;
+            color: #7f1d1d;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .dark .alert-error {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            border-color: #f87171;
+        }
+
+        .dark .alert-title {
+            color: #fecaca;
+        }
+
+        .dark .alert-message {
+            color: #fee2e2;
+        }
+
         .remember-row {
             display: flex;
             align-items: center;
@@ -349,22 +405,29 @@
         <form method="POST" action="{{ route('login') }}">
             @csrf
 
+            <!-- Alert Error -->
+            @if($errors->any())
+                <div class="alert-error">
+                    <svg class="alert-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div class="alert-content">
+                        <h4 class="alert-title">Gagal Masuk!</h4>
+                        <p class="alert-message">{{ $errors->first('email') }}</p>
+                    </div>
+                </div>
+            @endif
+
             <div class="form-group">
                 <label for="email">Email</label>
                 <input id="email" type="email" name="email" value="{{ old('email') }}" 
                        placeholder="Masukkan email Anda" required autofocus autocomplete="username">
-                @if($errors->has('email'))
-                    <div class="error-text">{{ $errors->first('email') }}</div>
-                @endif
             </div>
 
             <div class="form-group">
                 <label for="password">Password</label>
                 <input id="password" type="password" name="password" 
                        placeholder="Masukkan password Anda" required autocomplete="current-password">
-                @if($errors->has('password'))
-                    <div class="error-text">{{ $errors->first('password') }}</div>
-                @endif
             </div>
 
             <div class="remember-row">
