@@ -463,6 +463,11 @@
             transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
+            user-select: none;
+        }
+
+        .payment-option .payment-label * {
+            pointer-events: none;
         }
 
         .payment-option .payment-label::after {
@@ -614,11 +619,12 @@
         }
 
         .btn-pay:disabled {
-            background: #d5d0c8;
-            color: #7a8a9a;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
+            background: #94a3b8 !important;
+            color: #ffffff !important;
+            opacity: 0.65 !important;
+            cursor: not-allowed !important;
+            transform: none !important;
+            box-shadow: none !important;
         }
 
         .btn-pay:disabled::before {
@@ -798,6 +804,13 @@
             @if(session('warning'))
                 <div class="alert-warning"> ⚠️ {{ session('warning') }}</div>
             @endif
+            @if($errors->any())
+                <div class="alert-error">
+                    @foreach($errors->all() as $err)
+                        <div>⚠️ {{ $err }}</div>
+                    @endforeach
+                </div>
+            @endif
 
             <!-- ===== 2 KOLOM ===== -->
             <div class="checkout-grid">
@@ -878,9 +891,9 @@
                                                    form="paymentForm"
                                                    id="days_{{ $cart->id }}"
                                                    class="stepper-input"
-                                                   value="{{ min(5, max(1, $currentDays)) }}" 
+                                                   value="{{ $currentPeriod === 'weekly' ? 7 : min(5, max(1, $currentDays)) }}" 
                                                    min="1" 
-                                                   max="5"
+                                                   max="7"
                                                    readonly>
                                             <button type="button" class="stepper-btn" onclick="stepDays('{{ $cart->id }}', 1)">+</button>
                                         </div>
@@ -951,7 +964,7 @@
 
                     <div class="payment-grid">
                         <div class="payment-option">
-                            <input type="radio" name="payment_method" value="qris" id="qris">
+                            <input type="radio" name="payment_method" value="qris" id="qris" checked>
                             <label for="qris" class="payment-label">
                                 <span class="icon">
                                     <svg class="w-8 h-8 mx-auto text-slate-800 dark:text-slate-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1029,7 +1042,7 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="btn-pay" id="btnPay" disabled>
+                    <button type="submit" class="btn-pay" id="btnPay">
                         💳 Bayar Sekarang
                     </button>
                 </form>
@@ -1067,6 +1080,7 @@
             let itemSubtotal = 0;
             if (period === 'weekly') {
                 if (daysGroup) daysGroup.style.display = 'none';
+                daysInput.max = 7;
                 daysInput.value = 7;
                 itemSubtotal = weeklyPrice;
             } else {
@@ -1074,6 +1088,7 @@
                 let days = parseInt(daysInput.value) || 1;
                 if (days < 1) days = 1;
                 if (days > 5) days = 5;
+                daysInput.max = 5;
                 daysInput.value = days;
                 itemSubtotal = dailyPrice * days;
             }
@@ -1144,10 +1159,23 @@
         // Enable pay button when payment method is selected
         document.querySelectorAll('input[name="payment_method"]').forEach(function(radio) {
             radio.addEventListener('change', function() {
-                document.getElementById('btnPay').disabled = false;
                 const btn = document.getElementById('btnPay');
-                btn.style.transform = 'scale(1.02)';
-                setTimeout(() => { btn.style.transform = 'scale(1)'; }, 200);
+                if (btn) {
+                    btn.disabled = false;
+                    btn.style.transform = 'scale(1.02)';
+                    setTimeout(() => { btn.style.transform = 'scale(1)'; }, 200);
+                }
+            });
+        });
+
+        // Click on entire payment option card to select radio
+        document.querySelectorAll('.payment-option').forEach(function(option) {
+            option.addEventListener('click', function(e) {
+                const radio = this.querySelector('input[type="radio"]');
+                if (radio && !radio.checked) {
+                    radio.checked = true;
+                    radio.dispatchEvent(new Event('change'));
+                }
             });
         });
 
@@ -1159,6 +1187,16 @@
                 e.preventDefault();
                 alert('⚠️ Silakan pilih metode pembayaran terlebih dahulu!');
                 return false;
+            }
+
+            var btn = document.getElementById('btnPay');
+            if (btn) {
+                btn.innerHTML = '⏳ Memproses Pembayaran...';
+                btn.style.opacity = '0.8';
+                btn.style.cursor = 'wait';
+                setTimeout(function() {
+                    btn.disabled = true;
+                }, 50);
             }
 
             return true;

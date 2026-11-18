@@ -97,17 +97,6 @@
                                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>
                                             Proses Pengembalian
                                         </button>
-                                        @if ($rental->whatsapp_url)
-                                            <a href="{{ $rental->whatsapp_url }}" target="_blank" rel="noopener" class="ar-menu__item" @click="menu = false">
-                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="#16a34a"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm5.3 14.2c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.3.5-.4.4c-.1.1-.3.3-.1.6.2.3.7 1.2 1.6 1.9 1.1 1 2 1.3 2.3 1.4.3.1.4.1.6-.1l.8-1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.2.1.7-.1 1.4z"/></svg>
-                                                Hubungi Penyewa
-                                            </a>
-                                        @else
-                                            <span class="ar-menu__item ar-menu__item--disabled" title="Penyewa belum mengisi nomor HP">
-                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2z"/></svg>
-                                                Hubungi Penyewa (no. HP kosong)
-                                            </span>
-                                        @endif
                                         <div class="ar-menu__sep"></div>
                                         <button type="button" class="ar-menu__item ar-menu__item--danger" @click="menu = false; flagOpen = true">
                                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 21V4h11l1 2h4v9h-6l-1-2H4"/></svg>

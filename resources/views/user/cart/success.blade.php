@@ -327,10 +327,9 @@
                         </a>
                     </div>
 
-                    <!-- ===== WA ===== -->
-                    <a href="https://wa.me/628157184307?text=Halo%20GoAnywhere%2C%20saya%20sudah%20melakukan%20pembayaran%20dengan%20kode%20booking%3A%20{{ $booking_code }}" 
-                       target="_blank" class="btn-wa">
-                         Kirim bukti ke WhatsApp
+                    <!-- ===== LIVE CHAT SUPPORT ===== -->
+                    <a href="{{ route('user.chat.index') }}" class="btn-wa">
+                        💬 Hubungi Cabang via Live Chat
                     </a>
 
                 </div>
