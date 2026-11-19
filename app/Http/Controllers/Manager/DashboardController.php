@@ -128,11 +128,10 @@ class DashboardController extends Controller
         $defaultMonth = now()->format('Y-m');
         $selectedMonth = $request->query('month', $defaultMonth);
 
+        // Base query tanpa eager load & order (agar kompatibel untuk aggregate query)
         $monthlyBaseQuery = Cart::whereIn('status', $paidStatuses)
             ->whereHas('vehicle', fn($q) => $q->where('location', $location))
-            ->whereRaw("DATE_FORMAT(created_at, '%Y-%m') = ?", [$selectedMonth])
-            ->with(['vehicle', 'user'])
-            ->orderBy('created_at', 'desc');
+            ->whereRaw("DATE_FORMAT(created_at, '%Y-%m') = ?", [$selectedMonth]);
 
         $monthlyRentalRevenue = (clone $monthlyBaseQuery)
             ->selectRaw('SUM(CASE WHEN total_payment > 0 THEN total_payment ELSE subtotal END) as total')
@@ -153,7 +152,12 @@ class DashboardController extends Controller
 
         $monthlyTransactionCount = (clone $monthlyBaseQuery)->count();
 
-        $monthlyItems = $monthlyBaseQuery->paginate(5, ['*'], 'monthly_page')->withQueryString();
+        // Tambahkan eager load & order hanya untuk query list/paginate
+        $monthlyItems = (clone $monthlyBaseQuery)
+            ->with(['vehicle', 'user'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(5, ['*'], 'monthly_page')
+            ->withQueryString();
 
         [$selYear, $selMonthNum] = explode('-', $selectedMonth);
         $selectedMonthName = ($indoMonths[(int)$selMonthNum] ?? $selectedMonth) . ' ' . $selYear;
