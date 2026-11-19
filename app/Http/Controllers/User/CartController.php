@@ -41,7 +41,7 @@ class CartController extends Controller
         $request->validate([
             'vehicle_id' => 'required|exists:vehicles,id',
             'package_type' => 'nullable|in:daily,weekly',
-            'quantity_days' => 'nullable|integer|min:1|max:5',
+            'quantity_days' => 'nullable|integer|min:1|max:7',
         ]);
 
         $user = auth()->user();
@@ -71,7 +71,8 @@ class CartController extends Controller
 
         if ($hasSameVehicleInCart) {
             if ($isDirectCheckout) {
-                return redirect()->route('user.cart.checkout', ['selected_carts' => [$hasSameVehicleInCart->id]]);
+                session(['checkout_selected_carts' => [$hasSameVehicleInCart->id]]);
+                return redirect()->route('user.cart.checkout', ['selected_carts' => $hasSameVehicleInCart->id]);
             }
             return redirect()->route('user.cart')->with('info', "Kendaraan {$vehicle->name} sudah ada di keranjang Anda! Anda dapat mengatur durasi dan mencentangnya menggunakan checkbox saat checkout.");
         }
@@ -110,7 +111,8 @@ class CartController extends Controller
         ]);
 
         if ($isDirectCheckout) {
-            return redirect()->route('user.cart.checkout', ['selected_carts' => [$newCart->id]]);
+            session(['checkout_selected_carts' => [$newCart->id]]);
+            return redirect()->route('user.cart.checkout', ['selected_carts' => $newCart->id]);
         }
 
         return redirect()->route('user.cart')->with('success', 'Kendaraan berhasil ditambahkan ke keranjang!');
@@ -125,7 +127,7 @@ class CartController extends Controller
 
         $request->validate([
             'period' => 'required|in:daily,weekly',
-            'quantity_days' => 'nullable|integer|min:1|max:5',
+            'quantity_days' => 'nullable|integer|min:1|max:7',
         ]);
 
         $vehicle = Vehicle::find($cart->vehicle_id);
@@ -173,35 +175,52 @@ class CartController extends Controller
     {
         $user = auth()->user();
 
-        // Ambil ID cart yang dipilih dari checkbox
-        $rawSelected = $request->input('selected_carts', session('checkout_selected_carts', []));
+        // Ambil ID cart yang dipilih dari parameter URL atau session
+        $rawSelected = $request->input('selected_carts');
+        if (empty($rawSelected)) {
+            $rawSelected = session('checkout_selected_carts', []);
+        }
+
         if (is_string($rawSelected)) {
             $selectedIds = array_filter(array_map('trim', explode(',', $rawSelected)));
         } else {
-            $selectedIds = (array) $rawSelected;
+            $selectedIds = array_values(array_filter((array) $rawSelected));
         }
 
-        $query = Cart::where('user_id', $user->id)
-            ->where('status', 'pending')
-            ->with('vehicle');
-
+        // Coba cari cart pending sesuai selectedIds jika ada
+        $carts = collect();
         if (!empty($selectedIds)) {
-            $carts = $query->whereIn('id', $selectedIds)->get();
-        } else {
-            $allPending = $query->get();
-            // Jika ada lebih dari 2 atau campuran lebih dari 1 mobil/motor, minta user pilih via checkbox
-            $carCount = $allPending->where('vehicle.vehicle_type', 'car')->count();
-            $motorCount = $allPending->where('vehicle.vehicle_type', 'motorcycle')->count();
-            if ($carCount > 1 || $motorCount > 1 || $allPending->count() > 2) {
-                return redirect()->route('user.cart')->with('error', 'Silakan pilih kendaraan yang ingin disewa menggunakan centang checkbox di keranjang (Maks. 1 Mobil dan 1 Motor).');
+            $carts = Cart::where('user_id', $user->id)
+                ->where('status', 'pending')
+                ->whereIn('id', $selectedIds)
+                ->with('vehicle')
+                ->get();
+        }
+
+        // JIKA $carts kosong (misal ID di session sudah dibayar/kedaluwarsa atau belum terpilih),
+        // otomatis fallback ke semua cart pending milik user yang ada di database
+        if ($carts->isEmpty()) {
+            $allPending = Cart::where('user_id', $user->id)
+                ->where('status', 'pending')
+                ->with('vehicle')
+                ->get();
+
+            if ($allPending->isNotEmpty()) {
+                $carCount = $allPending->where('vehicle.vehicle_type', 'car')->count();
+                $motorCount = $allPending->where('vehicle.vehicle_type', 'motorcycle')->count();
+
+                if ($carCount <= 1 && $motorCount <= 1 && $allPending->count() <= 2) {
+                    $carts = $allPending;
+                } else {
+                    return redirect()->route('user.cart')->with('info', 'Silakan pilih kendaraan yang ingin disewa menggunakan centang checkbox di keranjang (Maks. 1 Mobil dan 1 Motor).');
+                }
             }
-            $carts = $allPending;
         }
 
         session(['checkout_selected_carts' => $carts->pluck('id')->toArray()]);
 
         if ($carts->isEmpty()) {
-            return redirect()->route('user.cart')->with('error', 'Keranjang kosong! Silakan pilih kendaraan terlebih dahulu.');
+            return redirect()->route('user.armada')->with('info', 'Keranjang Anda kosong. Silakan pilih armada yang ingin disewa terlebih dahulu.');
         }
 
         // Cek kelengkapan profil
@@ -278,7 +297,7 @@ class CartController extends Controller
             'selected_carts' => 'nullable|string',
             'durations' => 'nullable|array',
             'durations.*.period' => 'nullable|in:daily,weekly',
-            'durations.*.days' => 'nullable|integer|min:1|max:5',
+            'durations.*.days' => 'nullable|integer|min:1|max:7',
         ]);
 
         $user = auth()->user();
@@ -419,6 +438,7 @@ class CartController extends Controller
             }
 
             DB::commit();
+            session()->forget('checkout_selected_carts');
 
             return redirect()->route('user.payment.success', ['booking_code' => $firstBookingCode])
                 ->with('success', 'Pembayaran berhasil! Pesanan menunggu persetujuan manager armada.');

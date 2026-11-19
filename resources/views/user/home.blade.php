@@ -475,6 +475,237 @@
         }
 
         /* ============================================ */
+        /* DETAILED RENTAL WORKFLOW SECTION            */
+        /* ============================================ */
+        .flow-section {
+            padding: 50px 0 60px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .flow-header {
+            text-align: center;
+            max-width: 760px;
+            margin: 0 auto 44px;
+        }
+
+        .flow-tag {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #004B87;
+            background: rgba(0, 75, 135, 0.08);
+            padding: 6px 14px;
+            border-radius: 20px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(0, 75, 135, 0.15);
+        }
+
+        .dark .flow-tag {
+            color: #8ab4d4;
+            background: rgba(67, 99, 126, 0.25);
+            border-color: rgba(67, 99, 126, 0.4);
+        }
+
+        .flow-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: #002D55;
+            font-family: 'Poppins', sans-serif !important;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+
+        .dark .flow-title {
+            color: #ffffff;
+        }
+
+        .flow-subtitle {
+            font-size: 15px;
+            color: #64748B;
+            line-height: 1.6;
+        }
+
+        .dark .flow-subtitle {
+            color: #94a3b8;
+        }
+
+        .flow-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 22px;
+        }
+
+        @media (max-width: 1024px) {
+            .flow-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .flow-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .flow-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(16px);
+            border-radius: 22px;
+            padding: 26px 24px;
+            border: 1px solid rgba(232, 228, 222, 0.6);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dark .flow-card {
+            background: rgba(26, 38, 50, 0.85);
+            border-color: rgba(44, 62, 80, 0.6);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+        }
+
+        .flow-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 40px rgba(0, 75, 135, 0.12);
+            border-color: rgba(0, 75, 135, 0.3);
+        }
+
+        .dark .flow-card:hover {
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+            border-color: rgba(138, 180, 212, 0.3);
+        }
+
+        .flow-card-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .flow-badge-step {
+            font-size: 11px;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .flow-step-icon {
+            font-size: 28px;
+        }
+
+        .flow-card-heading {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 10px;
+            line-height: 1.35;
+        }
+
+        .dark .flow-card-heading {
+            color: #f8fafc;
+        }
+
+        .flow-card-desc {
+            font-size: 13.5px;
+            color: #475569;
+            line-height: 1.7;
+            margin-bottom: 16px;
+        }
+
+        .dark .flow-card-desc {
+            color: #cbd5e1;
+        }
+
+        .flow-card-tip {
+            background: rgba(241, 245, 249, 0.8);
+            border-radius: 12px;
+            padding: 10px 14px;
+            font-size: 11.5px;
+            color: #334155;
+            border-left: 3px solid #004B87;
+            line-height: 1.5;
+        }
+
+        .dark .flow-card-tip {
+            background: rgba(15, 23, 42, 0.6);
+            color: #94a3b8;
+            border-left-color: #38bdf8;
+        }
+
+        .flow-card-tip strong {
+            color: #004B87;
+        }
+
+        .dark .flow-card-tip strong {
+            color: #38bdf8;
+        }
+
+        .flow-summary-banner {
+            margin-top: 36px;
+            background: linear-gradient(135deg, #002D55 0%, #004B87 100%);
+            border-radius: 24px;
+            padding: 28px 32px;
+            color: #ffffff;
+            box-shadow: 0 16px 45px rgba(0, 45, 85, 0.25);
+        }
+
+        .dark .flow-summary-banner {
+            background: linear-gradient(135deg, #0a1928 0%, #17324d 100%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .flow-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        @media (max-width: 1024px) {
+            .flow-summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .flow-summary-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .flow-summary-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .flow-summary-icon {
+            font-size: 24px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .flow-summary-text h5 {
+            font-size: 14px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 4px;
+        }
+
+        .flow-summary-text p {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.75);
+            line-height: 1.5;
+        }
+
+        /* ============================================ */
         /* ARMADA SECTION                              */
         /* ============================================ */
         .armada-section {
@@ -1051,6 +1282,159 @@
                                 <span class="stat-icon">⭐</span>
                                 <div class="stat-number">100%</div>
                                 <div class="stat-label">Kepercayaan</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- PANDUAN DETAIL ALUR SEWA (USER JOURNEY)      -->
+        <!-- ============================================ -->
+        <div class="flow-section">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flow-header">
+                    <span class="flow-tag">Panduan Lengkap Penyewa</span>
+                    <h2 class="flow-title">Alur Lengkap Sewa Kendaraan di GoAnywhere</h2>
+                    <p class="flow-subtitle">
+                        Transparan, tertib, dan aman. Pahami 6 tahapan mudah mulai dari memilih unit armada hingga pengembalian dan penyelesaian transaksi.
+                    </p>
+                </div>
+
+                <div class="flow-grid">
+                    <!-- Step 1 -->
+                    <div class="flow-card">
+                        <div>
+                            <div class="flow-card-top">
+                                <span class="flow-badge-step bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300">Tahap 01</span>
+                                <span class="flow-step-icon">🚗</span>
+                            </div>
+                            <h3 class="flow-card-heading">Pilih Lokasi & Durasi Sewa</h3>
+                            <p class="flow-card-desc">
+                                Cari kendaraan sesuai wilayah Anda (Jakarta, Bogor, Depok, Tangerang, Bekasi). Tentukan paket durasi: <strong>Harian (1–5 hari)</strong> atau <strong>Mingguan (7 hari)</strong> dengan harga hemat.
+                            </p>
+                        </div>
+                        <div class="flow-card-tip">
+                            <strong>💡 Aturan Rental:</strong> Anda dapat menyewa maksimal 1 Mobil dan/atau 1 Motor dalam satu transaksi checkout.
+                        </div>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="flow-card">
+                        <div>
+                            <div class="flow-card-top">
+                                <span class="flow-badge-step bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">Tahap 02</span>
+                                <span class="flow-step-icon">💳</span>
+                            </div>
+                            <h3 class="flow-card-heading">Checkout & Pembayaran Online</h3>
+                            <p class="flow-card-desc">
+                                Masukkan alamat pengantaran unit. Biaya kirim door-to-door flat (Motor Rp 25k, Mobil Rp 50k). Bayar cepat melalui <strong>QRIS, Transfer Bank, GoPay, DANA, atau OVO</strong>.
+                            </p>
+                        </div>
+                        <div class="flow-card-tip">
+                            <strong>🛡️ Transparan:</strong> Begitu bayar, status menjadi <em>Paid</em>. Anda dapat membatalkan pesanan mandiri sebelum di-approve manager.
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="flow-card">
+                        <div>
+                            <div class="flow-card-top">
+                                <span class="flow-badge-step bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">Tahap 03</span>
+                                <span class="flow-step-icon">🚚</span>
+                            </div>
+                            <h3 class="flow-card-heading">Persetujuan Cabang & Unit OTW</h3>
+                            <p class="flow-card-desc">
+                                Manager cabang menyetujui pesanan Anda, stok unit terpotong otomatis, dan driver langsung mengantarkan armada ke titik lokasi Anda (status <strong>Armada OTW</strong>).
+                            </p>
+                        </div>
+                        <div class="flow-card-tip">
+                            <strong>💬 Live Chat:</strong> Pantau pengantaran dan chat langsung dengan driver/manager cabang via fitur Live Chat bawaan.
+                        </div>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div class="flow-card">
+                        <div>
+                            <div class="flow-card-top">
+                                <span class="flow-badge-step bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300">Tahap 04</span>
+                                <span class="flow-step-icon">🪪</span>
+                            </div>
+                            <h3 class="flow-card-heading">Serah Terima & Foto Jaminan KTP</h3>
+                            <p class="flow-card-desc">
+                                Saat unit tiba di lokasi, tunjukkan <strong>KTP Asli Fisik</strong> kepada staf untuk difoto sebagai jaminan resmi. Detik serah terima dikonfirmasi, status berubah menjadi <strong>Sewa Aktif</strong>.
+                            </p>
+                        </div>
+                        <div class="flow-card-tip">
+                            <strong>⏱️ Timer Adil:</strong> Timer masa sewa Anda <strong>baru mulai berjalan</strong> saat kunci fisik diserahkan, bukan saat bayar!
+                        </div>
+                    </div>
+
+                    <!-- Step 5 -->
+                    <div class="flow-card">
+                        <div>
+                            <div class="flow-card-top">
+                                <span class="flow-badge-step bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300">Tahap 05</span>
+                                <span class="flow-step-icon">🏢</span>
+                            </div>
+                            <h3 class="flow-card-heading">Pengembalian ke Gerai Cabang</h3>
+                            <p class="flow-card-desc">
+                                Sebelum batas waktu habis, bawa kendaraan ke gerai cabang terdaftar. Begitu Anda tiba dan menyerahkan kunci, Manager mengklik <strong>Konfirmasi Tiba di Gerai</strong>.
+                            </p>
+                        </div>
+                        <div class="flow-card-tip">
+                            <strong>🛑 Stop Denda:</strong> Timer keterlambatan terkunci dan berhenti resmi detik Manager mengonfirmasi kedatangan Anda di gerai.
+                        </div>
+                    </div>
+
+                    <!-- Step 6 -->
+                    <div class="flow-card">
+                        <div>
+                            <div class="flow-card-top">
+                                <span class="flow-badge-step bg-teal-100 text-teal-800 dark:bg-teal-950 dark:text-teal-300">Tahap 06</span>
+                                <span class="flow-step-icon">🔍</span>
+                            </div>
+                            <h3 class="flow-card-heading">Cek Fisik Unit & Selesai</h3>
+                            <p class="flow-card-desc">
+                                Manager memeriksa fisik kendaraan bersama Anda. Jika unit aman & tepat waktu, transaksi tuntas berstatus <strong>Selesai</strong> dan KTP jaminan Anda dikembalikan penuh.
+                            </p>
+                        </div>
+                        <div class="flow-card-tip">
+                            <strong>⚖️ Transparansi:</strong> Jika ada baret/kerusakan atau telat (>30 menit toleransi), tagihan denda diinput transparan dan dibayar online.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4 Highlight Bullets at Bottom -->
+                <div class="flow-summary-banner">
+                    <div class="flow-summary-grid">
+                        <div class="flow-summary-item">
+                            <span class="flow-summary-icon">⏱️</span>
+                            <div class="flow-summary-text">
+                                <h5>Timer Real-Time Adil</h5>
+                                <p>Durasi sewa murni dimulai saat terima kunci dan berhenti saat tiba di gerai cabang.</p>
+                            </div>
+                        </div>
+                        <div class="flow-summary-item">
+                            <span class="flow-summary-icon">🪪</span>
+                            <div class="flow-summary-text">
+                                <h5>KTP Terjamin Aman</h5>
+                                <p>Foto jaminan KTP tersimpan aman terenkripsi hanya untuk keperluan verifikasi unit.</p>
+                            </div>
+                        </div>
+                        <div class="flow-summary-item">
+                            <span class="flow-summary-icon">💬</span>
+                            <div class="flow-summary-text">
+                                <h5>Fitur Live Chat Bawaan</h5>
+                                <p>Komunikasi langsung dengan Manager gerai di dalam aplikasi tanpa nomor pribadi.</p>
+                            </div>
+                        </div>
+                        <div class="flow-summary-item">
+                            <span class="flow-summary-icon">🛡️</span>
+                            <div class="flow-summary-text">
+                                <h5>Bebas Biaya Tersembunyi</h5>
+                                <p>Semua rincian biaya sewa, ongkos kirim, dan denda tercatat detail dan transparan.</p>
                             </div>
                         </div>
                     </div>

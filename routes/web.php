@@ -121,6 +121,7 @@ Route::middleware(['auth', 'verified', 'role:manager'])->prefix('manager')->name
     Route::post('/rentals/{booking_code}/approve', [ManagerRentalController::class, 'approve'])->name('rentals.approve');
     Route::post('/rentals/{booking_code}/reject', [ManagerRentalController::class, 'reject'])->name('rentals.reject');
     Route::post('/rentals/{id}/handover', [ManagerRentalController::class, 'handover'])->name('rentals.handover');
+    Route::post('/rentals/{id}/arrive', [ManagerRentalController::class, 'arrive'])->name('rentals.arrive');
     Route::post('/rentals/{id}/inspect', [ManagerRentalController::class, 'inspectReturn'])->name('rentals.inspect');
     Route::post('/rentals/{id}/complete', [ManagerRentalController::class, 'complete'])->name('rentals.complete');
     Route::post('/rentals/{id}/flag', [ManagerRentalController::class, 'flag'])->name('rentals.flag');
@@ -161,5 +162,8 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+// Alias fallback for cancel booking (with or without /user prefix)
+Route::post('/rental/cancel/{booking_code}', [RentalController::class, 'cancelBooking'])->middleware(['auth', 'verified', 'role:user']);
 
 require __DIR__.'/auth.php';

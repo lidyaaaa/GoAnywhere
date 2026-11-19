@@ -98,15 +98,25 @@ class RentalController extends Controller
             ? $completedRentalsQuery->paginate(10, ['*'], 'completed_page')->appends($request->all())
             : new \Illuminate\Pagination\LengthAwarePaginator([], 0, 10, null, ['pageName' => 'completed_page']);
 
-        // 7. Riwayat Dibatalkan & Ditolak (Cancelled & Rejected)
+        // 7. Riwayat Dibatalkan oleh Pelanggan (Cancelled)
         $cancelledRentalsQuery = Cart::where('user_id', $userId)
-            ->whereIn('status', ['cancelled', 'rejected'])
+            ->where('status', 'cancelled')
             ->with('vehicle')
             ->orderBy('created_at', 'desc');
         $applySearch($cancelledRentalsQuery);
-        $cancelledRentals = ($statusFilter === 'all' || in_array($statusFilter, ['cancelled', 'rejected']))
+        $cancelledRentals = ($statusFilter === 'all' || $statusFilter === 'cancelled')
             ? $cancelledRentalsQuery->paginate(10, ['*'], 'cancelled_page')->appends($request->all())
             : new \Illuminate\Pagination\LengthAwarePaginator([], 0, 10, null, ['pageName' => 'cancelled_page']);
+
+        // 8. Riwayat Ditolak oleh Manager (Rejected)
+        $rejectedRentalsQuery = Cart::where('user_id', $userId)
+            ->where('status', 'rejected')
+            ->with('vehicle')
+            ->orderBy('created_at', 'desc');
+        $applySearch($rejectedRentalsQuery);
+        $rejectedRentals = ($statusFilter === 'all' || $statusFilter === 'rejected')
+            ? $rejectedRentalsQuery->paginate(10, ['*'], 'rejected_page')->appends($request->all())
+            : new \Illuminate\Pagination\LengthAwarePaginator([], 0, 10, null, ['pageName' => 'rejected_page']);
 
         // Kalkulasi keterlambatan untuk sewa aktif
         $activeRentals->each(function (Cart $rental) {
@@ -132,6 +142,7 @@ class RentalController extends Controller
             'pendingPayments',
             'completedRentals',
             'cancelledRentals',
+            'rejectedRentals',
             'statusFilter',
             'search',
             'counts',
@@ -143,8 +154,15 @@ class RentalController extends Controller
     /**
      * User Membatalkan Booking Sebelum Di-approve Manager.
      */
-    public function cancelBooking($bookingCode)
+    public function cancelBooking(Request $request, $bookingCode)
     {
+        $request->validate([
+            'cancel_reason' => 'required|string|min:5|max:500',
+        ], [
+            'cancel_reason.required' => 'Silakan masukkan alasan pembatalan booking Anda.',
+            'cancel_reason.min' => 'Alasan pembatalan minimal 5 karakter.',
+        ]);
+
         $carts = Cart::where('user_id', auth()->id())
             ->where('booking_code', $bookingCode)
             ->where('status', 'paid')
@@ -153,18 +171,21 @@ class RentalController extends Controller
 
         if ($carts->isEmpty()) {
             return redirect()->route('user.rental')
-                ->with('error', 'Booking tidak dapat dibatalkan atau sudah disetujui manager.');
+                ->with('error', 'Booking tidak dapat dibatalkan atau sudah diproses manager.');
         }
 
-        DB::transaction(function () use ($carts) {
+        DB::transaction(function () use ($carts, $request) {
             foreach ($carts as $cart) {
                 $cart->status = 'cancelled';
+                $cart->cancel_reason = $request->cancel_reason;
                 $cart->save();
             }
 
-            $carts->first()->payment()->update([
-                'payment_status' => 'failed',
-            ]);
+            if ($carts->first()->payment) {
+                $carts->first()->payment()->update([
+                    'payment_status' => 'failed',
+                ]);
+            }
         });
 
         return redirect()->route('user.rental')
@@ -173,37 +194,21 @@ class RentalController extends Controller
     }
 
     /**
-     * Tampilan Konfirmasi Pengembalian
+     * Tampilan Konfirmasi Pengembalian (Diarahkan ke instruksi gerai)
      */
     public function return($id)
     {
-        $cart = Cart::where('user_id', auth()->id())
-            ->where('id', $id)
-            ->where('status', 'active')
-            ->with('vehicle')
-            ->firstOrFail();
-
-        $late = LateFeeCalculator::calculate($cart, now());
-
-        return view('user.rental.return', compact('cart', 'late'));
+        return redirect()->route('user.rental')
+            ->with('warning', 'Pengembalian unit wajib dilakukan langsung di gerai cabang. Silakan serahkan unit dan kunci kepada Manager/Petugas gerai untuk serah terima & cek fisik.');
     }
 
     /**
-     * Trigger User: User klik tombol "Kembalikan" di gerai.
-     * Status berubah menjadi PENDING_RETURN (Menunggu Pengecekan Fisik Manager).
+     * Konfirmasi Pengembalian Unit (Hanya dapat dikonfirmasi oleh Manager di gerai)
      */
     public function processReturn(Request $request, $id)
     {
-        $cart = Cart::where('user_id', auth()->id())
-            ->where('id', $id)
-            ->where('status', 'active')
-            ->firstOrFail();
-
-        $cart->status = 'pending_return';
-        $cart->save();
-
         return redirect()->route('user.rental')
-            ->with('success', 'Permintaan pengembalian telah dikirim! Silakan serahkan kunci dan unit kepada Manager untuk pengecekan fisik kendaraan.');
+            ->with('warning', 'Pengembalian unit dikonfirmasi langsung oleh Manager di gerai saat fisik unit dan kunci diserahkan.');
     }
 
     /**

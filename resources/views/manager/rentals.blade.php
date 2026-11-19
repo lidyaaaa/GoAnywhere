@@ -330,6 +330,13 @@
                                         <td>
                                             <div class="font-semibold">{{ $item->user->name }}</div>
                                             <div class="text-xs text-slate-500">{{ $item->user->phone }}</div>
+                                            @if($item->ktp_image)
+                                                <button type="button" 
+                                                        onclick="openViewKtpModal('{{ asset('storage/' . $item->ktp_image) }}', '{{ addslashes($item->user->name) }}', '{{ $item->booking_code }}', '{{ addslashes($item->vehicle->name) }}')"
+                                                        class="mt-1 inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold bg-sky-100 hover:bg-sky-200 text-sky-800 dark:bg-sky-950 dark:text-sky-300 transition shadow-sm">
+                                                    <span>🪪</span> Lihat KTP
+                                                </button>
+                                            @endif
                                         </td>
                                         <td>
                                             <span class="text-xs font-semibold text-slate-700 dark:text-slate-300">
@@ -392,7 +399,17 @@
                                     <tr>
                                         <td><span class="font-mono font-bold">{{ $item->booking_code }}</span></td>
                                         <td class="font-bold">{{ $item->vehicle->name }}</td>
-                                        <td>{{ $item->user->name }} ({{ $item->user->phone }})</td>
+                                        <td>
+                                            <div class="font-semibold">{{ $item->user->name }}</div>
+                                            <div class="text-xs text-slate-500">{{ $item->user->phone }}</div>
+                                            @if($item->ktp_image)
+                                                <button type="button" 
+                                                        onclick="openViewKtpModal('{{ asset('storage/' . $item->ktp_image) }}', '{{ addslashes($item->user->name) }}', '{{ $item->booking_code }}', '{{ addslashes($item->vehicle->name) }}')"
+                                                        class="mt-1 inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold bg-sky-100 hover:bg-sky-200 text-sky-800 dark:bg-sky-950 dark:text-sky-300 transition shadow-sm">
+                                                    <span>🪪</span> Lihat KTP
+                                                </button>
+                                            @endif
+                                        </td>
                                         <td>
                                             @if($late['is_late'])
                                                 <span class="px-2.5 py-1 bg-rose-100 text-rose-800 text-xs font-bold rounded-lg inline-flex items-center gap-1">
@@ -455,7 +472,17 @@
                                     <tr>
                                         <td><span class="font-mono font-bold">{{ $item->booking_code }}</span></td>
                                         <td class="font-bold">{{ $item->vehicle->name }}</td>
-                                        <td>{{ $item->user->name }} ({{ $item->user->phone }})</td>
+                                        <td>
+                                            <div class="font-semibold">{{ $item->user->name }}</div>
+                                            <div class="text-xs text-slate-500">{{ $item->user->phone }}</div>
+                                            @if($item->ktp_image)
+                                                <button type="button" 
+                                                        onclick="openViewKtpModal('{{ asset('storage/' . $item->ktp_image) }}', '{{ addslashes($item->user->name) }}', '{{ $item->booking_code }}', '{{ addslashes($item->vehicle->name) }}')"
+                                                        class="mt-1 inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold bg-sky-100 hover:bg-sky-200 text-sky-800 dark:bg-sky-950 dark:text-sky-300 transition shadow-sm">
+                                                    <span>🪪</span> Lihat KTP
+                                                </button>
+                                            @endif
+                                        </td>
                                         <td class="text-xs">
                                             @if($item->damage_fee > 0)
                                                 <div class="text-rose-700 font-semibold">Reparasi: Rp {{ number_format($item->damage_fee, 0, ',', '.') }} ({{ $item->damage_note }})</div>
@@ -497,6 +524,7 @@
                         {{ count($activeRentals) }} Unit Digunakan
                     </span>
                 </div>
+                <p class="text-xs text-slate-500 mb-4">Unit sedang digunakan oleh pelanggan. Pantau jatuh tempo sewa dan jika pelanggan telah tiba di gerai untuk mengembalikan kendaraan, klik <strong>Konfirmasi Tiba di Gerai</strong> untuk menghentikan timer denda keterlambatan dan melanjutkan ke cek fisik.</p>
                 @if(count($activeRentals) > 0)
                     <div class="table-wrap">
                         <table>
@@ -518,7 +546,17 @@
                                     <tr>
                                         <td><span class="font-mono font-bold">{{ $item->booking_code }}</span></td>
                                         <td class="font-bold">{{ $item->vehicle->name }}</td>
-                                        <td>{{ $item->user->name }} ({{ $item->user->phone }})</td>
+                                        <td>
+                                            <div class="font-semibold">{{ $item->user->name }}</div>
+                                            <div class="text-xs text-slate-500">{{ $item->user->phone }}</div>
+                                            @if($item->ktp_image)
+                                                <button type="button" 
+                                                        onclick="openViewKtpModal('{{ asset('storage/' . $item->ktp_image) }}', '{{ addslashes($item->user->name) }}', '{{ $item->booking_code }}', '{{ addslashes($item->vehicle->name) }}')"
+                                                        class="mt-1 inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold bg-sky-100 hover:bg-sky-200 text-sky-800 dark:bg-sky-950 dark:text-sky-300 transition shadow-sm">
+                                                    <span>🪪</span> Lihat KTP
+                                                </button>
+                                            @endif
+                                        </td>
                                         <td class="text-xs">{{ \Carbon\Carbon::parse($item->rental_start_date)->format('d M Y H:i') }}</td>
                                         <td class="text-xs font-semibold {{ $late['is_late'] ? 'text-rose-600' : 'text-slate-700' }}">
                                             {{ \Carbon\Carbon::parse($item->rental_end_date)->format('d M Y H:i') }}
@@ -528,14 +566,15 @@
                                         </td>
                                         <td>
                                             <div class="flex items-center gap-2">
-                                                <button type="button" onclick="openInspectModal('{{ $item->id }}', '{{ $item->booking_code }}', '{{ $item->vehicle->name }}', '{{ $late['is_late'] ? $late['fine_amount'] : 0 }}', '{{ $late['duration_label'] }}')" class="btn-action-primary bg-purple-600 hover:bg-purple-700">
-                                                    <span>🔍</span> Terima & Cek Fisik
-                                                </button>
-                                                @if($item->whatsapp_url)
-                                                    <a href="{{ $item->whatsapp_url }}" target="_blank" class="btn-chat-link bg-emerald-100 text-emerald-800 hover:bg-emerald-200">
-                                                        WhatsApp
-                                                    </a>
-                                                @endif
+                                                <form method="POST" action="{{ route('manager.rentals.arrive', $item->id) }}" onsubmit="return confirm('Konfirmasi bahwa unit {{ addslashes($item->vehicle->name) }} (Booking #{{ $item->booking_code }}) telah tiba di gerai cabang? Status akan dipindahkan ke Menunggu Cek Fisik Unit.')">
+                                                    @csrf
+                                                    <button type="submit" class="btn-action-primary bg-indigo-600 hover:bg-indigo-700 shadow-md shadow-indigo-600/20">
+                                                        <span>📥</span> Konfirmasi Tiba di Gerai
+                                                    </button>
+                                                </form>
+                                                <a href="{{ route('manager.chat.start', ['user_id' => $item->user_id, 'vehicle_id' => $item->vehicle_id]) }}" class="btn-chat-link">
+                                                    💬 Chat Customer
+                                                </a>
                                             </div>
                                         </td>
                                     </tr>
@@ -582,7 +621,16 @@
                                     <tr>
                                         <td><span class="font-mono text-xs font-bold">{{ $item->booking_code }}</span></td>
                                         <td>{{ $item->vehicle->name }}</td>
-                                        <td>{{ $item->user->name }}</td>
+                                        <td>
+                                            <div class="font-semibold">{{ $item->user->name }}</div>
+                                            @if($item->ktp_image)
+                                                <button type="button" 
+                                                        onclick="openViewKtpModal('{{ asset('storage/' . $item->ktp_image) }}', '{{ addslashes($item->user->name) }}', '{{ $item->booking_code }}', '{{ addslashes($item->vehicle->name) }}')"
+                                                        class="mt-1 inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold bg-sky-100 hover:bg-sky-200 text-sky-800 dark:bg-sky-950 dark:text-sky-300 transition shadow-sm">
+                                                    <span>🪪</span> Lihat KTP
+                                                </button>
+                                            @endif
+                                        </td>
                                         <td>Rp {{ number_format($item->total_payment > 0 ? $item->total_payment : $item->subtotal, 0, ',', '.') }}</td>
                                         <td>
                                             @if(($item->damage_fee + $item->fine_amount) > 0)
@@ -609,19 +657,19 @@
             @endif
 
             <!-- ======================================================== -->
-            <!-- 7. RIWAYAT DIBATALKAN & DITOLAK                          -->
+            <!-- 7. RIWAYAT DIBATALKAN (CANCELLED)                        -->
             <!-- ======================================================== -->
-            @if($statusFilter === 'all' || in_array($statusFilter, ['cancelled', 'rejected']))
-            <div class="section-card border-l-4 border-l-rose-400">
+            @if($statusFilter === 'all' || $statusFilter === 'cancelled')
+            <div class="section-card border-l-4 border-l-slate-400">
                 <div class="flex items-center justify-between mb-2">
                     <h3 class="section-title text-slate-800 dark:text-slate-200">
-                        <span>❌</span> Riwayat Dibatalkan & Ditolak
+                        <span>❌</span> Riwayat Dibatalkan (Customer)
                     </h3>
-                    <span class="text-xs font-bold px-2.5 py-1 bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-200 rounded-full">
+                    <span class="text-xs font-bold px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-full">
                         {{ $cancelledRentals->total() ?? count($cancelledRentals) }} Transaksi
                     </span>
                 </div>
-                <p class="text-xs text-slate-500 mb-4">Arsip transaksi yang dibatalkan oleh pengguna atau ditolak oleh pihak cabang.</p>
+                <p class="text-xs text-slate-500 mb-4">Arsip transaksi yang dibatalkan langsung oleh pelanggan sebelum masa sewa dimulai.</p>
 
                 @if(count($cancelledRentals) > 0)
                     <div class="table-wrap">
@@ -632,7 +680,7 @@
                                     <th>Kendaraan</th>
                                     <th>Penyewa</th>
                                     <th>Total Bayar</th>
-                                    <th>Keterangan / Alasan</th>
+                                    <th>Alasan Pembatalan</th>
                                     <th>Status Akhir</th>
                                 </tr>
                             </thead>
@@ -641,21 +689,22 @@
                                     <tr>
                                         <td><span class="font-mono text-xs font-bold">{{ $item->booking_code }}</span></td>
                                         <td>{{ $item->vehicle->name }}</td>
-                                        <td>{{ $item->user->name }}</td>
-                                        <td>Rp {{ number_format($item->total_payment > 0 ? $item->total_payment : $item->subtotal, 0, ',', '.') }}</td>
-                                        <td class="text-xs text-slate-500 max-w-xs">
-                                            @if($item->status === 'rejected')
-                                                <span class="text-rose-600 font-medium">{{ $item->reject_reason ?? 'Ditolak Manager' }}</span>
-                                            @else
-                                                <span class="text-slate-500">Dibatalkan oleh Pelanggan</span>
+                                        <td>
+                                            <div class="font-semibold">{{ $item->user->name }}</div>
+                                            @if($item->ktp_image)
+                                                <button type="button" 
+                                                        onclick="openViewKtpModal('{{ asset('storage/' . $item->ktp_image) }}', '{{ addslashes($item->user->name) }}', '{{ $item->booking_code }}', '{{ addslashes($item->vehicle->name) }}')"
+                                                        class="mt-1 inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold bg-sky-100 hover:bg-sky-200 text-sky-800 dark:bg-sky-950 dark:text-sky-300 transition shadow-sm">
+                                                    <span>🪪</span> Lihat KTP
+                                                </button>
                                             @endif
                                         </td>
+                                        <td>Rp {{ number_format($item->total_payment > 0 ? $item->total_payment : $item->subtotal, 0, ',', '.') }}</td>
+                                        <td class="text-xs max-w-xs">
+                                            <span class="text-slate-700 dark:text-slate-300 font-medium">{{ $item->cancel_reason ?? 'Dibatalkan oleh Pelanggan' }}</span>
+                                        </td>
                                         <td>
-                                            @if($item->status === 'rejected')
-                                                <span class="px-2.5 py-1 bg-rose-100 text-rose-800 text-xs font-bold rounded-full" title="Alasan: {{ $item->reject_reason }}">🚫 Ditolak</span>
-                                            @else
-                                                <span class="px-2.5 py-1 bg-slate-100 text-slate-700 text-xs font-bold rounded-full">❌ Dibatalkan</span>
-                                            @endif
+                                            <span class="px-2.5 py-1 bg-slate-100 text-slate-700 text-xs font-bold rounded-full">❌ Dibatalkan</span>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -666,7 +715,71 @@
                         {{ $cancelledRentals->links() }}
                     </div>
                 @else
-                    <div class="empty-box">Tidak ada transaksi yang dibatalkan atau ditolak.</div>
+                    <div class="empty-box">Tidak ada transaksi yang dibatalkan oleh pelanggan.</div>
+                @endif
+            </div>
+            @endif
+
+            <!-- ======================================================== -->
+            <!-- 8. RIWAYAT DITOLAK (REJECTED)                            -->
+            <!-- ======================================================== -->
+            @if($statusFilter === 'all' || $statusFilter === 'rejected')
+            <div class="section-card border-l-4 border-l-rose-500">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="section-title text-slate-800 dark:text-slate-200">
+                        <span>🚫</span> Riwayat Ditolak (Manager)
+                    </h3>
+                    <span class="text-xs font-bold px-2.5 py-1 bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-200 rounded-full">
+                        {{ $rejectedRentals->total() ?? count($rejectedRentals) }} Transaksi
+                    </span>
+                </div>
+                <p class="text-xs text-slate-500 mb-4">Arsip pengajuan sewa/booking yang ditolak oleh pihak cabang beserta catatan alasannya.</p>
+
+                @if(count($rejectedRentals) > 0)
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Kode Booking</th>
+                                    <th>Kendaraan</th>
+                                    <th>Penyewa</th>
+                                    <th>Total Bayar</th>
+                                    <th>Alasan Penolakan</th>
+                                    <th>Status Akhir</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($rejectedRentals as $item)
+                                    <tr>
+                                        <td><span class="font-mono text-xs font-bold">{{ $item->booking_code }}</span></td>
+                                        <td>{{ $item->vehicle->name }}</td>
+                                        <td>
+                                            <div class="font-semibold">{{ $item->user->name }}</div>
+                                            @if($item->ktp_image)
+                                                <button type="button" 
+                                                        onclick="openViewKtpModal('{{ asset('storage/' . $item->ktp_image) }}', '{{ addslashes($item->user->name) }}', '{{ $item->booking_code }}', '{{ addslashes($item->vehicle->name) }}')"
+                                                        class="mt-1 inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold bg-sky-100 hover:bg-sky-200 text-sky-800 dark:bg-sky-950 dark:text-sky-300 transition shadow-sm">
+                                                    <span>🪪</span> Lihat KTP
+                                                </button>
+                                            @endif
+                                        </td>
+                                        <td>Rp {{ number_format($item->total_payment > 0 ? $item->total_payment : $item->subtotal, 0, ',', '.') }}</td>
+                                        <td class="text-xs max-w-xs">
+                                            <span class="text-rose-600 font-medium">{{ $item->reject_reason ?? 'Ditolak oleh Manager' }}</span>
+                                        </td>
+                                        <td>
+                                            <span class="px-2.5 py-1 bg-rose-100 text-rose-800 text-xs font-bold rounded-full" title="Alasan: {{ $item->reject_reason }}">🚫 Ditolak</span>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-4">
+                        {{ $rejectedRentals->links() }}
+                    </div>
+                @else
+                    <div class="empty-box">Tidak ada pengajuan sewa yang ditolak.</div>
                 @endif
             </div>
             @endif
@@ -887,5 +1000,57 @@
                 noteInput.value = '';
             }
         }
+
+        function openViewKtpModal(imageUrl, userName, bookingCode, vehicleName) {
+            const modal = document.getElementById('modalViewKtp');
+            const img = document.getElementById('viewKtpImage');
+            const sub = document.getElementById('viewKtpSubtitle');
+            const dl = document.getElementById('viewKtpDownload');
+            if (modal && img) {
+                img.src = imageUrl;
+                if (dl) dl.href = imageUrl;
+                if (sub) sub.textContent = userName + ' • ' + bookingCode + ' • ' + vehicleName;
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+        }
+        function closeViewKtpModal() {
+            const modal = document.getElementById('modalViewKtp');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
     </script>
+
+    <!-- ======================================================== -->
+    <!-- MODAL 4: PREVIEW KTP PELANGGAN                           -->
+    <!-- ======================================================== -->
+    <div id="modalViewKtp" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/75 backdrop-blur-md">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-2xl w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800">
+            <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-100 dark:border-slate-800">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-10 h-10 rounded-xl bg-sky-100 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 flex items-center justify-center text-xl">
+                        🪪
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900 dark:text-white">Foto Jaminan KTP Pelanggan</h3>
+                        <p id="viewKtpSubtitle" class="text-xs text-slate-500"></p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeViewKtpModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center text-sm font-bold transition">✕</button>
+            </div>
+
+            <div class="relative bg-slate-950/5 dark:bg-slate-950/50 rounded-2xl p-2 flex items-center justify-center min-h-[300px] max-h-[70vh] overflow-hidden">
+                <img id="viewKtpImage" src="" alt="Foto KTP Jaminan" class="max-h-[65vh] w-auto max-w-full rounded-xl object-contain shadow-md transition-transform hover:scale-[1.02]">
+            </div>
+
+            <div class="mt-4 flex items-center justify-between gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+                <a id="viewKtpDownload" href="" target="_blank" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-[#004B87] hover:bg-[#003B6F] text-white transition shadow-sm">
+                    <span>↗️</span> Buka Ukuran Penuh
+                </a>
+                <button type="button" onclick="closeViewKtpModal()" class="py-2 px-5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl font-bold text-xs transition">Tutup</button>
+            </div>
+        </div>
+    </div>
 </x-app-layout>

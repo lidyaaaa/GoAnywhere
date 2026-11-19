@@ -37,6 +37,7 @@ class Cart extends Model
         'damage_fee',
         'damage_note',
         'reject_reason',
+        'cancel_reason',
         'extra_charge',
         'extra_charge_note',
         'dispute_note',

@@ -39,9 +39,10 @@ class RentalController extends Controller
             }
         };
 
-        // Ringkasan hitungan badge per status
+        // Ringkasan hitungan badge per status (hanya menghitung transaksi sewa nyata, abaikan item keranjang 'pending' yang belum dicheckout)
+        $validStatuses = ['paid', 'approved', 'active', 'pending_return', 'pending_payment', 'completed', 'cancelled', 'rejected'];
+        
         $counts = [
-            'all' => Cart::whereHas('vehicle', fn($q) => $q->where('location', $location))->count(),
             'paid' => Cart::where('status', 'paid')->whereHas('vehicle', fn($q) => $q->where('location', $location))->count(),
             'approved' => Cart::where('status', 'approved')->whereHas('vehicle', fn($q) => $q->where('location', $location))->count(),
             'active' => Cart::where('status', 'active')->whereHas('vehicle', fn($q) => $q->where('location', $location))->count(),
@@ -51,6 +52,8 @@ class RentalController extends Controller
             'cancelled' => Cart::where('status', 'cancelled')->whereHas('vehicle', fn($q) => $q->where('location', $location))->count(),
             'rejected' => Cart::where('status', 'rejected')->whereHas('vehicle', fn($q) => $q->where('location', $location))->count(),
         ];
+        // 'all' adalah total dari seluruh transaksi aktif dan riwayat di cabang ini (tanpa status pending keranjang)
+        $counts['all'] = array_sum($counts);
 
         // 1. Menunggu Persetujuan Manager (Status: PAID)
         $pendingApprovalsQuery = Cart::where('status', 'paid')
@@ -102,15 +105,25 @@ class RentalController extends Controller
             ? $completedRentalsQuery->paginate(10, ['*'], 'completed_page')->appends($request->all())
             : new \Illuminate\Pagination\LengthAwarePaginator([], 0, 10, null, ['pageName' => 'completed_page']);
 
-        // 7. Riwayat Dibatalkan & Ditolak (Cancelled & Rejected)
-        $cancelledRentalsQuery = Cart::whereIn('status', ['cancelled', 'rejected'])
+        // 7. Riwayat Dibatalkan oleh Pelanggan (Status: CANCELLED)
+        $cancelledRentalsQuery = Cart::where('status', 'cancelled')
             ->whereHas('vehicle', fn($q) => $q->where('location', $location))
             ->with(['vehicle', 'user'])
             ->orderBy('updated_at', 'desc');
         $applySearch($cancelledRentalsQuery);
-        $cancelledRentals = ($statusFilter === 'all' || in_array($statusFilter, ['cancelled', 'rejected']))
+        $cancelledRentals = ($statusFilter === 'all' || $statusFilter === 'cancelled')
             ? $cancelledRentalsQuery->paginate(10, ['*'], 'cancelled_page')->appends($request->all())
             : new \Illuminate\Pagination\LengthAwarePaginator([], 0, 10, null, ['pageName' => 'cancelled_page']);
+
+        // 8. Riwayat Ditolak oleh Pihak Rental (Status: REJECTED)
+        $rejectedRentalsQuery = Cart::where('status', 'rejected')
+            ->whereHas('vehicle', fn($q) => $q->where('location', $location))
+            ->with(['vehicle', 'user'])
+            ->orderBy('updated_at', 'desc');
+        $applySearch($rejectedRentalsQuery);
+        $rejectedRentals = ($statusFilter === 'all' || $statusFilter === 'rejected')
+            ? $rejectedRentalsQuery->paginate(10, ['*'], 'rejected_page')->appends($request->all())
+            : new \Illuminate\Pagination\LengthAwarePaginator([], 0, 10, null, ['pageName' => 'rejected_page']);
 
         // Tambahkan kalkulasi keterlambatan & link WhatsApp untuk sewa aktif & pending return
         $activeRentals->each(function (Cart $rental) {
@@ -131,6 +144,7 @@ class RentalController extends Controller
             'pendingPayments',
             'completedRentals',
             'cancelledRentals',
+            'rejectedRentals',
             'statusFilter',
             'search',
             'counts'
@@ -258,6 +272,28 @@ class RentalController extends Controller
     }
 
     /**
+     * 2b. Konfirmasi Unit Tiba di Gerai Cabang (Status: PENDING_RETURN)
+     * Detik tombol ini ditekan oleh Manager, timer denda keterlambatan resmi berhenti
+     * dan unit berpindah ke tab "Menunggu Cek Fisik Unit".
+     */
+    public function arrive(Request $request, $id)
+    {
+        $location = auth()->user()->location;
+        $cart = Cart::where('id', $id)
+            ->where('status', 'active')
+            ->whereHas('vehicle', fn($q) => $q->where('location', $location))
+            ->with(['vehicle', 'user'])
+            ->firstOrFail();
+
+        $cart->status = 'pending_return';
+        $cart->returned_at = now();
+        $cart->save();
+
+        return redirect()->route('manager.rentals', ['status' => 'pending_return'])
+            ->with('success', "Unit {$cart->vehicle->name} (Booking #{$cart->booking_code}) telah dikonfirmasi tiba di gerai! Silakan lanjutkan ke pemeriksaan fisik kendaraan.");
+    }
+
+    /**
      * 3. Pengecekan Fisik Unit & Pengembalian (Unit Aman vs Unit Rusak)
      */
     public function inspectReturn(Request $request, $id)
@@ -279,8 +315,8 @@ class RentalController extends Controller
             ->with(['vehicle', 'user'])
             ->firstOrFail();
 
-        $now = now();
-        $late = LateFeeCalculator::calculate($cart, $now);
+        $returnTime = $cart->returned_at ? \Illuminate\Support\Carbon::parse($cart->returned_at) : now();
+        $late = LateFeeCalculator::calculate($cart, $returnTime);
         $isLate = $late['is_late'];
         $lateFine = (float) $late['fine_amount'];
         $lateMinutes = (int) $late['late_minutes'];
@@ -294,7 +330,7 @@ class RentalController extends Controller
 
         DB::beginTransaction();
         try {
-            $cart->returned_at = $now;
+            $cart->returned_at = $returnTime;
             $cart->is_late = $isLate;
             $cart->late_minutes = $lateMinutes;
             $cart->fine_amount = $lateFine;

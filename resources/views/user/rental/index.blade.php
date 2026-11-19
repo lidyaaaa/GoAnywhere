@@ -349,12 +349,11 @@
                                         </td>
                                         <td>
                                             <div class="flex items-center gap-2">
-                                                <form action="{{ route('user.rental.cancel', $item->booking_code) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan booking ini? Dana pembayaran Anda akan otomatis diproses untuk pengembalian dana penuh.')">
-                                                    @csrf
-                                                    <button type="submit" class="btn-action-danger">
-                                                        <span>❌</span> Batalkan Pesanan
-                                                    </button>
-                                                </form>
+                                                <button type="button" 
+                                                        class="btn-action-danger" 
+                                                        onclick="openCancelModal('{{ $item->booking_code }}', '{{ addslashes($item->vehicle->name ?? 'Kendaraan') }}')">
+                                                    <span>❌</span> Batalkan Pesanan
+                                                </button>
                                                 <a href="{{ route('user.chat.start', ['vehicle_id' => $item->vehicle_id]) }}" class="btn-chat-link">
                                                     💬 Chat Manager
                                                 </a>
@@ -457,7 +456,7 @@
                                     <th>Mulai Sewa (Handover)</th>
                                     <th>Batas Wajib Kembali</th>
                                     <th>Status Waktu</th>
-                                    <th>Aksi Pengembalian</th>
+                                    <th>Prosedur Pengembalian</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -489,13 +488,18 @@
                                             @endif
                                         </td>
                                         <td>
-                                            <div class="flex items-center gap-2">
-                                                <a href="{{ route('user.rental.return', $item->id) }}" class="btn-action-primary bg-emerald-600 hover:bg-emerald-700">
-                                                    <span>🏁</span> Kembalikan Unit
-                                                </a>
-                                                <a href="{{ route('user.chat.start', ['vehicle_id' => $item->vehicle_id]) }}" class="btn-chat-link">
-                                                    💬 Chat
-                                                </a>
+                                            <div class="flex flex-col gap-1.5 max-w-xs">
+                                                <div class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                                                    <span>🏢</span> Bawa ke Gerai {{ $item->vehicle->location }}
+                                                </div>
+                                                <div class="text-[11px] text-slate-500 leading-tight">
+                                                    Serahkan unit & kunci ke petugas gerai untuk konfirmasi tiba & cek fisik.
+                                                </div>
+                                                <div class="mt-0.5">
+                                                    <a href="{{ route('user.chat.start', ['vehicle_id' => $item->vehicle_id]) }}" class="btn-chat-link inline-flex">
+                                                        💬 Chat Manager
+                                                    </a>
+                                                </div>
                                             </div>
                                         </td>
                                     </tr>
@@ -542,7 +546,7 @@
                                         <td><span class="font-mono font-bold text-purple-700">{{ $item->booking_code }}</span></td>
                                         <td class="font-bold">{{ $item->vehicle->name }}</td>
                                         <td class="text-xs">
-                                            {{ $item->return_date ? \Carbon\Carbon::parse($item->return_date)->format('d M Y, H:i') : '-' }}
+                                            {{ ($item->returned_at ?? $item->return_date) ? \Carbon\Carbon::parse($item->returned_at ?? $item->return_date)->format('d M Y, H:i') : '-' }}
                                         </td>
                                         <td>
                                             <span class="px-2.5 py-1 bg-purple-50 dark:bg-purple-950/60 text-purple-800 dark:text-purple-200 text-xs font-semibold rounded-lg inline-flex items-center gap-1.5">
@@ -700,19 +704,19 @@
             @endif
 
             <!-- ======================================================== -->
-            <!-- 7. RIWAYAT DIBATALKAN & DITOLAK                          -->
+            <!-- 7. RIWAYAT DIBATALKAN (CANCELLED)                        -->
             <!-- ======================================================== -->
-            @if($statusFilter === 'all' || in_array($statusFilter, ['cancelled', 'rejected']))
-            <div class="section-card border-l-4 border-l-rose-400">
+            @if($statusFilter === 'all' || $statusFilter === 'cancelled')
+            <div class="section-card border-l-4 border-l-slate-400">
                 <div class="flex items-center justify-between mb-2">
                     <h3 class="section-title text-slate-800 dark:text-slate-200">
-                        <span>❌</span> Riwayat Dibatalkan & Ditolak
+                        <span>❌</span> Riwayat Dibatalkan (Customer)
                     </h3>
-                    <span class="text-xs font-bold px-2.5 py-1 bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-200 rounded-full">
+                    <span class="text-xs font-bold px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-full">
                         {{ $cancelledRentals->total() ?? count($cancelledRentals) }} Transaksi
                     </span>
                 </div>
-                <p class="text-xs text-slate-500 mb-4">Arsip transaksi rental kendaraan yang dibatalkan oleh Anda atau ditolak oleh Manager cabang.</p>
+                <p class="text-xs text-slate-500 mb-4">Arsip transaksi rental kendaraan yang Anda batalkan sebelum masa sewa dimulai.</p>
 
                 @if(count($cancelledRentals) > 0)
                     <div class="table-wrap">
@@ -724,7 +728,7 @@
                                     <th>Tanggal Booking</th>
                                     <th>Durasi Sewa</th>
                                     <th>Total Pembayaran</th>
-                                    <th>Keterangan / Alasan</th>
+                                    <th>Alasan Pembatalan</th>
                                     <th>Status Akhir</th>
                                 </tr>
                             </thead>
@@ -745,19 +749,11 @@
                                         <td class="font-bold text-slate-700 dark:text-slate-300">
                                             Rp {{ number_format($item->total_payment > 0 ? $item->total_payment : $item->subtotal, 0, ',', '.') }}
                                         </td>
-                                        <td class="text-xs text-slate-500 max-w-xs">
-                                            @if($item->status === 'rejected')
-                                                <span class="text-rose-600 font-medium">{{ $item->reject_reason ?? 'Ditolak oleh Manager gerai' }}</span>
-                                            @else
-                                                <span class="text-slate-500">Dibatalkan oleh Pelanggan</span>
-                                            @endif
+                                        <td class="text-xs max-w-xs">
+                                            <span class="text-slate-700 dark:text-slate-300 font-medium">{{ $item->cancel_reason ?? 'Dibatalkan oleh Pelanggan' }}</span>
                                         </td>
                                         <td>
-                                            @if($item->status === 'rejected')
-                                                <span class="px-2.5 py-1 bg-rose-100 text-rose-800 text-xs font-bold rounded-full" title="Alasan: {{ $item->reject_reason ?? 'Ditolak Manager' }}">🚫 Ditolak</span>
-                                            @else
-                                                <span class="px-2.5 py-1 bg-slate-100 text-slate-700 text-xs font-bold rounded-full">❌ Dibatalkan</span>
-                                            @endif
+                                            <span class="px-2.5 py-1 bg-slate-100 text-slate-700 text-xs font-bold rounded-full">❌ Dibatalkan</span>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -768,7 +764,73 @@
                         {{ $cancelledRentals->links() }}
                     </div>
                 @else
-                    <div class="empty-box">Tidak ada transaksi yang dibatalkan atau ditolak.</div>
+                    <div class="empty-box">Tidak ada transaksi yang Anda batalkan.</div>
+                @endif
+            </div>
+            @endif
+
+            <!-- ======================================================== -->
+            <!-- 8. RIWAYAT DITOLAK (REJECTED)                            -->
+            <!-- ======================================================== -->
+            @if($statusFilter === 'all' || $statusFilter === 'rejected')
+            <div class="section-card border-l-4 border-l-rose-500">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="section-title text-slate-800 dark:text-slate-200">
+                        <span>🚫</span> Riwayat Ditolak (Manager)
+                    </h3>
+                    <span class="text-xs font-bold px-2.5 py-1 bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-200 rounded-full">
+                        {{ $rejectedRentals->total() ?? count($rejectedRentals) }} Transaksi
+                    </span>
+                </div>
+                <p class="text-xs text-slate-500 mb-4">Arsip pengajuan rental kendaraan yang ditolak oleh Manager cabang beserta alasannya.</p>
+
+                @if(count($rejectedRentals) > 0)
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Kode Booking</th>
+                                    <th>Kendaraan</th>
+                                    <th>Tanggal Booking</th>
+                                    <th>Durasi Sewa</th>
+                                    <th>Total Pembayaran</th>
+                                    <th>Alasan Penolakan</th>
+                                    <th>Status Akhir</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($rejectedRentals as $item)
+                                    <tr>
+                                        <td><span class="font-mono text-xs font-bold text-slate-900 dark:text-white">{{ $item->booking_code }}</span></td>
+                                        <td>
+                                            <div class="font-bold text-slate-900 dark:text-white">{{ $item->vehicle->name ?? 'N/A' }}</div>
+                                            <div class="text-xs text-slate-500">📍 Gerai {{ $item->vehicle->location ?? '-' }}</div>
+                                        </td>
+                                        <td>{{ \Carbon\Carbon::parse($item->created_at)->format('d M Y') }}</td>
+                                        <td>
+                                            <span class="px-2 py-0.5 rounded text-xs font-semibold {{ $item->period === 'weekly' ? 'bg-purple-100 text-purple-800' : 'bg-slate-100 text-slate-800' }}">
+                                                {{ $item->period === 'weekly' ? '🎁 Paket 7 Hari' : ($item->quantity_days ?? 1) . ' Hari' }}
+                                            </span>
+                                        </td>
+                                        <td class="font-bold text-slate-700 dark:text-slate-300">
+                                            Rp {{ number_format($item->total_payment > 0 ? $item->total_payment : $item->subtotal, 0, ',', '.') }}
+                                        </td>
+                                        <td class="text-xs max-w-xs">
+                                            <span class="text-rose-600 font-medium">{{ $item->reject_reason ?? 'Ditolak oleh Manager gerai' }}</span>
+                                        </td>
+                                        <td>
+                                            <span class="px-2.5 py-1 bg-rose-100 text-rose-800 text-xs font-bold rounded-full" title="Alasan: {{ $item->reject_reason ?? 'Ditolak Manager' }}">🚫 Ditolak</span>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-4">
+                        {{ $rejectedRentals->links() }}
+                    </div>
+                @else
+                    <div class="empty-box">Tidak ada pengajuan sewa yang ditolak oleh Manager.</div>
                 @endif
             </div>
             @endif
@@ -842,4 +904,78 @@
         </div>
     @endif
 
+    <!-- ======================================================== -->
+    <!-- MODAL: FORM ALASAN PEMBATALAN BOOKING OLEH USER          -->
+    <!-- ======================================================== -->
+    <div id="modalCancelBooking" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 transform animate-scale-up">
+            <div class="w-14 h-14 bg-rose-100 dark:bg-rose-950/60 text-rose-600 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-3 shadow-inner">
+                ⚠️
+            </div>
+            <h3 class="text-lg font-bold text-slate-900 dark:text-white text-center mb-1">
+                Batalkan Pesanan
+            </h3>
+            <p class="text-xs text-slate-500 text-center mb-4 leading-relaxed">
+                Pesanan <span id="cancelVehicleName" class="font-bold text-slate-700 dark:text-slate-300"></span> (<span id="cancelBookingCodeDisplay" class="font-mono font-bold text-[#004B87]"></span>) akan dibatalkan dan dana Anda akan diproses untuk pengembalian dana penuh.
+            </p>
+
+            <form id="cancelBookingForm" method="POST" action="">
+                @csrf
+                <div class="mb-4 text-left">
+                    <label for="cancel_reason" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                        Alasan Pembatalan <span class="text-rose-500">*</span>
+                    </label>
+                    <textarea name="cancel_reason" 
+                              id="cancel_reason" 
+                              rows="3" 
+                              required 
+                              minlength="5"
+                              maxlength="500"
+                              placeholder="Tulis alasan pembatalan Anda di sini (misal: ada perubahan rencana, salah armada, dll)..." 
+                              class="w-full text-xs rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white p-3 focus:ring-2 focus:ring-[#004B87] focus:outline-none resize-none"></textarea>
+                    <span class="text-[10px] text-slate-400 mt-1 block">Minimal 5 karakter. Alasan ini akan tercatat untuk evaluasi pihak cabang.</span>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <button type="button" 
+                            onclick="closeCancelModal()" 
+                            class="w-1/2 py-2.5 px-4 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl font-bold text-xs transition">
+                        Kembali
+                    </button>
+                    <button type="submit" 
+                            class="w-1/2 py-2.5 px-4 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold text-xs transition shadow-md hover:shadow-rose-500/25">
+                        Ya, Batalkan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openCancelModal(bookingCode, vehicleName) {
+            const modal = document.getElementById('modalCancelBooking');
+            const form = document.getElementById('cancelBookingForm');
+            const codeDisplay = document.getElementById('cancelBookingCodeDisplay');
+            const vehicleDisplay = document.getElementById('cancelVehicleName');
+            const textarea = document.getElementById('cancel_reason');
+
+            if (modal && form) {
+                form.action = "{{ url('/user/rental/cancel') }}/" + bookingCode;
+                if (codeDisplay) codeDisplay.textContent = bookingCode;
+                if (vehicleDisplay) vehicleDisplay.textContent = vehicleName;
+                if (textarea) textarea.value = '';
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                setTimeout(() => { if (textarea) textarea.focus(); }, 100);
+            }
+        }
+
+        function closeCancelModal() {
+            const modal = document.getElementById('modalCancelBooking');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+    </script>
 </x-app-layout>
